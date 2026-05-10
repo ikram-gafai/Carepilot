@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: carepilot-postgres
+    restart: unless-stopped
+    # Port hôte 5433 : évite les conflits avec un PostgreSQL local souvent déjà sur 5432 (Windows).
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: carepilot
+      POSTGRES_PASSWORD: carepilot
+      POSTGRES_DB: carepilot
+    volumes:
+      - carepilot_pgdata:/var/lib/postgresql/data
+
+volumes:
+  carepilot_pgdata:

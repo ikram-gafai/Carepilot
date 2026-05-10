@@ -36,7 +36,6 @@ export function BenchmarkDashboard({ report }: { report: BenchmarkReport }) {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-base font-semibold tracking-tight">Benchmarks &amp; évaluation</h1>
         <p className="text-[11px] text-muted-foreground">
           Vue administrative — métriques plafonnées à 95 %. Généré :{" "}
           <span className="tabular-nums">{new Date(report.generatedAt).toLocaleString("fr-FR")}</span>

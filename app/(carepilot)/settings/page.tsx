@@ -1,9 +1,10 @@
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function SettingsPage() {
   return (
     <div className="space-y-3">
-      <h1 className="text-lg font-semibold tracking-tight">Settings</h1>
+      <CarePilotSetHeader title="Settings" />
       <Card className="border-border bg-background shadow-none">
         <CardHeader className="border-b border-border py-3">
           <CardTitle className="text-sm">Configuration locale</CardTitle>

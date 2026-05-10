@@ -1,5 +1,6 @@
 import { asc } from "drizzle-orm"
 
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
@@ -25,8 +26,8 @@ export default async function KmPage() {
 
   return (
     <div className="space-y-3">
+      <CarePilotSetHeader title="KM Procedures" />
       <div>
-        <h1 className="text-lg font-semibold tracking-tight">KM Procedures</h1>
         <p className="text-xs text-muted-foreground">
           Catalogue simulateur — CAREPILOT ne génère pas de nouvelles procédures.
         </p>

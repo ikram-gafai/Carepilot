@@ -4,6 +4,8 @@ export type DashboardMetrics = {
   backlog: number
   ticketsByStatus: Record<string, number>
   slaAtRisk: number
+  /** Share of finished syncs marked success among the last N runs (null if none). */
+  syncSuccessRate: number | null
   escalationRate: number
   transferRate: number
   missingInformationRate: number
@@ -65,6 +67,26 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     ticketsByStatus[r.status] = r.c
   }
 
+  const syncRateRows = await sql`
+    WITH recent AS (
+      SELECT status
+      FROM carepilot.sync_logs
+      WHERE sync_finished_at IS NOT NULL
+      ORDER BY sync_started_at DESC
+      LIMIT 25
+    )
+    SELECT
+      COUNT(*)::int AS n,
+      COUNT(*) FILTER (WHERE lower(status) = 'success')::int AS successes
+    FROM recent;
+  `
+  type SyncRateRow = { n: number; successes: number }
+  const syncRate = syncRateRows[0] as SyncRateRow | undefined
+  const syncSuccessRate =
+    syncRate && syncRate.n > 0
+      ? Math.min(1, Math.max(0, syncRate.successes / syncRate.n))
+      : null
+
   const syncRows = await sql`
     SELECT sync_finished_at, status, tickets_imported, tickets_updated, error_message
     FROM carepilot.sync_logs
@@ -86,6 +108,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     backlog: agg?.backlog ?? 0,
     ticketsByStatus,
     slaAtRisk: agg?.sla_at_risk ?? 0,
+    syncSuccessRate,
     escalationRate: clampPct(Number(agg?.escalation_rate ?? 0)),
     transferRate: clampPct(Number(agg?.transfer_rate ?? 0)),
     missingInformationRate: clampPct(Number(agg?.missing_information_rate ?? 0)),

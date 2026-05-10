@@ -1,12 +1,13 @@
 import Link from "next/link"
 
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function SimilarTicketsPage() {
   return (
     <div className="space-y-3">
+      <CarePilotSetHeader title="Similar Tickets" />
       <div>
-        <h1 className="text-lg font-semibold tracking-tight">Similar Tickets</h1>
         <p className="text-xs text-muted-foreground">
           La recherche sémantique est exécutée via PostgreSQL + pgvector après synchronisation.
         </p>

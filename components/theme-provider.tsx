@@ -3,9 +3,6 @@
 import * as React from "react"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 
-/**
- * Application en mode clair uniquement (pas de thème système ni sombre).
- */
 function ThemeProvider({
   children,
   ...props
@@ -13,9 +10,9 @@ function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="light"
-      enableSystem={false}
-      forcedTheme="light"
+      defaultTheme="system"
+      enableSystem
+      storageKey="carepilot-theme"
       disableTransitionOnChange
       {...props}
     >

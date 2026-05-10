@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -26,8 +27,8 @@ export default async function TicketsPage() {
 
   return (
     <div className="space-y-3">
+      <CarePilotSetHeader title="Tickets FO VLP" />
       <div>
-        <h1 className="text-lg font-semibold tracking-tight">Tickets FO VLP</h1>
         <p className="text-xs text-muted-foreground">
           File opérationnelle — données synchronisées vers CAREPILOT.
         </p>

@@ -1,6 +1,7 @@
 "use client"
 
 import type { CSSProperties } from "react"
+import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import {
   IconAlertOctagon,
@@ -11,9 +12,11 @@ import {
 } from "@tabler/icons-react"
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { resolvedTheme } = useTheme()
+
   return (
     <Sonner
-      theme="light"
+      theme={resolvedTheme === "dark" ? "dark" : "light"}
       className="toaster group"
       icons={{
         success: <IconCircleCheck className="size-4" />,

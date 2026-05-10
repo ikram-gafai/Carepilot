@@ -1,11 +1,15 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
 import {
   IconChevronDown,
+  IconDeviceDesktop,
   IconHome,
   IconLogout,
+  IconMoon,
   IconSettings,
+  IconSun,
 } from "@tabler/icons-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -13,6 +17,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -25,8 +32,10 @@ import {
 import { cn } from "@/lib/utils"
 
 const DEFAULT_USER = {
-  name: "Agent opérationnel",
+  name: "Ikram Gafai",
   email: "console.carepilot@interne.local",
+  /** Shown under the name; falls back to `email` when omitted. */
+  subtitle: "Super Admin",
   avatar: "" as string | undefined,
 }
 
@@ -40,10 +49,12 @@ function initials(name: string) {
 export function CarePilotSidebarFooter({
   user = DEFAULT_USER,
 }: {
-  user?: { name: string; email: string; avatar?: string }
+  user?: { name: string; email: string; subtitle?: string; avatar?: string }
 }) {
   const router = useRouter()
   const { isMobile } = useSidebar()
+  const { theme, setTheme } = useTheme()
+  const profileLine = user.subtitle ?? user.email
 
   return (
     <SidebarFooter className="gap-0 border-t border-sidebar-border p-0">
@@ -53,7 +64,7 @@ export function CarePilotSidebarFooter({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                title={`${user.name} — ${user.email}`}
+                title={`${user.name} — ${profileLine}`}
                 className={cn(
                   "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-xl px-2 py-2 text-left text-sm text-sidebar-foreground ring-sidebar-ring outline-none transition-[width,height,padding]",
                   "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
@@ -75,9 +86,9 @@ export function CarePilotSidebarFooter({
                   </Avatar>
                 </span>
                 <div className="grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs font-normal text-muted-foreground">
-                    {user.email}
+                    {profileLine}
                   </span>
                 </div>
                 <IconChevronDown className="ml-auto size-5 shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden" />
@@ -101,12 +112,44 @@ export function CarePilotSidebarFooter({
                   </Avatar>
                 </span>
                 <div className="grid min-w-0 flex-1 leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user.email}
+                    {profileLine}
                   </span>
                 </div>
               </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide">
+                Thème
+              </DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={
+                  theme === "dark" ? "dark" : theme === "light" ? "light" : "system"
+                }
+                onValueChange={(v) => setTheme(v)}
+              >
+                <DropdownMenuRadioItem
+                  value="light"
+                  className="gap-2 rounded-xl py-2 pl-2 [&_svg]:size-5!"
+                >
+                  <IconSun className="opacity-70" />
+                  Clair
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem
+                  value="dark"
+                  className="gap-2 rounded-xl py-2 pl-2 [&_svg]:size-5!"
+                >
+                  <IconMoon className="opacity-70" />
+                  Sombre
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem
+                  value="system"
+                  className="gap-2 rounded-xl py-2 pl-2 [&_svg]:size-5!"
+                >
+                  <IconDeviceDesktop className="opacity-70" />
+                  Système
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="gap-2 rounded-xl py-2 [&_svg]:size-5!"

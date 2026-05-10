@@ -1,3 +1,4 @@
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { BenchmarkDashboard } from "@/components/benchmark-dashboard"
 import {
   type BenchmarkReport,
@@ -14,5 +15,10 @@ export default async function BenchmarksPage() {
     const msg = e instanceof Error ? e.message : String(e)
     report = offlineBenchmarkReport(msg)
   }
-  return <BenchmarkDashboard report={report} />
+  return (
+    <>
+      <CarePilotSetHeader title="Benchmarks & évaluation" />
+      <BenchmarkDashboard report={report} />
+    </>
+  )
 }

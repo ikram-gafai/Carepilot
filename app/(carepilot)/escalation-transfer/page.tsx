@@ -1,13 +1,14 @@
 import { InfoIcon } from "lucide-react"
 
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function EscalationTransferPage() {
   return (
     <div className="space-y-3">
+      <CarePilotSetHeader title="Escalation & Transfer Assistance" />
       <div>
-        <h1 className="text-lg font-semibold tracking-tight">Escalation &amp; Transfer Assistance</h1>
         <p className="text-xs text-muted-foreground">
           MVP : moteur de règles (pas de ML entraîné). Endpoint :{" "}
           <code className="rounded bg-muted px-1">POST /api/decision/assist</code>.

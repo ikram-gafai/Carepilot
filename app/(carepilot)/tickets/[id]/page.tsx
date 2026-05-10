@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { ConfidenceBandBadge } from "@/components/confidence-band"
 import { TicketAgentDecisionForm } from "@/components/ticket-agent-decision-form"
 import { TicketEntitiesTable } from "@/components/ticket-detail/ticket-entities-table"
@@ -37,6 +38,8 @@ export default async function TicketDetailPage(props: PageProps) {
 
   return (
     <div className="space-y-4">
+      <CarePilotSetHeader title={source.title} />
+
       <TicketPipelineBanner
         hasAnalysis={hasAnalysis}
         hasSimilar={hasSimilar}
@@ -55,7 +58,6 @@ export default async function TicketDetailPage(props: PageProps) {
             <span className="text-border">·</span>
             <span className="font-mono text-[10px]">CP#{ticket.id}</span>
           </div>
-          <h1 className="text-lg font-semibold leading-snug tracking-tight">{source.title}</h1>
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="outline" className="text-[10px] font-normal">
               {ticket.status}

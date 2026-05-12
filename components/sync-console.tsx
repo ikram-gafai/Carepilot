@@ -32,7 +32,7 @@ export function SyncConsole() {
       </div>
       {log ? (
         <ScrollArea className="h-72 rounded-md border border-border">
-          <pre className="p-3 font-mono text-[11px] leading-snug">{log}</pre>
+          <pre className="p-3 text-[11px] leading-snug">{log}</pre>
         </ScrollArea>
       ) : (
         <p className="text-muted-foreground">

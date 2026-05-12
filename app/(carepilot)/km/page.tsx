@@ -52,7 +52,7 @@ export default async function KmPage() {
               <TableBody>
                 {rows.map((r) => (
                   <TableRow key={r.id} className="text-xs">
-                    <TableCell className="py-2 font-mono text-[11px]">{r.kmCode}</TableCell>
+                    <TableCell className="py-2 text-[11px]">{r.kmCode}</TableCell>
                     <TableCell className="py-2">{r.title}</TableCell>
                     <TableCell className="py-2">{r.perimeter}</TableCell>
                     <TableCell className="py-2">{r.category}</TableCell>

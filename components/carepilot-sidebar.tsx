@@ -4,14 +4,8 @@ import * as React from "react"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  IconBook,
-  IconBookFilled,
-  IconCloudComputing,
-  IconCloudComputingFilled,
-  IconExchange,
-  IconExchangeFilled,
-  IconGauge,
-  IconGaugeFilled,
+  IconChartAreaLine,
+  IconChartAreaLineFilled,
   IconLayoutDashboard,
   IconLayoutDashboardFilled,
   IconSearch,
@@ -20,8 +14,6 @@ import {
   IconSettingsFilled,
   IconTicket,
   IconTicketFilled,
-  IconVersions,
-  IconVersionsFilled,
 } from "@tabler/icons-react"
 
 import {
@@ -66,15 +58,9 @@ const OPERATION_ICONS: Record<
     Filled: IconLayoutDashboardFilled,
   },
   "/tickets": { Outline: IconTicket, Filled: IconTicketFilled },
-  "/similar": { Outline: IconVersions, Filled: IconVersionsFilled },
-  "/km": { Outline: IconBook, Filled: IconBookFilled },
-  "/escalation-transfer": {
-    Outline: IconExchange,
-    Filled: IconExchangeFilled,
-  },
-  "/sync": {
-    Outline: IconCloudComputing,
-    Filled: IconCloudComputingFilled,
+  "/analytics": {
+    Outline: IconChartAreaLine,
+    Filled: IconChartAreaLineFilled,
   },
 }
 
@@ -90,7 +76,6 @@ const ADMIN_LINK_ICONS: Record<
     Filled: React.ComponentType<{ className?: string }>
   }
 > = {
-  "/benchmarks": { Outline: IconGauge, Filled: IconGaugeFilled },
   "/settings": { Outline: IconSettings, Filled: IconSettingsFilled },
 }
 
@@ -99,16 +84,16 @@ const adminLinkNav: NavItem[] = CAREPILOT_ADMIN_LINK_ROUTES.map((r) => {
   return { title: r.title, url: r.url, Outline: icons.Outline, Filled: icons.Filled }
 })
 
-const secondaryNav: NavItem[] = [
-  {
-    title: "Search",
-    url: CAREPILOT_COMMAND_TAB_VALUE,
-    Outline: IconSearch,
-    Filled: IconSearchFilled,
-    shortcutKeys: ["Ctrl", "K"],
-  },
-  ...adminLinkNav,
-]
+const searchNavItem: NavItem = {
+  title: "Search",
+  url: CAREPILOT_COMMAND_TAB_VALUE,
+  Outline: IconSearch,
+  Filled: IconSearchFilled,
+  shortcutKeys: ["Ctrl", "K"],
+}
+
+/** Operations + Search + Settings */
+const topNav: NavItem[] = [...mainNav, searchNavItem, ...adminLinkNav]
 
 function navIsActive(pathname: string, url: string) {
   return pathname === url || pathname.startsWith(`${url}/`)
@@ -135,11 +120,10 @@ export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
   const { open: commandOpen, setOpen: setCommandOpen } = useCarePilotCommand()
 
-  const mainValue = navSectionValue(pathname, mainNav)
-  const adminLinkValue = navSectionValue(pathname, adminLinkNav)
-  const secondaryTabValue = commandOpen
+  const topPathNav: NavItem[] = [...mainNav, ...adminLinkNav]
+  const topTabValue = commandOpen
     ? CAREPILOT_COMMAND_TAB_VALUE
-    : (adminLinkValue ?? null)
+    : (navSectionValue(pathname, topPathNav) ?? null)
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -163,41 +147,7 @@ export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
             <Tabs
               orientation="vertical"
               className="w-full gap-0"
-              value={mainValue ?? null}
-              onValueChange={(v) => {
-                setCommandOpen(false)
-                router.push(String(v))
-              }}
-            >
-              <TabsList
-                variant="default"
-                className="h-auto w-full flex-col gap-0.5 rounded-[20px] bg-sidebar-accent/40 p-1 text-sidebar-foreground"
-              >
-                {mainNav.map((item) => (
-                  <TabsTrigger
-                    key={item.url}
-                    value={item.url}
-                    title={item.title}
-                    className={tabTriggerClass}
-                  >
-                    <TablerTabsTriggerIcons
-                      Outline={item.Outline}
-                      Filled={item.Filled}
-                    />
-                    <span className={tabLabelClass}>{item.title}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup className="mt-auto shrink-0 pt-2">
-          <SidebarGroupLabel>Administration</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <Tabs
-              orientation="vertical"
-              className="w-full gap-0"
-              value={secondaryTabValue}
+              value={topTabValue}
               onValueChange={(v) => {
                 if (v === CAREPILOT_COMMAND_TAB_VALUE) {
                   setCommandOpen(true)
@@ -211,7 +161,7 @@ export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 variant="default"
                 className="h-auto w-full flex-col gap-0.5 rounded-[20px] bg-sidebar-accent/40 p-1 text-sidebar-foreground"
               >
-                {secondaryNav.map((item) => (
+                {topNav.map((item) => (
                   <TabsTrigger
                     key={item.url}
                     value={item.url}
@@ -232,7 +182,7 @@ export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         {item.shortcutKeys.map((key) => (
                           <kbd
                             key={key}
-                            className="rounded border border-sidebar-border bg-sidebar px-1 py-px font-mono text-[10px] font-medium text-muted-foreground shadow-xs"
+                            className="rounded border border-sidebar-border bg-sidebar px-1 py-px text-[10px] font-medium text-muted-foreground shadow-xs"
                           >
                             {key}
                           </kbd>

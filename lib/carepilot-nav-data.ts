@@ -3,14 +3,10 @@ export type CarePilotRoute = { title: string; url: string }
 
 export const CAREPILOT_OPERATION_ROUTES: CarePilotRoute[] = [
   { title: "Dashboard", url: "/dashboard" },
-  { title: "Tickets FO VLP", url: "/tickets" },
-  { title: "Similar Tickets", url: "/similar" },
-  { title: "KM Procedures", url: "/km" },
-  { title: "Escalation & Transfer Assistance", url: "/escalation-transfer" },
-  { title: "Synchronization", url: "/sync" },
+  { title: "Tickets", url: "/tickets" },
+  { title: "Analytics", url: "/analytics" },
 ]
 
 export const CAREPILOT_ADMIN_LINK_ROUTES: CarePilotRoute[] = [
-  { title: "Benchmarks", url: "/benchmarks" },
   { title: "Settings", url: "/settings" },
 ]

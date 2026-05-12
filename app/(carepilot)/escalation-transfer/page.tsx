@@ -27,7 +27,7 @@ export default function EscalationTransferPage() {
         <CardHeader className="border-b border-border py-3">
           <CardTitle className="text-sm">Principes opérationnels</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 py-3 text-xs leading-relaxed text-muted-foreground">
+        <CardContent className="space-y-2 pb-3 text-xs leading-relaxed text-muted-foreground">
           <ul className="list-inside list-disc space-y-1">
             <li>KM applicable mais non appliquée → éviter escalade N3 prématurée.</li>
             <li>KM appliquée + échec + historiques sensibles → signaler « échec de procédure ».</li>

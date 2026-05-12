@@ -56,7 +56,7 @@ export function BenchmarkDashboard({ report }: { report: BenchmarkReport }) {
                   {key.replace(/_/g, " ")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="py-2">
+              <CardContent className="pb-2 pt-0">
                 <div className="text-lg font-semibold tabular-nums">{pct(val)}</div>
                 <p className="mt-0.5 text-[10px] text-muted-foreground">≤ 95 % (règle MVP)</p>
               </CardContent>
@@ -70,7 +70,7 @@ export function BenchmarkDashboard({ report }: { report: BenchmarkReport }) {
           <CardHeader className="border-b border-border py-3">
             <CardTitle className="text-sm">Retrieval KM — precision@k</CardTitle>
           </CardHeader>
-          <CardContent className="h-[220px] pt-3">
+          <CardContent className="h-[220px] pb-3 pt-0">
             {chartData.length === 0 ? (
               <p className="text-[11px] text-muted-foreground">Pas de données golden KM.</p>
             ) : (
@@ -83,7 +83,7 @@ export function BenchmarkDashboard({ report }: { report: BenchmarkReport }) {
                     formatter={(value) => [`${Number(value ?? 0)}%`, "Hit rate"]}
                     contentStyle={{ fontSize: 11 }}
                   />
-                  <Bar dataKey="value" fill="#64748b" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" fill="var(--primary)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -126,7 +126,7 @@ export function BenchmarkDashboard({ report }: { report: BenchmarkReport }) {
           <CardTitle className="text-sm">Matrice confusion — buckets escalade/transfert (rule-based)</CardTitle>
           <p className="text-[11px] font-normal text-muted-foreground">{confusion.note}</p>
         </CardHeader>
-        <CardContent className="overflow-x-auto py-3">
+        <CardContent className="overflow-x-auto pb-3 pt-0">
           {confusion.labels.length === 0 ? (
             <p className="text-[11px] text-muted-foreground">Pas de décisions golden à comparer.</p>
           ) : (

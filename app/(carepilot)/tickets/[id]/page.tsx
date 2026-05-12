@@ -5,23 +5,41 @@ import { CarePilotSetHeader } from "@/components/carepilot-page-header"
 import { ConfidenceBandBadge } from "@/components/confidence-band"
 import { TicketAgentDecisionForm } from "@/components/ticket-agent-decision-form"
 import { TicketEntitiesTable } from "@/components/ticket-detail/ticket-entities-table"
+import {
+  TicketHeroSummary,
+  ticketHeroMetaPillClass,
+} from "@/components/ticket-detail/ticket-hero-summary"
 import { TicketPipelineBanner } from "@/components/ticket-detail/ticket-pipeline-banner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { getDb } from "@/lib/db"
-import { loadTicketDetail } from "@/lib/queries/ticket-detail"
+import { TicketDemoWorkspace } from "@/components/ticket-detail/ticket-demo-workspace"
+import { TicketShellHeaderActions } from "@/components/ticket-detail/ticket-shell-header-actions"
+import { getDbOrNull } from "@/lib/db"
+import { findDemoQueueRowByRef } from "@/lib/tickets-demo-detail"
+import {
+  loadTicketDetail,
+  loadTicketDetailByCareTicketId,
+} from "@/lib/queries/ticket-detail"
 
 type PageProps = { params: Promise<{ id: string }> }
 
 export default async function TicketDetailPage(props: PageProps) {
-  const { id } = await props.params
-  const ticketId = Number.parseInt(id, 10)
-  if (Number.isNaN(ticketId)) notFound()
+  const { id: rawId } = await props.params
+  const id = decodeURIComponent(rawId)
 
-  const db = getDb()
-  const data = await loadTicketDetail(db, ticketId)
+  const db = getDbOrNull()
+  if (!db) {
+    const demoRow = findDemoQueueRowByRef(id)
+    if (!demoRow) notFound()
+    return <TicketDemoWorkspace row={demoRow} />
+  }
+
+  const numericId = Number.parseInt(id, 10)
+  const data = Number.isNaN(numericId)
+    ? await loadTicketDetailByCareTicketId(db, id)
+    : await loadTicketDetail(db, numericId)
   if (!data || !data.source) notFound()
 
   const { ticket, source, analysis, similar, kmRecos, decisions, timeline } = data
@@ -36,9 +54,44 @@ export default async function TicketDetailPage(props: PageProps) {
   const hasKmRecos = kmRecos.length > 0
   const hasDecision = Boolean(aiDecision)
 
+  const priorityLabel =
+    ticket.priority === "P1"
+      ? "High"
+      : ticket.priority === "P2"
+        ? "Medium"
+        : ticket.priority === "P3"
+          ? "Low"
+          : ticket.priority
+
+  const now = new Date()
+
+  let slaLabel = "—"
+  let slaBreached = false
+  if (source.slaDueAt) {
+    const due = new Date(source.slaDueAt)
+    if (due < now) {
+      slaBreached = true
+      const mins = Math.max(1, Math.floor((now.getTime() - due.getTime()) / 60_000))
+      slaLabel = `breached by ${mins}m`
+    } else {
+      slaLabel = `due ${due.toLocaleString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`
+    }
+  }
+
   return (
     <div className="space-y-4">
-      <CarePilotSetHeader title={source.title} />
+      <CarePilotSetHeader
+        breadcrumbLabel="Tickets"
+        breadcrumbHref="/tickets"
+        title={source.careTicketId}
+        trailingActions={<TicketShellHeaderActions />}
+      />
 
       <TicketPipelineBanner
         hasAnalysis={hasAnalysis}
@@ -47,35 +100,41 @@ export default async function TicketDetailPage(props: PageProps) {
         hasDecision={hasDecision}
       />
 
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3">
-        <div className="min-w-0 space-y-1">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-            <Link href="/tickets" className="hover:text-foreground hover:underline">
-              ← Tickets FO VLP
-            </Link>
-            <span className="text-border">/</span>
-            <span className="font-mono">{source.careTicketId}</span>
-            <span className="text-border">·</span>
-            <span className="font-mono text-[10px]">CP#{ticket.id}</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <Badge variant="outline" className="text-[10px] font-normal">
-              {ticket.status}
-            </Badge>
-            <Badge variant="outline" className="text-[10px] font-normal">
-              {ticket.priority}
-            </Badge>
-            <Badge variant="outline" className="text-[10px] font-normal">
-              {ticket.perimeter}
-            </Badge>
-            {source.channel ? (
-              <Badge variant="outline" className="text-[10px] font-normal">
-                {source.channel}
+      <TicketHeroSummary
+        ticketId={source.careTicketId}
+        title={source.title}
+        badges={
+          <>
+            {slaBreached ? (
+              <Badge variant="destructive" className="text-[10px] font-medium">
+                Breached
               </Badge>
             ) : null}
-          </div>
-        </div>
-      </div>
+            <Badge className={ticketHeroMetaPillClass}>{source.perimeter.replaceAll("_", " / ")}</Badge>
+            <Badge className={ticketHeroMetaPillClass}>{priorityLabel}</Badge>
+            {source.channel ? (
+              <Badge className={ticketHeroMetaPillClass}>{source.channel}</Badge>
+            ) : null}
+          </>
+        }
+        metrics={[
+          { label: "Requester", value: "—" },
+          { label: "SMAC", value: source.storeCode ?? "—" },
+          { label: "Caisse", value: source.cashRegisterCode ?? "—" },
+          { label: "Status", value: ticket.status },
+          { label: "SLA", value: slaLabel },
+          {
+            label: "Last update",
+            value: new Date(ticket.updatedAt).toLocaleString("fr-FR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ]}
+      />
 
       {tags.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
@@ -94,7 +153,7 @@ export default async function TicketDetailPage(props: PageProps) {
 
       <div className="grid gap-4 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-7">
-          <Card className="border-border bg-background shadow-none">
+          <Card className="border-border bg-background py-0 shadow-none">
             <CardHeader className="border-b border-border py-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <CardTitle className="text-sm">Synthèse &amp; analyse</CardTitle>
@@ -103,7 +162,7 @@ export default async function TicketDetailPage(props: PageProps) {
                 ) : null}
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 py-3 text-xs">
+            <CardContent className="space-y-3 pb-3 text-xs">
               <div>
                 <div className="text-[11px] font-semibold text-muted-foreground">Résumé problème</div>
                 <p className="mt-1 leading-relaxed">
@@ -145,11 +204,11 @@ export default async function TicketDetailPage(props: PageProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-background shadow-none">
+          <Card className="border-border bg-background py-0 shadow-none">
             <CardHeader className="border-b border-border py-3">
               <CardTitle className="text-sm">Tickets similaires (retrieval)</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 py-3 text-xs">
+            <CardContent className="space-y-3 pb-3 text-xs">
               {similar.length === 0 ? (
                 <div className="space-y-2 text-muted-foreground">
                   <p className="text-[11px]">Aucun résultat — le ticket n’a pas encore été vectorisé ou la sync est incomplète.</p>
@@ -161,7 +220,7 @@ export default async function TicketDetailPage(props: PageProps) {
                 similar.map((s) => (
                   <div key={`${s.similarId}-${s.rank}`} className="rounded border border-border bg-muted/20 p-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="font-mono text-[11px]">
+                      <div className="text-[11px]">
                         <Link
                           className="text-primary underline-offset-2 hover:underline"
                           href={`/tickets/${s.similarId}`}
@@ -189,11 +248,11 @@ export default async function TicketDetailPage(props: PageProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-background shadow-none">
+          <Card className="border-border bg-background py-0 shadow-none">
             <CardHeader className="border-b border-border py-3">
               <CardTitle className="text-sm">Recommandations KM (catalogue existant)</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 py-3 text-xs">
+            <CardContent className="space-y-3 pb-3 text-xs">
               {kmRecos.length === 0 ? (
                 <div className="space-y-2 text-muted-foreground">
                   <p className="text-[11px]">Pas de reco — pipeline KM non exécuté ou corpus vide.</p>
@@ -233,11 +292,11 @@ export default async function TicketDetailPage(props: PageProps) {
         </div>
 
         <div className="space-y-4 xl:col-span-5">
-          <Card className="border-border bg-background shadow-none">
+          <Card className="border-border bg-background py-0 shadow-none">
             <CardHeader className="border-b border-border py-3">
               <CardTitle className="text-sm">Escalade &amp; transfert — assistance IA</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 py-3 text-xs">
+            <CardContent className="space-y-3 pb-3 text-xs">
               {!aiDecision ? (
                 <div className="space-y-2 text-muted-foreground">
                   <p className="text-[11px]">Pas encore de suggestion — exécutez la synchronisation / pipeline.</p>
@@ -279,11 +338,14 @@ export default async function TicketDetailPage(props: PageProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-background shadow-none">
+          <Card
+            id="ticket-agent-decision-section"
+            className="scroll-mt-24 border-border bg-background py-0 shadow-none"
+          >
             <CardHeader className="border-b border-border py-3">
               <CardTitle className="text-sm">Décision agent (manuelle)</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 py-3 text-xs">
+            <CardContent className="space-y-3 pb-3 text-xs">
               <div className="rounded border border-dashed border-border bg-muted/20 p-2">
                 <div className="text-[11px] font-semibold text-muted-foreground">Suggestion IA vs décision agent</div>
                 <p className="mt-1 text-[11px]">
@@ -318,11 +380,11 @@ export default async function TicketDetailPage(props: PageProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-background shadow-none">
+          <Card className="border-border bg-background py-0 shadow-none">
             <CardHeader className="border-b border-border py-3">
               <CardTitle className="text-sm">Timeline opérationnelle</CardTitle>
             </CardHeader>
-            <CardContent className="py-3">
+            <CardContent className="pb-3 pt-0">
               <ol className="relative space-y-0 border-l border-border pl-4 text-xs">
                 {timeline.map((ev, idx) => (
                   <li key={`${ev.kind}-${idx}-${ev.occurredAt.toISOString()}`} className="relative pb-4 pl-1">

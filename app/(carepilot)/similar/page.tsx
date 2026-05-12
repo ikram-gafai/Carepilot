@@ -16,7 +16,7 @@ export default function SimilarTicketsPage() {
         <CardHeader className="border-b border-border py-3">
           <CardTitle className="text-sm">Navigation</CardTitle>
         </CardHeader>
-        <CardContent className="py-3 text-xs text-muted-foreground">
+        <CardContent className="pb-3 pt-0 text-xs text-muted-foreground">
           Ouvrez un ticket dans la{" "}
           <Link href="/tickets" className="text-primary underline-offset-2 hover:underline">
             file Tickets FO VLP

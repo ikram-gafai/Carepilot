@@ -34,7 +34,7 @@ export function TicketPipelineBanner({ hasAnalysis, hasSimilar, hasKmRecos, hasD
         </ul>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-xl text-[11px] leading-snug text-amber-950/75">
-            Ré-enqueuez via <span className="font-mono text-foreground">POST /api/sync/care</span> jusqu’à traitement
+            Ré-enqueuez via <span className="text-foreground">POST /api/sync/care</span> jusqu’à traitement
             complet, ou relancez un POST analyze sur ce ticket.
           </p>
           <Button variant="outline" size="sm" className="h-8 shrink-0 text-xs" asChild>

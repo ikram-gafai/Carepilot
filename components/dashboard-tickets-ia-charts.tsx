@@ -42,7 +42,7 @@ function buildIaDecisionsDemo(): Record<string, unknown>[] {
 const chartCard =
   "min-h-0 gap-0 py-0 border-border bg-background shadow-none"
 const chartHeader = "shrink-0 space-y-0 px-3 pb-0 pt-3"
-const chartContent = "min-h-0 px-3 pb-3 pt-1.5"
+const chartContent = "min-h-0 px-3 pb-3"
 const chartInner =
   "overflow-hidden rounded-2xl bg-muted/55 p-2.5 shadow-none dark:bg-muted/35"
 

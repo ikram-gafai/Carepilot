@@ -36,7 +36,7 @@ export function TicketEntitiesTable({ entities }: { entities: Record<string, unk
               <TableCell className="py-1.5 align-top font-medium text-muted-foreground">
                 {formatLabel(key)}
               </TableCell>
-              <TableCell className="py-1.5 align-top font-mono text-[11px] leading-snug break-all">
+              <TableCell className="py-1.5 align-top text-[11px] leading-snug break-all">
                 {formatValue(val)}
               </TableCell>
             </TableRow>

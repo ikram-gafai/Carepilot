@@ -115,6 +115,29 @@ export async function loadTicketDetail(db: Db, carepilotTicketId: number) {
   }
 }
 
+/** Resolve CARE ticket id (e.g. `INC-2025-0148`) to the same payload as {@link loadTicketDetail}. */
+export async function loadTicketDetailByCareTicketId(db: Db, careTicketId: string) {
+  const srcRows = await db
+    .select()
+    .from(careSourceTickets)
+    .where(eq(careSourceTickets.careTicketId, careTicketId))
+    .limit(1)
+
+  const src = srcRows[0]
+  if (!src) return null
+
+  const cpRows = await db
+    .select()
+    .from(carepilotTickets)
+    .where(eq(carepilotTickets.sourceTicketId, src.id))
+    .limit(1)
+
+  const cp = cpRows[0]
+  if (!cp) return null
+
+  return loadTicketDetail(db, cp.id)
+}
+
 async function buildMergedTimeline(
   db: Db,
   cp: typeof carepilotTickets.$inferSelect,

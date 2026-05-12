@@ -11,6 +11,7 @@ import {
   ticketActions,
   ticketComments,
 } from "@/lib/db/schema/care-source"
+import { DEMO_TICKETS_QUEUE } from "@/lib/tickets-demo-queue"
 
 function mulberry32(seed: number) {
   return function () {
@@ -304,13 +305,23 @@ async function main() {
       finalAction = finalAction ?? "Transfer Hardware (demande mag — à valider)"
     }
 
+    const demoSlot = i - 1 < DEMO_TICKETS_QUEUE.length ? DEMO_TICKETS_QUEUE[i - 1]! : undefined
+    const careTicketId = demoSlot?.ticketId ?? `CARE-VLP-${String(i).padStart(6, "0")}`
+    const seedTitle = demoSlot?.subject ?? title
+    const seedDescription = demoSlot
+      ? `${demoSlot.subject}. Alignement démo CAREPILOT — périmètre ${demoSlot.perimeter}.`
+      : description
+    const seedPerimeter = demoSlot
+      ? demoSlot.perimeter.replace(/\s*\/\s*/g, "_").replace(/\s+/g, "")
+      : "FO_VLP"
+
     const [ticketRow] = await db
       .insert(careSourceTickets)
       .values({
-        careTicketId: `CARE-VLP-${String(i).padStart(6, "0")}`,
-        title,
-        description,
-        perimeter: "FO_VLP",
+        careTicketId,
+        title: seedTitle,
+        description: seedDescription,
+        perimeter: seedPerimeter,
         status,
         priority: priorities[Math.floor(rnd() * priorities.length)]!,
         channel: rnd() < 0.8 ? "PORTAL" : "PHONE",

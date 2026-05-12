@@ -18,6 +18,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { getChartSeriesColors } from "@/lib/chart-series-colors"
 import {
   Select,
   SelectContent,
@@ -126,17 +127,18 @@ const chartData = [
   { date: "2024-06-30", desktop: 446, mobile: 400 },
 ]
 
+const [areaColorDesktop, areaColorMobile] = getChartSeriesColors(2)
 const chartConfig = {
   visitors: {
     label: "Visitors",
   },
   desktop: {
     label: "Desktop",
-    color: "var(--primary)",
+    color: areaColorDesktop,
   },
   mobile: {
     label: "Mobile",
-    color: "var(--primary)",
+    color: areaColorMobile,
   },
 } satisfies ChartConfig
 
@@ -203,7 +205,7 @@ export function ChartAreaInteractive() {
           </Select>
         </CardAction>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+      <CardContent className="px-2 sm:px-6">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"

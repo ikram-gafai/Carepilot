@@ -5,8 +5,9 @@ export function getCarePilotFallbackTitle(pathname: string): string {
   }
 
   const exact: Record<string, string> = {
-    "/dashboard": "Operational dashboard",
-    "/tickets": "Tickets FO VLP",
+    "/dashboard": "Dashboard",
+    "/tickets": "Tickets",
+    "/analytics": "Analytics",
     "/similar": "Similar Tickets",
     "/km": "KM Procedures",
     "/escalation-transfer": "Escalation & Transfer Assistance",

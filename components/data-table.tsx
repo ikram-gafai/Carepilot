@@ -48,6 +48,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { getChartSeriesColors } from "@/lib/chart-series-colors"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Drawer,
@@ -666,14 +667,15 @@ const chartData = [
   { month: "June", desktop: 214, mobile: 140 },
 ]
 
+const [tableChartDesktop, tableChartMobile] = getChartSeriesColors(2)
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "var(--primary)",
+    color: tableChartDesktop,
   },
   mobile: {
     label: "Mobile",
-    color: "var(--primary)",
+    color: tableChartMobile,
   },
 } satisfies ChartConfig
 

@@ -6,8 +6,13 @@ import * as carepilotSchema from "./schema/carepilot"
 
 const schema = { ...careSourceSchema, ...carepilotSchema }
 
+/** True when `DATABASE_URL` is set (non-empty). Safe to call from any runtime. */
+export function hasDatabaseUrl(): boolean {
+  return Boolean(process.env.DATABASE_URL?.trim())
+}
+
 function requireDatabaseUrl(): string {
-  const url = process.env.DATABASE_URL
+  const url = process.env.DATABASE_URL?.trim()
   if (!url) {
     throw new Error("DATABASE_URL is not set")
   }
@@ -24,6 +29,12 @@ export function getSql() {
     globalForDb.carepilotSql = postgres(requireDatabaseUrl(), { max: 10 })
   }
   return globalForDb.carepilotSql
+}
+
+/** Returns Drizzle client, or `null` when no database URL (offline / demo UI). */
+export function getDbOrNull(): ReturnType<typeof getDb> | null {
+  if (!hasDatabaseUrl()) return null
+  return getDb()
 }
 
 export function getDb() {

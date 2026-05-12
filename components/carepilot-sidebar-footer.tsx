@@ -35,7 +35,7 @@ const DEFAULT_USER = {
   name: "Ikram Gafai",
   email: "console.carepilot@interne.local",
   /** Shown under the name; falls back to `email` when omitted. */
-  subtitle: "Super Admin",
+  subtitle: "Agent Account",
   avatar: "" as string | undefined,
 }
 

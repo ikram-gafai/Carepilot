@@ -16,7 +16,7 @@ export default function SyncPage() {
         <CardHeader className="border-b border-border py-3">
           <CardTitle className="text-sm">Console de synchronisation</CardTitle>
         </CardHeader>
-        <CardContent className="py-3">
+        <CardContent className="pb-3 pt-0">
           <SyncConsole />
         </CardContent>
       </Card>

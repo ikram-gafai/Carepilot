@@ -1,210 +1,113 @@
 # CAREPILOT
 
+Internal operational assistance platform (Front Office VLP): sync from a CARE simulator (`care_source.*`), enrichment in `carepilot.*`, semantic search with PostgreSQL + pgvector, and an ITSM-style console UI.
 
+## Prerequisites
 
-Plateforme interne d’assistance opérationnelle (Front Office VLP) : synchronisation depuis un simulateur CARE (`care_source.*`), enrichissement dans `carepilot.*`, recherche sémantique PostgreSQL + pgvector, et UI type console ITSM.
-
-
-
-## Prérequis
-
-
-
-- [Bun](https://bun.sh/) (ou Node équivalent)
-
+- [Bun](https://bun.sh/) (or equivalent Node)
 - Docker (PostgreSQL + pgvector via `docker-compose.yml`)
 
-
-
-## Démarrage base de données
-
-
+## Database setup
 
 ```bash
-
 docker compose up -d
 
-cp .env.example .env.local   # recommandé ; sinon scripts → URL Docker par défaut (voir ci‑dessous)
+cp .env.example .env.local   # recommended; otherwise scripts use the default Docker URL (see below)
 
 bun run db:ping
 
 bun run db:init
 
 bun run db:seed
-
 ```
 
+Without `.env` / `.env.local` or without `DATABASE_URL`, scripts use **`postgresql://carepilot:carepilot@localhost:5433/carepilot`** (host port from compose). The container listens on **5433** on the host to avoid clashes with a system PostgreSQL often already on **5432** (common on Windows). Add `.env.local` to override.
 
+### Docker: database creation and Drizzle
 
-Sans `.env` / `.env.local` ou sans `DATABASE_URL`, les scripts utilisent **`postgresql://carepilot:carepilot@localhost:5433/carepilot`** (port hôte du compose). Le conteneur écoute sur **5433** côté machine hôte pour éviter les conflits avec un PostgreSQL système souvent déjà sur **5432** (cas fréquent sous Windows). Ajoutez `.env.local` pour surcharger.
+On the **first** `docker compose up -d`, the Postgres image automatically creates:
 
-### Docker : création de la base et Drizzle
+- user: `carepilot`
+- password: `carepilot`
+- **database**: `carepilot` (`POSTGRES_DB`)
 
-Au **premier** `docker compose up -d`, l’image Postgres crée automatiquement :
+You do not need to create the database manually unless you want an **extra** database (then `docker exec -it carepilot-postgres psql -U carepilot -d postgres -c "CREATE DATABASE ..."`).
 
-- utilisateur : `carepilot`
-- mot de passe : `carepilot`
-- **base de données** : `carepilot` (`POSTGRES_DB`)
+**Drizzle connection**: the same `DATABASE_URL` is used by the app ([`lib/db/index.ts`](lib/db/index.ts)) and Drizzle Kit ([`drizzle.config.ts`](drizzle.config.ts), which loads `.env` / `.env.local` like the scripts).
 
-Tu n’as pas besoin de créer la base à la main sauf si tu veux une base **supplémentaire** (alors `docker exec -it carepilot-postgres psql -U carepilot -d postgres -c "CREATE DATABASE ..."`).
+Useful commands (container already running, SQL schema applied with `db:init` or aligned with Drizzle):
 
-**Connexion Drizzle** : le même `DATABASE_URL` sert à l’app ([`lib/db/index.ts`](lib/db/index.ts)) et à Drizzle Kit ([`drizzle.config.ts`](drizzle.config.ts), qui charge `.env` / `.env.local` comme les scripts).
+| Command | Purpose |
+| ------- | ------- |
+| `bun run db:ping` | Check that Postgres responds |
+| `bun run db:push` | Push the schema from `lib/db/schema/*.ts` to the database |
+| `bun run db:studio` | Drizzle Studio UI for this database |
+| `bun run db:generate` | Generate SQL migration files under `./drizzle` |
 
-Commandes utiles (conteneur déjà démarré, schéma SQL appliqué avec `db:init` ou aligné avec Drizzle) :
+MVP workflow: **`docker compose up -d`** then **`DATABASE_URL=…5433/carepilot`** in `.env` / `.env.local`, then **`bun run db:init`** (DDL + `vector` extension) before **`db:seed`**.
 
-| Commande | Rôle |
-|----------|------|
-| `bun run db:ping` | Vérifie que Postgres répond |
-| `bun run db:push` | Pousse le schéma défini dans `lib/db/schema/*.ts` vers la base |
-| `bun run db:studio` | UI Drizzle Studio sur cette base |
-| `bun run db:generate` | Génère des fichiers SQL de migration dans `./drizzle` |
+The seed creates **520 anonymized operational tickets** by default (adjust with `SEED_TICKET_COUNT`).
 
-En pratique MVP : **`docker compose up -d`** puis **`DATABASE_URL=…5433/carepilot`** dans `.env` / `.env.local`, puis **`bun run db:init`** (DDL + extension `vector`) avant **`db:seed`**.
+### Demo checklist (happy path)
 
-La seed génère par défaut **520 tickets synthétiques anonymisés** (variable `SEED_TICKET_COUNT` pour ajuster).
+1. **Docker**: `docker compose up -d`
+2. **Schema**: `bun run db:init`
+3. **Simulator data**: `bun run db:seed`
+4. **App**: `bun run dev`
+5. **Sync CARE → CAREPILOT**: call `POST /api/sync/care` in a loop until `pendingRemaining: 0` (batched; see below).
+6. **UI**: `/dashboard` then `/tickets` → open a ticket (`/tickets/[id]`): analysis, similar tickets, KM, escalation & transfer, timeline.
+7. **ML preparation**: use `bun run db:ensure-ml-training`, `bun run db:seed:ml-training`, and the notebooks under `ml/notebooks/escalation`.
 
+### Schema and Drizzle
 
+- Local DDL source of truth is `sql/init.sql` (`db:init`).
+- Optional: align a dev environment with `bun run db:push`, or generate migration files with `bun run db:generate` (`DATABASE_URL` + `drizzle.config.ts`), without replacing the Docker bootstrap above.
 
-### Checklist démo (flux nominal)
+### ML benchmarking
 
-
-
-1. **Docker** : `docker compose up -d`
-
-2. **Schéma** : `bun run db:init`
-
-3. **Données simulateur** : `bun run db:seed`
-
-4. **Application** : `bun run dev`
-
-5. **Sync CARE → CAREPILOT** : appeler `POST /api/sync/care` en boucle jusqu’à `pendingRemaining: 0` (batch limité, voir ci‑dessous).
-
-6. **Parcours UI** : `/dashboard` puis `/tickets` → ouvrir un ticket (`/tickets/[id]`) : analyse, similaires, KM, escalade & transfert, timeline.
-
-7. **Benchmarks (optionnel)** : `bun run db:seed:golden` puis `/benchmarks` ou `bun run benchmark:eval`.
-
-
-
-### Schéma et Drizzle
-
-
-
-- La vérité DDL locale est `sql/init.sql` (`db:init`).
-
-- Optionnel : aligner un environnement de dev avec `bun run db:push`, ou générer des fichiers de migration avec `bun run db:generate` (`DATABASE_URL` + `drizzle.config.ts`), sans remplacer l’initialisation Docker décrite ci‑dessus.
-
-
-
-### Benchmarks (golden set)
-
-
-
-Après synchronisation complète des tickets :
-
-
-
-```bash
-
-bun run db:seed:golden
-
-bun run benchmark:eval
-
-```
-
-
-
-Les métriques rapportées sont volontairement **plafonnées à 95 %** dans le moteur de rapport (réalisme académique).
-
-
+Escalation prediction benchmarking is organized under `ml/notebooks/escalation`, with shared outputs in `ml/artifacts`, `ml/plots`, and `ml/reports`.
 
 ### Tests
 
-
-
 ```bash
-
 bun test tests
-
 ```
 
+Optional Postgres smoke: `RUN_INTEGRATION=1` and `DATABASE_URL` pointing at a reachable instance.
 
-
-Smoke Postgres optionnel : `RUN_INTEGRATION=1` et `DATABASE_URL` pointant vers une instance joignable.
-
-
-
-## Synchronisation CARE → CAREPILOT
-
-
+## CARE → CAREPILOT sync
 
 ```bash
-
 curl -X POST http://localhost:3000/api/sync/care
-
 ```
 
+Processing is **batched** (`CARE_SYNC_BATCH_LIMIT`, default **80**) to limit timeouts; repeat the call until `pendingRemaining: 0`.
 
+Each synced ticket runs the pipeline: analysis → pgvector embedding → similar tickets → KM recommendations → escalation & transfer suggestion → aggregate updates shown on the **dashboard**.
 
-Le traitement est **par batch** (`CARE_SYNC_BATCH_LIMIT`, défaut **80**) pour limiter les timeouts ; répétez l’appel jusqu’à `pendingRemaining: 0`.
-
-
-
-Chaque ticket synchronisé déclenche le pipeline : analyse → embedding pgvector → tickets similaires → reco KM → suggestion escalade & transfert → mise à jour des agrégats consultables au **dashboard**.
-
-
-
-## Application Next.js
-
-
+## Next.js app
 
 ```bash
-
 bun run dev
-
 ```
 
+- `/dashboard` — aggregated metrics (PostgreSQL)
+- `/tickets` and `/tickets/[id]` — queue and detail (timeline, recommendations, escalation/transfer, agent override)
+- `/sync`, `/km`, `/escalation-transfer`, `/settings`
 
+## Main APIs
 
-- `/dashboard` — métriques agrégées (PostgreSQL)
+Uniform error responses: `{ "ok": false, "error": "…" }` (HTTP 4xx/5xx per route).
 
-- `/tickets` et `/tickets/[id]` — file et détail (timeline, reco, escalade/transfert, override agent)
-
-- `/sync`, `/km`, `/escalation-transfer`, `/benchmarks`, `/settings`
-
-
-
-## API principales
-
-
-
-Réponses d’erreur homogènes : `{ "ok": false, "error": "…" }` (HTTP 4xx/5xx selon route).
-
-
-
-- `POST /api/sync/care` — sync batch ; corps de réponse inchangé (`ok`, `imported`, `updated`, `pendingRemaining`, …).
-
-- `POST /api/tickets/analyze` · `POST /api/tickets/similar` · `POST /api/km/recommend` · `POST /api/decision/assist` — corps `{ "ticketId": number }` ; succès `{ "ok": true, "ticketId", "stage": "…" }`.
-
-- `GET /api/dashboard/metrics` — `{ "ok": true, …métriques }` (backlog, `ticketsByStatus`, dernier sync, etc.).
-
-- `GET /api/benchmarks/report` — `{ "ok": true, "report": { … } }` (métriques, matrices, precision@k).
-
-- `PATCH /api/tickets/[id]/decision` — décision agent manuelle `{ "agentFinalDecision": "…", "notes"? }`.
-
-
+- `POST /api/sync/care` — batch sync; response body unchanged (`ok`, `imported`, `updated`, `pendingRemaining`, …).
+- `POST /api/tickets/analyze` · `POST /api/tickets/similar` · `POST /api/km/recommend` · `POST /api/decision/assist` — body `{ "ticketId": number }`; success `{ "ok": true, "ticketId", "stage": "…" }`.
+- `GET /api/dashboard/metrics` — `{ "ok": true, …metrics }` (backlog, `ticketsByStatus`, last sync, etc.).
+- `PATCH /api/tickets/[id]/decision` — manual agent decision `{ "agentFinalDecision": "…", "notes"? }`.
 
 ## shadcn/ui
 
-
-
-Ajout de composants :
-
-
+Add components:
 
 ```bash
-
 npx shadcn@latest add button
-
 ```
-
-

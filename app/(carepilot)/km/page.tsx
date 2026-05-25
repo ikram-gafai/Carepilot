@@ -29,7 +29,7 @@ export default async function KmPage() {
       <CarePilotSetHeader title="KM Procedures" />
       <div>
         <p className="text-xs text-muted-foreground">
-          Catalogue simulateur — CAREPILOT ne génère pas de nouvelles procédures.
+          Simulator catalog — CAREPILOT does not generate new procedures.
         </p>
       </div>
       {error ? (
@@ -37,16 +37,16 @@ export default async function KmPage() {
       ) : (
         <Card className="border-border bg-background shadow-none">
           <CardHeader className="border-b border-border py-3">
-            <CardTitle className="text-sm">Procédures ({rows.length})</CardTitle>
+            <CardTitle className="text-sm">Procedures ({rows.length})</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="h-9 text-xs">Code</TableHead>
-                  <TableHead className="h-9 text-xs">Titre</TableHead>
-                  <TableHead className="h-9 text-xs">Périmètre</TableHead>
-                  <TableHead className="h-9 text-xs">Catégorie</TableHead>
+                  <TableHead className="h-9 text-xs">Title</TableHead>
+                  <TableHead className="h-9 text-xs">Scope</TableHead>
+                  <TableHead className="h-9 text-xs">Category</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

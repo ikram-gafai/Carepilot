@@ -22,63 +22,63 @@ const DEMO_ROWS: {
 }[] = [
   {
     id: "1140821",
-    title: "Edition facture",
+    title: "Invoice edit",
     level: "N2",
     sync: "Synced",
-    aiDecision: "Résolution N2 (KM trouvé)",
+    aiDecision: "N2 resolution (KM found)",
   },
   {
     id: "1160310",
     title: "SCO NCR 33/34",
     level: "N2",
     sync: "Pending",
-    aiDecision: "Escalade vers N3 (pas de KM)",
+    aiDecision: "Escalation to N3 (no KM)",
   },
   {
     id: "1172619",
-    title: "Réouverture ticket 117/31614",
+    title: "Reopened ticket 117/31614",
     level: "N3",
     sync: "Failed",
-    aiDecision: "Traitement N3 (aucun KM disponible)",
+    aiDecision: "N3 handling (no KM available)",
   },
   {
     id: "1150001",
-    title: "Edition facture - 1150001",
+    title: "Invoice edit - 1150001",
     level: "N2",
     sync: "Synced",
-    aiDecision: "Résolution N2 (KM trouvé)",
+    aiDecision: "N2 resolution (KM found)",
   },
   {
     id: "1150002",
     title: "SCO NCR 33/34 - 1150002",
     level: "N3",
     sync: "Synced",
-    aiDecision: "Traitement N3 (aucun KM disponible)",
+    aiDecision: "N3 handling (no KM available)",
   },
   {
     id: "1150003",
-    title: "Réouverture ticket 117/31614 - 1150003",
+    title: "Reopened ticket 117/31614 - 1150003",
     level: "N2",
     sync: "Synced",
-    aiDecision: "Résolution N2 (KM trouvé)",
+    aiDecision: "N2 resolution (KM found)",
   },
   {
     id: "1150004",
-    title: "Edition facture - 1150004",
+    title: "Invoice edit - 1150004",
     level: "N2",
     sync: "Synced",
-    aiDecision: "Résolution N2 (KM trouvé)",
+    aiDecision: "N2 resolution (KM found)",
   },
 ]
 
 function SyncStatusBadge({ status }: { status: SyncStatus }) {
   const pill = {
     Synced:
-      "bg-sky-100 text-sky-800 dark:bg-sky-950/55 dark:text-sky-200",
+      "bg-primary/12 text-foreground dark:bg-primary/18 dark:text-foreground",
     Pending:
-      "bg-orange-100 text-orange-900 dark:bg-orange-950/50 dark:text-orange-200",
+      "bg-muted text-muted-foreground dark:bg-muted/80 dark:text-muted-foreground",
     Failed:
-      "bg-red-100 text-red-800 dark:bg-red-950/55 dark:text-red-200",
+      "bg-destructive/12 text-destructive dark:bg-destructive/18 dark:text-destructive",
   } satisfies Record<SyncStatus, string>
 
   return (
@@ -103,7 +103,7 @@ export function DashboardSyncedTicketsTable() {
     <Card className="border-border bg-background shadow-none">
       <CardHeader className="border-b border-border py-3">
         <CardTitle className="text-sm font-semibold">
-          Derniers tickets synchronisés
+          Latest synced tickets
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -114,16 +114,16 @@ export function DashboardSyncedTicketsTable() {
                 ID
               </TableHead>
               <TableHead className="h-9 min-w-[140px] px-3 text-xs font-medium text-muted-foreground">
-                Titre
+                Title
               </TableHead>
               <TableHead className="h-9 w-[1%] whitespace-nowrap px-3 text-xs font-medium text-muted-foreground">
-                Niveau
+                Level
               </TableHead>
               <TableHead className="h-9 w-[1%] whitespace-nowrap px-3 text-xs font-medium text-muted-foreground">
                 Sync
               </TableHead>
               <TableHead className="h-9 min-w-[180px] px-3 text-xs font-medium text-muted-foreground">
-                Décision IA
+                AI decision
               </TableHead>
             </TableRow>
           </TableHeader>

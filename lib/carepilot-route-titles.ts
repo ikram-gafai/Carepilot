@@ -11,8 +11,6 @@ export function getCarePilotFallbackTitle(pathname: string): string {
     "/similar": "Similar Tickets",
     "/km": "KM Procedures",
     "/escalation-transfer": "Escalation & Transfer Assistance",
-    "/sync": "Synchronization",
-    "/benchmarks": "Benchmarks & évaluation",
     "/settings": "Settings",
   }
 

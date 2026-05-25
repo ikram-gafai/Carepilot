@@ -13,7 +13,7 @@ export async function PATCH(req: Request, ctx: Params) {
     const { id } = await ctx.params
     const ticketId = Number.parseInt(id, 10)
     if (Number.isNaN(ticketId)) {
-      return apiFail(400, "Identifiant ticket invalide")
+      return apiFail(400, "Invalid ticket id")
     }
 
     const parsed = await parseBody(agentDecisionBodySchema, req)
@@ -33,7 +33,7 @@ export async function PATCH(req: Request, ctx: Params) {
     await appendTimelineEvent(db, {
       ticketId,
       eventType: "agent_override",
-      summary: `Décision agent (override) : ${parsed.data.agentFinalDecision}`,
+      summary: `Agent decision (override): ${parsed.data.agentFinalDecision}`,
       detail: parsed.data.notes ?? "",
       occurredAt: new Date(),
     })

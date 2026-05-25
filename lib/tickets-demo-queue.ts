@@ -16,7 +16,7 @@ export type DemoTicketQueueRow = {
 export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
   {
     ticketId: "INC-2025-0148",
-    subject: "Printer not printing on caisse 25",
+    subject: "Printer not printing on lane 25",
     perimeter: "FO / VLP",
     slaState: "breached",
     predictedOutcome: "Continue N2 with KM",
@@ -31,10 +31,10 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
     subject: "SCO payment failure",
     perimeter: "SCO",
     slaState: "at-risk",
-    predictedOutcome: "Transfer out of perimeter",
+    predictedOutcome: "Transfer Network",
     confidence: 76,
     reason:
-      "Network dependency detected. Ticket appears outside FO/VLP responsibility.",
+      "Network dependency detected. Payment issue outside lane POS perimeter.",
     age: "1d 7h",
     lastUpdateLabel: "15/05/2025 09:12",
   },
@@ -43,10 +43,10 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
     subject: "Cash drawer not opening",
     perimeter: "FO / VLP",
     slaState: "at-risk",
-    predictedOutcome: "Transfer out of perimeter",
+    predictedOutcome: "Transfer Hardware",
     confidence: 77,
     reason:
-      "Hardware signal detected. Ticket should be transferred after basic on-site checks.",
+      "Physical device replacement required after basic on-site checks.",
     age: "1d 2h",
     lastUpdateLabel: "15/05/2025 07:33",
   },
@@ -66,7 +66,7 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
     subject: "Receipt not printing",
     perimeter: "FO / VLP",
     slaState: "on-track",
-    predictedOutcome: "Escalate N3 — procedure failure",
+    predictedOutcome: "Escalate N3",
     confidence: 85,
     reason:
       "KM was already applied but the issue persists. Escalation reason: procedure failure.",
@@ -78,7 +78,7 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
     subject: "Network disconnected",
     perimeter: "Network",
     slaState: "at-risk",
-    predictedOutcome: "Escalate N3 — absence of procedure",
+    predictedOutcome: "Escalate N3",
     confidence: 79,
     reason:
       "No exploitable KM found after diagnostic checks. Escalation reason: absence of procedure.",

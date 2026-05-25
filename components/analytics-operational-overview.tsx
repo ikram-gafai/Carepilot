@@ -90,9 +90,9 @@ const LIVE_DECISIONS = [
     text: "Traitement N2 validated after KM execution",
     status: "Validated",
     emphasis: true,
-    rowTint: "border-l-[3px] border-l-emerald-600 bg-emerald-500/[0.07]",
+    rowTint: "border-l-[3px] border-l-primary bg-primary/[0.08]",
     badgeClass:
-      "border-emerald-600/45 bg-emerald-600 text-white shadow-sm hover:bg-emerald-600/90 dark:bg-emerald-700 dark:text-white",
+      "border-primary/45 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
     StatusIcon: IconCircleCheck,
   },
   {
@@ -100,8 +100,8 @@ const LIVE_DECISIONS = [
     text: "Payment cluster correlation accepted by routing engine",
     status: "Accepted",
     emphasis: false,
-    rowTint: "border-l-[3px] border-l-chart-1 bg-chart-1/[0.07]",
-    badgeClass: "border-chart-1/35 bg-chart-1/15 text-chart-3 dark:bg-chart-1/20 dark:text-foreground",
+    rowTint: "border-l-[3px] border-l-primary/55 bg-primary/[0.04]",
+    badgeClass: "border-primary/30 bg-primary/10 text-foreground dark:bg-primary/15 dark:text-foreground",
     StatusIcon: IconCheck,
   },
   {
@@ -109,9 +109,8 @@ const LIVE_DECISIONS = [
     text: "Hardware transfer dependency overridden after N2 review",
     status: "Overridden",
     emphasis: false,
-    rowTint: "border-l-[3px] border-l-amber-500/80 bg-amber-500/[0.07]",
-    badgeClass:
-      "border-amber-500/40 bg-amber-500/12 text-amber-950 dark:bg-amber-500/15 dark:text-amber-100",
+    rowTint: "border-l-[3px] border-l-foreground/20 bg-muted/50 dark:bg-muted/30",
+    badgeClass: "border-border bg-muted/70 text-foreground dark:bg-muted/50",
     StatusIcon: IconArrowBackUp,
   },
   {
@@ -119,9 +118,9 @@ const LIVE_DECISIONS = [
     text: "SCO synchronization pattern validated against live perimeter",
     status: "Validated",
     emphasis: true,
-    rowTint: "border-l-[3px] border-l-emerald-600 bg-emerald-500/[0.07]",
+    rowTint: "border-l-[3px] border-l-primary bg-primary/[0.08]",
     badgeClass:
-      "border-emerald-600/45 bg-emerald-600 text-white shadow-sm hover:bg-emerald-600/90 dark:bg-emerald-700 dark:text-white",
+      "border-primary/45 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
     StatusIcon: IconCircleCheck,
   },
   {
@@ -129,8 +128,8 @@ const LIVE_DECISIONS = [
     text: "Network escalation chain accepted — cross-store linkage",
     status: "Accepted",
     emphasis: false,
-    rowTint: "border-l-[3px] border-l-chart-1 bg-chart-1/[0.07]",
-    badgeClass: "border-chart-1/35 bg-chart-1/15 text-chart-3 dark:bg-chart-1/20 dark:text-foreground",
+    rowTint: "border-l-[3px] border-l-primary/55 bg-primary/[0.04]",
+    badgeClass: "border-primary/30 bg-primary/10 text-foreground dark:bg-primary/15 dark:text-foreground",
     StatusIcon: IconCheck,
   },
 ] as const
@@ -168,35 +167,35 @@ const ESCALATION_STAGES = [
     subtitle: "live operational stage",
     value: "58",
     Icon: IconInbox,
-    valueClass: "text-chart-1",
+    valueClass: "text-foreground",
   },
   {
     title: "Diagnostic validation",
     subtitle: "live operational stage",
     value: "41",
     Icon: IconStethoscope,
-    valueClass: "text-chart-2",
+    valueClass: "text-foreground",
   },
   {
     title: "KM applicable",
     subtitle: "live operational stage",
     value: "27",
     Icon: IconBook,
-    valueClass: "text-chart-3",
+    valueClass: "text-foreground",
   },
   {
-    title: "Traitement N2",
+    title: "N2 handling",
     subtitle: "live operational stage",
     value: "32",
     Icon: IconUsers,
-    valueClass: "text-chart-4",
+    valueClass: "text-foreground",
   },
   {
-    title: "Escalade N3",
+    title: "N3 escalation",
     subtitle: "live operational stage",
     value: "12",
     Icon: IconAlertTriangle,
-    valueClass: "text-chart-5",
+    valueClass: "text-destructive",
   },
 ] as const
 
@@ -247,7 +246,7 @@ export function AnalyticsOperationalOverview() {
 
                 <div className="flex h-44 w-44 flex-col items-center justify-center rounded-full border-[5px] border-primary bg-gradient-to-br from-primary/18 via-background to-primary/10 text-center shadow-lg ring-2 ring-primary/25 ring-offset-2 ring-offset-background">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                    CarePilot
+                    CAREPILOT
                   </span>
                   <span className="bg-gradient-to-br from-primary to-primary/75 bg-clip-text text-4xl font-semibold tabular-nums tracking-tight text-transparent">
                     58
@@ -296,7 +295,7 @@ export function AnalyticsOperationalOverview() {
               >
                 <div className="min-w-0 flex-1 space-y-1">
                   <p className="flex items-center gap-1.5 text-xs font-semibold tabular-nums text-foreground">
-                    <span className="inline-block size-1.5 shrink-0 rounded-full bg-chart-3" aria-hidden />
+                    <span className="inline-block size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
                     {row.id}
                   </p>
                   <p className="text-xs leading-snug text-muted-foreground">{row.text}</p>
@@ -308,7 +307,7 @@ export function AnalyticsOperationalOverview() {
                   <row.StatusIcon
                     className={cn(
                       "size-3.5 opacity-90",
-                      row.emphasis && "text-white"
+                      row.emphasis && "text-primary-foreground"
                     )}
                   />
                   {row.status}

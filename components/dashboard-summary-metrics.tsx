@@ -18,11 +18,8 @@ function slaComplianceRate(backlog: number, slaAtRisk: number): number {
   return Math.max(0, Math.min(1, (backlog - slaAtRisk) / backlog))
 }
 
-/** Blend KM coverage and tickets without missing-info flags as a coarse IA quality readout. */
-function aiPrecisionReadout(metrics: DashboardMetrics): number {
-  const km = metrics.kmRecommendationCoverage
-  const completeness = 1 - metrics.missingInformationRate
-  return Math.max(0, Math.min(1, (km + completeness) / 2))
+function aiPrecisionReadout(_metrics: DashboardMetrics): number {
+  return 0
 }
 
 function SummaryMetricTile({
@@ -58,12 +55,11 @@ export function DashboardSummaryMetrics({
   demo?: boolean
 }) {
   const slaOk =
-    metrics != null ? slaComplianceRate(metrics.backlog, metrics.slaAtRisk) : null
-  const syncPct =
-    metrics?.syncSuccessRate != null ? pctDisplay(metrics.syncSuccessRate) : null
+    metrics != null ? slaComplianceRate(metrics.openTickets, metrics.slaAtRisk) : null
+  const syncPct = metrics?.syncHealth ? metrics.syncHealth : null
 
   const backlog =
-    demo || metrics == null ? DASHBOARD_SUMMARY_DEMO_VALUES.backlog : String(metrics.backlog)
+    demo || metrics == null ? DASHBOARD_SUMMARY_DEMO_VALUES.backlog : String(metrics.openTickets)
   const sla =
     demo || slaOk == null
       ? DASHBOARD_SUMMARY_DEMO_VALUES.slaCompliancePct
@@ -78,12 +74,12 @@ export function DashboardSummaryMetrics({
       : syncPct
 
   return (
-    <section aria-label={demo ? "Indicateurs de démonstration" : undefined}>
+    <section aria-label={demo ? "Demo indicators" : undefined}>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <SummaryMetricTile title="Tickets ouverts (backlog actif)" value={backlog} />
-        <SummaryMetricTile title="Taux de conformité SLA" value={sla} />
-        <SummaryMetricTile title="Précision moyenne IA" value={ai} />
-        <SummaryMetricTile title="Taux de synchronisation réussi" value={sync} />
+        <SummaryMetricTile title="Open tickets (active backlog)" value={backlog} />
+        <SummaryMetricTile title="SLA compliance rate" value={sla} />
+        <SummaryMetricTile title="Average AI precision" value={ai} />
+        <SummaryMetricTile title="Successful sync rate" value={sync} />
       </div>
     </section>
   )

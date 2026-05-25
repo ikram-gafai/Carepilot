@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { z } from "zod"
 
-/** Réponses JSON homogènes pour les route handlers (démo / clients API). */
+/** Uniform JSON responses for route handlers (demo / API clients). */
 export function apiOk<T extends Record<string, unknown>>(data: T & { ok?: never }) {
   return NextResponse.json({ ok: true as const, ...data })
 }
@@ -20,7 +20,7 @@ export async function parseBody<S extends z.ZodType>(
   } catch {
     return {
       success: false,
-      response: apiFail(400, "Corps JSON invalide ou vide"),
+      response: apiFail(400, "Invalid or empty JSON body"),
     }
   }
 
@@ -29,7 +29,7 @@ export async function parseBody<S extends z.ZodType>(
     const issues = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")
     return {
       success: false,
-      response: apiFail(400, issues || "Validation échouée"),
+      response: apiFail(400, issues || "Validation failed"),
     }
   }
 

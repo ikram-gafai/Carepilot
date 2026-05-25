@@ -27,126 +27,135 @@ const TICKET_COUNT = Number(process.env.SEED_TICKET_COUNT ?? "520")
 const KM_SEED = [
   {
     kmCode: "KM-VLP-001",
-    title: "Redémarrage contrôlé caisse VLP",
+    title: "Controlled VLP lane restart",
     perimeter: "FO_VLP",
-    category: "CAISSE",
+    category: "CHECKOUT",
     content:
-      "Procédure standard : isolation caisse, vérif session, redémarrage applicatif, contrôle logs erreur.",
-    prerequisites: "Magasin et caisse identifiés",
-    tags: "caisse,vlp,redémarrage",
+      "Standard procedure: isolate lane, verify session, restart application, review error logs.",
+    prerequisites: "Store and lane identified",
+    tags: "lane,vlp,restart",
   },
   {
     kmCode: "KM-VLP-002",
-    title: "Erreur scanner douchette",
+    title: "Handheld scanner error",
     perimeter: "FO_VLP",
     category: "PERIPH",
     content:
-      "Vérifier rattachement USB, ports hub, pilote scanner, test lecture codes dégradés.",
-    prerequisites: "Erreur scanner reproduite",
-    tags: "scanner,matériel,douchette",
+      "Check USB attachment, hub ports, scanner driver, test degraded barcode reads.",
+    prerequisites: "Scanner error reproduced",
+    tags: "scanner,hardware,handheld",
   },
   {
     kmCode: "KM-VLP-003",
-    title: "Perte liaison réseau magasin",
+    title: "Store network link loss",
     perimeter: "NETWORK",
-    category: "RESEAU",
+    category: "NETWORK",
     content:
-      "Ping passerelle, VLAN magasin, DNS, tests cablage rack caisse — escalade réseau si persistant.",
-    prerequisites: "Symptômes réseau décrits",
-    tags: "réseau,vlan,dns",
+      "Ping gateway, store VLAN, DNS, cabling tests at lane rack — escalate to network if persistent.",
+    prerequisites: "Network symptoms described",
+    tags: "network,vlan,dns",
   },
   {
     kmCode: "KM-VLP-004",
-    title: "Blocage impression ticket client",
+    title: "Customer receipt print blocked",
     perimeter: "FO_VLP",
     category: "PRINT",
     content:
-      "File spooler, test page Windows, driver imprimante thermique, alignement rouleau.",
-    prerequisites: "Modèle imprimante",
-    tags: "impression,thermique",
+      "Print spooler, Windows test page, thermal printer driver, roller alignment.",
+    prerequisites: "Printer model",
+    tags: "print,thermal",
   },
   {
     kmCode: "KM-VLP-005",
-    title: "Incident terminal paiement",
+    title: "Payment terminal incident",
     perimeter: "FO_VLP",
     category: "TPE",
     content:
-      "Recette TPE : reboot, test ligne, contrat acquéreur, substitution matériel selon stock.",
-    prerequisites: "Code erreur TPE",
-    tags: "tpe,paiement",
+      "TPE checklist: reboot, line test, acquirer contract, hardware swap from stock.",
+    prerequisites: "TPE error code",
+    tags: "tpe,payment",
   },
   {
     kmCode: "KM-VLP-006",
-    title: "Sync catalogue article lent",
+    title: "Slow article catalog sync",
     perimeter: "FO_VLP",
     category: "DATA",
     content:
-      "Vérifier fenêtre sync, charge serveur régionale, relance job sync, logs middleware.",
-    prerequisites: "Horodatage incident",
-    tags: "sync,catalogue",
+      "Check sync window, regional server load, restart sync job, middleware logs.",
+    prerequisites: "Incident timestamp",
+    tags: "sync,catalog",
   },
   {
     kmCode: "KM-VLP-007",
-    title: "Session caissier verrouillée",
+    title: "Cashier session locked",
     perimeter: "FO_VLP",
     category: "IAM",
     content:
-      "Déverrouillage superviseur, reset session AD locale, contrôle politique mot de passe.",
-    prerequisites: "Identité caissier",
+      "Supervisor unlock, local AD session reset, password policy check.",
+    prerequisites: "Cashier identity",
     tags: "session,iam",
   },
   {
     kmCode: "KM-VLP-008",
-    title: "Remontée anomalies inventaire",
+    title: "Inventory anomaly report",
     perimeter: "FO_VLP",
     category: "INV",
     content:
-      "Extraction logs inventaire, réconciliation stock théorique / physique, purge caches.",
-    prerequisites: "Référence inventaire",
-    tags: "inventaire,stock",
+      "Pull inventory logs, reconcile theoretical vs physical stock, clear caches.",
+    prerequisites: "Inventory reference",
+    tags: "inventory,stock",
   },
 ]
 
 const TITLE_TEMPLATES = [
-  "Caisse {reg} — erreur transaction intermittente",
-  "Scanner ne lit pas les EAN sur caisse {reg}",
-  "Coupure liaison HQ — magasin {store}",
-  "Impression ticket client décalée",
-  "Latence excessive ouverture vente",
-  "TPE refuse carte sans contact",
-  "Crash applicatif après mise à jour nocturne",
-  "Doublon ticket inventaire — besoin clarification",
-  "[URG] caisse {reg} HS intermitt.",
-  "Pb sync — mag {store} (idem hier)",
-  "VLP {reg} : latence + coupures wifi ???",
-  "Doublon — cf CARE précédent même mag",
-  "Escalade N3 demandée par mag — à valider",
+  "Lane {reg} — intermittent transaction error",
+  "Scanner not reading EANs on lane {reg}",
+  "HQ link down — store {store}",
+  "Customer receipt print misaligned",
+  "Excessive latency opening a sale",
+  "POS terminal refusing contactless card",
+  "App crash after overnight update",
+  "Duplicate inventory ticket — needs clarification",
+  "[URG] lane {reg} intermittently down",
+  "Sync issue — store {store} (same as yesterday)",
+  "VLP {reg}: latency + Wi-Fi drops ???",
+  "Duplicate — see prior CARE same store",
+  "N3 escalation requested by store — pending validation",
 ]
 
 const SHORT_COMMENTS = [
-  "vu avec mag",
-  "pas de capture",
-  "idem hier",
+  "checked with store",
+  "no screenshot",
+  "same as yesterday",
   "?",
-  "esc N3 ???",
-  "transfert fw?",
-  "scanner ou vlan pas clair",
-  "besoin n° série",
+  "N3 esc ???",
+  "transfer to fw?",
+  "scanner vs VLAN unclear",
+  "need serial number",
 ]
 
 async function truncateSimulator() {
   const sql = getSql()
+  const [embeddingsTable] = await sql`
+    SELECT 1 AS ok FROM information_schema.tables
+    WHERE table_schema = 'carepilot' AND table_name = 'embeddings'
+    LIMIT 1
+  `
+  const carepilotTables = [
+    "carepilot.golden_test_cases",
+    "carepilot.similar_ticket_results",
+    "carepilot.km_recommendations",
+    "carepilot.decision_suggestions",
+    "carepilot.ticket_timeline_events",
+    "carepilot.ticket_analysis",
+    ...(embeddingsTable ? ["carepilot.embeddings"] : []),
+    "carepilot.tickets",
+    "carepilot.sync_logs",
+  ].join(",\n      ")
+
   await sql.unsafe(`
     TRUNCATE TABLE
-      carepilot.golden_test_cases,
-      carepilot.similar_ticket_results,
-      carepilot.km_recommendations,
-      carepilot.decision_suggestions,
-      carepilot.ticket_timeline_events,
-      carepilot.ticket_analysis,
-      carepilot.embeddings,
-      carepilot.tickets,
-      carepilot.sync_logs
+      ${carepilotTables}
     RESTART IDENTITY CASCADE;
   `)
   await sql.unsafe(`
@@ -163,7 +172,7 @@ async function truncateSimulator() {
 
 async function main() {
   if (!process.env.DATABASE_URL) {
-    console.error("DATABASE_URL manquant")
+    console.error("DATABASE_URL is required")
     process.exit(1)
   }
 
@@ -172,14 +181,14 @@ async function main() {
 
   const rnd = mulberry32(42)
 
-  console.log(`Seed: ${TICKET_COUNT} tickets synthétiques anonymisés FO VLP`)
+  console.log(`Seed: ${TICKET_COUNT} anonymized FO VLP operational tickets`)
 
   const cityPairs = [
-    ["101", "Magasin Nord Alpha", "Lille"],
-    ["102", "Magasin Est Beta", "Metz"],
-    ["103", "Magasin Sud Gamma", "Toulouse"],
-    ["104", "Magasin Ouest Delta", "Nantes"],
-    ["105", "Magasin Centre Epsilon", "Lyon"],
+    ["101", "North Alpha Store", "Lille"],
+    ["102", "East Beta Store", "Metz"],
+    ["103", "South Gamma Store", "Toulouse"],
+    ["104", "West Delta Store", "Nantes"],
+    ["105", "Central Epsilon Store", "Lyon"],
   ]
 
   const storeIds: number[] = []
@@ -217,7 +226,7 @@ async function main() {
 
   const statuses = ["OPEN", "IN_PROGRESS", "WAITING_STORE", "RESOLVED", "TRANSFERRED"]
   const priorities = ["P3", "P2", "P1"]
-  const categories = ["CAISSE", "RESEAU", "PERIPH", "PRINT", "TPE", "DATA"]
+  const categories = ["CHECKOUT", "NETWORK", "PERIPH", "PRINT", "TPE", "DATA"]
 
   let lastRichDescription = ""
 
@@ -243,26 +252,26 @@ async function main() {
       networkHeavy = true
     }
 
-    let description = `Incident opérationnel FO VLP — ${title}. `
+    let description = `FO VLP operational incident — ${title}. `
     description += hardwareHeavy
-      ? "Symptômes matériels (USB/scanner/roller). "
+      ? "Hardware symptoms (USB/scanner/roller). "
       : ""
     description += networkHeavy
-      ? "Symptômes réseau (latence, VLAN, perte paquets). "
+      ? "Network symptoms (latency, VLAN, packet loss). "
       : ""
-    description += ambiguousHwNw ? "Ambiguïté terrain : périf ou infra — qualification floue. " : ""
-    description += `Contexte magasin ${storeCode}, caisse ${registerCode}. `
+    description += ambiguousHwNw ? "Field ambiguity: peripheral vs infra — unclear qualification. " : ""
+    description += `Store ${storeCode}, lane ${registerCode}. `
     description +=
       rnd() < 0.15
-        ? "Libellé imprécis — besoin précisions terrain."
-        : "Description détaillée disponible pour analyse."
-    description += rnd() < 0.12 ? " Abrég. opérationnel — cf note magasin." : ""
-    description += rnd() < 0.07 ? " Faute frappe volontaire dans libellé article (anomalie seed)." : ""
+        ? "Vague wording — needs field details."
+        : "Detailed description available for analysis."
+    description += rnd() < 0.12 ? " Abbreviated ops note — see store comment." : ""
+    description += rnd() < 0.07 ? " Intentional typo in item label (seed anomaly)." : ""
 
     if (i > 2 && rnd() < 0.04 && lastRichDescription.length > 40) {
       description =
         lastRichDescription.slice(0, Math.min(lastRichDescription.length - 20, 220)) +
-        " … REPEAT / quasi-doublon même symptôme."
+        " … REPEAT / near-duplicate same symptom."
     }
 
     lastRichDescription = description
@@ -302,14 +311,14 @@ async function main() {
     const transferMismatch = rnd() < 0.035 && status === "OPEN" && rnd() < 0.5
     if (transferMismatch) {
       transferRequired = true
-      finalAction = finalAction ?? "Transfer Hardware (demande mag — à valider)"
+      finalAction = finalAction ?? "Transfer Hardware (store request — pending validation)"
     }
 
     const demoSlot = i - 1 < DEMO_TICKETS_QUEUE.length ? DEMO_TICKETS_QUEUE[i - 1]! : undefined
     const careTicketId = demoSlot?.ticketId ?? `CARE-VLP-${String(i).padStart(6, "0")}`
     const seedTitle = demoSlot?.subject ?? title
     const seedDescription = demoSlot
-      ? `${demoSlot.subject}. Alignement démo CAREPILOT — périmètre ${demoSlot.perimeter}.`
+      ? `${demoSlot.subject}. CAREPILOT demo alignment — perimeter ${demoSlot.perimeter}.`
       : description
     const seedPerimeter = demoSlot
       ? demoSlot.perimeter.replace(/\s*\/\s*/g, "_").replace(/\s+/g, "")
@@ -330,7 +339,7 @@ async function main() {
         category: categories[Math.floor(rnd() * categories.length)]!,
         errorMessage: err || null,
         finalAction,
-        finalReason: finalAction ? "Synthétique — résolution type PFE" : null,
+        finalReason: finalAction ? "PFE-style operational resolution" : null,
         incidentCategory: categories[Math.floor(rnd() * categories.length)]!,
         escalationRequired,
         transferRequired,
@@ -351,8 +360,8 @@ async function main() {
     if (rnd() < 0.85) {
       const longComment =
         rnd() < 0.3
-          ? "cf historique — incident récurrent sur cette caisse."
-          : "Merci de préciser capture écran erreur si possible."
+          ? "See history — recurring incident on this lane."
+          : "Please attach an error screenshot if possible."
       await db.insert(ticketComments).values({
         ticketId: tid,
         authorRole: rnd() < 0.5 ? "N1_AGENT" : "STORE_MANAGER",
@@ -374,8 +383,8 @@ async function main() {
       await db.insert(ticketActions).values({
         ticketId: tid,
         actionType: "DIAGNOSTIC",
-        description: networkHeavy ? "Test ping passerelle magasin" : "Contrôle logs applicatifs caisse",
-        result: rnd() < 0.4 ? "OK partiel" : "Non conclusif",
+        description: networkHeavy ? "Ping store gateway" : "Review lane application logs",
+        result: rnd() < 0.4 ? "Partial OK" : "Inconclusive",
         performedBy: "N1_AGENT",
         createdAt: new Date(created.getTime() + 7200_000),
       })
@@ -385,8 +394,8 @@ async function main() {
       await db.insert(ticketActions).values({
         ticketId: tid,
         actionType: "KM_APPLY",
-        description: `Application procédure ${appliedKm}`,
-        result: rnd() < 0.35 ? "Échec après KM" : "OK",
+        description: `Applied procedure ${appliedKm}`,
+        result: rnd() < 0.35 ? "Failed after KM" : "OK",
         performedBy: "N2_AGENT",
         createdAt: new Date(created.getTime() + 10_800_000),
       })
@@ -395,7 +404,7 @@ async function main() {
     if (i % 100 === 0) console.log(`  … ${i} tickets`)
   }
 
-  console.log("Seed CARE Simulator terminé (care_source.*). Lancez POST /api/sync/care pour CAREPILOT.")
+  console.log("CARE Simulator seed complete (care_source.*). Run POST /api/sync/care for CAREPILOT.")
 }
 
 main().catch((e) => {

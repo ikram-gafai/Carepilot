@@ -2,8 +2,9 @@ import { careSourceTickets } from "@/lib/db/schema/care-source"
 
 export type SourceTicketRow = typeof careSourceTickets.$inferSelect
 
-const HARDWARE_HINTS = /\b(scanner|imprimante|hardware|câble|usb|toner|roller|matériel)\b/i
-const NETWORK_HINTS = /\b(wifi|lan|réseau|ping|switch|vlan|dns)\b/i
+const HARDWARE_HINTS =
+  /\b(scanner|imprimante|printer|hardware|câble|cable|usb|toner|roller|matériel|materiel)\b/i
+const NETWORK_HINTS = /\b(wifi|lan|réseau|network|ping|switch|vlan|dns)\b/i
 
 export type HeuristicAnalysis = {
   extractedEntities: Record<string, unknown>
@@ -31,8 +32,8 @@ export function analyzeTicketHeuristic(input: {
 }): HeuristicAnalysis {
   const text = input.rawText
   const entities: Record<string, unknown> = {
-    magasin: input.source.storeCode ?? null,
-    caisse: input.source.cashRegisterCode ?? null,
+    store: input.source.storeCode ?? null,
+    lane: input.source.cashRegisterCode ?? null,
     perimeter: input.source.perimeter,
     category: input.source.category ?? null,
     error_message: input.source.errorMessage ?? extractErrorLike(text),
@@ -41,15 +42,15 @@ export function analyzeTicketHeuristic(input: {
   }
 
   const missing: string[] = []
-  if (!input.source.storeCode) missing.push("magasin")
-  if (!input.source.cashRegisterCode) missing.push("caisse")
-  if (!entities.error_message) missing.push("message_erreur")
+  if (!input.source.storeCode) missing.push("store")
+  if (!input.source.cashRegisterCode) missing.push("lane")
+  if (!entities.error_message) missing.push("error_message")
 
   const tags: string[] = []
-  if (missing.includes("caisse")) tags.push("Missing caisse")
+  if (missing.includes("lane")) tags.push("Missing lane")
   if (input.source.kmApplicable || input.source.appliedKmCode) tags.push("KM available")
-  if (HARDWARE_HINTS.test(text)) tags.push("Possible matériel")
-  if (NETWORK_HINTS.test(text)) tags.push("Possible réseau")
+  if (HARDWARE_HINTS.test(text)) tags.push("Possible hardware")
+  if (NETWORK_HINTS.test(text)) tags.push("Possible network")
   if (input.source.slaDueAt && slaSoon(input.source.slaDueAt)) tags.push("SLA risk")
 
   let problemType: string | null = input.source.category ?? null

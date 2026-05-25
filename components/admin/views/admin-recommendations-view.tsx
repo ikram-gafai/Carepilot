@@ -1,0 +1,31 @@
+"use client"
+
+import { PENDING_AI_TRAINING } from "@/lib/ai-phase"
+import type { adminRecommendations } from "@/lib/queries/admin"
+import { Card, CardContent } from "@/components/ui/card"
+import { adminSurfaces } from "@/lib/admin-surface"
+import { cn } from "@/lib/utils"
+
+type Data = Awaited<ReturnType<typeof adminRecommendations>>
+
+const cardClass = cn(adminSurfaces.card, "shadow-sm")
+
+export function AdminRecommendationsView({ data }: { data: Data }) {
+  if ("pendingAiTraining" in data && data.pendingAiTraining) {
+    return (
+      <div className="mx-auto max-w-[1600px] p-4 pb-6">
+        <Card className={cardClass}>
+          <CardContent className="flex min-h-[16rem] flex-col items-center justify-center gap-2 px-6 py-12 text-center">
+            <p className="text-base font-semibold text-foreground">{PENDING_AI_TRAINING}</p>
+            <p className="max-w-md text-sm text-muted-foreground">
+              Recommendation quality, validation, and governance metrics will be available after the AI
+              training phase.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return null
+}

@@ -1,5 +1,6 @@
 import { customType } from "drizzle-orm/pg-core"
 import {
+  boolean,
   integer,
   jsonb,
   pgSchema,
@@ -154,4 +155,43 @@ export const goldenTestCases = carepilot.table("golden_test_cases", {
   expectedSimilarGroup: text("expected_similar_group"),
   expectedKm: text("expected_km"),
   expectedDecision: text("expected_decision"),
+})
+
+/** CarePilot platform sign-in (internal support users) — distinct from `cp_agent.users`. */
+export const carepilotUsers = carepilot.table("users", {
+  id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  avatarUrl: text("avatar_url"),
+  role: text("role").notNull(),
+  department: text("department"),
+  status: text("status").notNull().default("active"),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const carepilotSessions = carepilot.table("sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => carepilotUsers.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const carepilotUserPreferences = carepilot.table("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .unique()
+    .references(() => carepilotUsers.id, { onDelete: "cascade" }),
+  theme: text("theme").notNull().default("dark"),
+  compactMode: boolean("compact_mode").notNull().default(false),
+  notificationsEnabled: boolean("notifications_enabled").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 })

@@ -42,56 +42,56 @@ export function TicketAgentDecisionForm({
   return (
     <form onSubmit={onSubmit} className="space-y-3 text-xs">
       <Separator />
-      <div className="text-[11px] font-semibold text-muted-foreground">Nouvelle saisie</div>
+      <div className="text-[11px] font-semibold text-muted-foreground">New entry</div>
       <div className="grid gap-2">
-        <span className="font-medium text-muted-foreground">Suggestion IA (rappel)</span>
+        <span className="font-medium text-muted-foreground">AI suggestion (reminder)</span>
         <p className="rounded-md border border-dashed border-border bg-muted/30 px-2 py-2 leading-relaxed">
           {initialAiSuggestion}
         </p>
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="agent-decision" className="text-xs font-medium">
-          Décision agent finalisée
+          Final agent decision
         </Label>
         <Input
           id="agent-decision"
           value={decision}
           onChange={(e) => setDecision(e.target.value)}
-          placeholder="Ex. Escalade N3 manuelle — transfert réseau annulé"
+          placeholder="e.g. Manual N3 escalation — network transfer cancelled"
           required
           className="h-9 text-xs"
         />
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="agent-notes" className="text-xs font-medium">
-          Notes / audit (optionnel)
+          Notes / audit (optional)
         </Label>
         <Textarea
           id="agent-notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Contexte terrain, référence change, justification override…"
+          placeholder="Field context, change reference, override justification…"
           rows={3}
           className="min-h-[4.5rem] resize-y text-xs"
         />
       </div>
       {status === "saved" ? (
         <Alert className="py-2">
-          <AlertTitle className="text-xs">Décision enregistrée</AlertTitle>
+          <AlertTitle className="text-xs">Decision saved</AlertTitle>
           <AlertDescription className="text-xs">
-            Rafraîchissez la page pour voir la timeline « décision agent ».
+            Refresh the page to see the &quot;agent decision&quot; timeline entry.
           </AlertDescription>
         </Alert>
       ) : null}
       {status === "error" ? (
         <Alert variant="destructive" className="py-2">
-          <AlertTitle className="text-xs">Échec enregistrement</AlertTitle>
-          <AlertDescription className="text-xs">Vérifiez la session réseau puis réessayez.</AlertDescription>
+          <AlertTitle className="text-xs">Save failed</AlertTitle>
+          <AlertDescription className="text-xs">Check your network session and try again.</AlertDescription>
         </Alert>
       ) : null}
       <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
         <Button type="submit" size="sm" className="h-8 text-xs" disabled={status === "saving"}>
-          {status === "saving" ? "Enregistrement…" : "Enregistrer la décision"}
+          {status === "saving" ? "Saving…" : "Save decision"}
         </Button>
       </div>
     </form>

@@ -32,9 +32,9 @@ import type { DemoSlaState, DemoTicketQueueRow } from "@/lib/tickets-demo-queue"
 
 function slaStateBadgeClass(state: DemoSlaState) {
   if (state === "at-risk") {
-    return "border-amber-500/35 bg-amber-500/15 text-amber-950 dark:bg-amber-500/20 dark:text-amber-100"
+    return "border-primary/35 bg-primary/10 text-foreground dark:border-primary/40 dark:bg-primary/15 dark:text-foreground"
   }
-  return "border-sky-500/35 bg-sky-500/15 text-sky-950 dark:bg-sky-500/20 dark:text-sky-100"
+  return "border-border bg-muted/35 text-muted-foreground dark:border-border dark:bg-muted/25 dark:text-muted-foreground"
 }
 
 function slaStateLabel(state: DemoSlaState) {
@@ -86,7 +86,7 @@ export function TicketDemoWorkspace({ row }: { row: DemoTicketQueueRow }) {
         metrics={[
           { label: "Requester", value: meta.requester },
           { label: "SMAC", value: meta.smac },
-          { label: "Caisse", value: meta.caisse },
+          { label: "Lane", value: meta.lane },
           { label: "Status", value: meta.status },
           { label: "SLA", value: meta.sla },
           { label: "Last update", value: meta.lastUpdate },
@@ -114,8 +114,8 @@ export function TicketDemoWorkspace({ row }: { row: DemoTicketQueueRow }) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4 pt-4 pb-4">
-          <div className="rounded-xl border border-sky-500/25 bg-sky-500/[0.06] p-4 dark:bg-sky-500/10">
-            <p className="text-[10px] font-semibold tracking-wide text-sky-900 uppercase dark:text-sky-200">
+          <div className="rounded-xl border border-primary/25 bg-primary/[0.06] p-4 dark:bg-primary/10">
+            <p className="text-[10px] font-semibold tracking-wide text-primary uppercase dark:text-primary">
               Recommended operational outcome
             </p>
             <p className="mt-2 text-xl font-bold tracking-tight text-foreground">{row.predictedOutcome}</p>
@@ -151,7 +151,7 @@ export function TicketDemoWorkspace({ row }: { row: DemoTicketQueueRow }) {
             {DEMO_DIAGNOSTIC_ITEMS.map((item) => (
               <div key={item.label} className="flex items-center justify-between gap-2 px-4 py-3 text-sm">
                 <span className="text-foreground">{item.label}</span>
-                <Badge className="border-transparent bg-amber-500/90 text-[10px] font-medium text-amber-950 hover:bg-amber-500">
+                <Badge className="border-border bg-muted px-2 text-[10px] font-medium text-foreground hover:bg-muted/80">
                   Missing
                 </Badge>
               </div>
@@ -191,7 +191,7 @@ export function TicketDemoWorkspace({ row }: { row: DemoTicketQueueRow }) {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-semibold text-foreground">{step.title}</span>
                   {step.current ? (
-                    <Badge className="h-5 border-sky-500/40 bg-sky-500/15 px-1.5 text-[10px] font-medium text-sky-900 dark:text-sky-100">
+                    <Badge className="h-5 border-primary/35 bg-primary/12 px-1.5 text-[10px] font-medium text-foreground dark:bg-primary/18 dark:text-foreground">
                       Current
                     </Badge>
                   ) : null}

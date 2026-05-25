@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const BRAND = "var(--primary)"
 
-/** Stable demo window — one point per calendar day (DD/MM style on axis). */
+/** Stable demo window — one point per calendar day (short dates on axis). */
 function buildTicketVolumeDemo(): Record<string, unknown>[] {
   const days = [
     "2026-04-02T12:00:00.000Z",
@@ -32,10 +32,10 @@ function buildTicketVolumeDemo(): Record<string, unknown>[] {
 
 function buildIaDecisionsDemo(): Record<string, unknown>[] {
   return [
-    { decision: "Résolution N2", count: 4 },
-    { decision: "Escalade vers N3", count: 2 },
-    { decision: "Réaffectation N2", count: 2 },
-    { decision: "Traitement N3", count: 2 },
+    { decision: "N2 resolution", count: 4 },
+    { decision: "Escalation to N3", count: 2 },
+    { decision: "N2 reassignment", count: 2 },
+    { decision: "N3 handling", count: 2 },
   ]
 }
 
@@ -55,7 +55,7 @@ export function DashboardTicketsIaCharts() {
       <Card className={chartCard}>
         <CardHeader className={chartHeader}>
           <CardTitle className="text-sm font-semibold">
-            Volume des tickets (démo)
+            Ticket volume (demo)
           </CardTitle>
         </CardHeader>
         <CardContent className={chartContent}>
@@ -91,7 +91,7 @@ export function DashboardTicketsIaCharts() {
               />
               <XAxis
                 formatTick={(d) =>
-                  d.toLocaleDateString("fr-FR", {
+                  d.toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "2-digit",
                   })
@@ -118,7 +118,7 @@ export function DashboardTicketsIaCharts() {
       <Card className={chartCard}>
         <CardHeader className={chartHeader}>
           <CardTitle className="text-sm font-semibold">
-            Répartition des décisions IA (démo)
+            AI decision split (demo)
           </CardTitle>
         </CardHeader>
         <CardContent className={chartContent}>
@@ -149,7 +149,7 @@ export function DashboardTicketsIaCharts() {
                 rows={(point) => [
                   {
                     color: BRAND,
-                    label: "Décisions",
+                    label: "Decisions",
                     value: point.count as number,
                   },
                 ]}

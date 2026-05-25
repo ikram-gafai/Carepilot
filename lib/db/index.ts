@@ -3,18 +3,33 @@ import postgres from "postgres"
 
 import * as careSourceSchema from "./schema/care-source"
 import * as carepilotSchema from "./schema/carepilot"
+import * as cpAdminSchema from "./schema/cp-admin"
+import * as cpAgentSchema from "./schema/cp-agent"
+import * as mlTrainingSchema from "./schema/ml-training"
 
-const schema = { ...careSourceSchema, ...carepilotSchema }
+const schema = {
+  ...careSourceSchema,
+  ...carepilotSchema,
+  ...cpAgentSchema,
+  ...cpAdminSchema,
+  ...mlTrainingSchema,
+}
 
-/** True when `DATABASE_URL` is set (non-empty). Safe to call from any runtime. */
+function resolvedDatabaseUrl(): string | undefined {
+  return (
+    process.env.DATABASE_URL?.trim() || process.env.POSTGRES_DATABASE_URL?.trim() || undefined
+  )
+}
+
+/** True when a Postgres URL is set (non-empty). Safe to call from any runtime. */
 export function hasDatabaseUrl(): boolean {
-  return Boolean(process.env.DATABASE_URL?.trim())
+  return Boolean(resolvedDatabaseUrl())
 }
 
 function requireDatabaseUrl(): string {
-  const url = process.env.DATABASE_URL?.trim()
+  const url = resolvedDatabaseUrl()
   if (!url) {
-    throw new Error("DATABASE_URL is not set")
+    throw new Error("DATABASE_URL or POSTGRES_DATABASE_URL must be set")
   }
   return url
 }

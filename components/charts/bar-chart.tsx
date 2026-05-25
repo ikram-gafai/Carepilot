@@ -298,8 +298,8 @@ function ChartInner({
     [data, categoryAccessor]
   );
 
-  // Create a fake time scale for compatibility with ChartContext
-  const fakeTimeScale = useMemo(() => {
+  // Create a placeholder time scale for compatibility with ChartContext
+  const placeholderTimeScale = useMemo(() => {
     const now = Date.now();
     const start = now - data.length * 24 * 60 * 60 * 1000;
     const scale = {
@@ -494,7 +494,7 @@ function ChartInner({
 
   const contextValue = {
     data,
-    xScale: fakeTimeScale as unknown as ReturnType<
+    xScale: placeholderTimeScale as unknown as ReturnType<
       typeof import("@visx/scale").scaleTime<number>
     >,
     yScale: valueScale,

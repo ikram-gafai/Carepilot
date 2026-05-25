@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   pgSchema,
+  real,
   serial,
   text,
   timestamp,
@@ -14,6 +15,8 @@ export const stores = careSource.table("stores", {
   storeCode: text("store_code").notNull().unique(),
   storeName: text("store_name").notNull(),
   city: text("city").notNull(),
+  region: text("region").notNull().default(""),
+  storeType: text("store_type").notNull().default("Market"),
 })
 
 export const cashRegisters = careSource.table("cash_registers", {
@@ -48,7 +51,10 @@ export const careSourceTickets = careSource.table("tickets", {
   status: text("status").notNull(),
   priority: text("priority").notNull(),
   channel: text("channel").notNull().default("PORTAL"),
-  storeCode: text("store_code"),
+  storeId: integer("store_id")
+    .notNull()
+    .references(() => stores.id, { onDelete: "restrict" }),
+  storeCode: text("store_code").notNull(),
   cashRegisterCode: text("cash_register_code"),
   category: text("category"),
   errorMessage: text("error_message"),
@@ -66,6 +72,15 @@ export const careSourceTickets = careSource.table("tickets", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   closedAt: timestamp("closed_at", { withTimezone: true }),
   slaDueAt: timestamp("sla_due_at", { withTimezone: true }),
+  syncBatch: integer("sync_batch").notNull().default(1),
+  reference: text("reference"),
+  subCategory: text("sub_category"),
+  assignedGroup: text("assigned_group"),
+  assignedAgent: text("assigned_agent"),
+  aiRecommendedAction: text("ai_recommended_action"),
+  aiConfidence: real("ai_confidence"),
+  aiReason: text("ai_reason"),
+  aiStatus: text("ai_status").default("active"),
 })
 
 export const ticketComments = careSource.table("ticket_comments", {

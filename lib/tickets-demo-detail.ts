@@ -6,8 +6,9 @@ export function findDemoQueueRowByRef(ref: string): DemoTicketQueueRow | null {
   return DEMO_TICKETS_QUEUE.find((r) => r.ticketId === id) ?? null
 }
 
-export function extractCaisseFromSubject(subject: string): string | null {
-  const m = subject.match(/caisse\s*(\d+)/i)
+/** Lane/register number from subject text (supports legacy French "caisse"). */
+export function extractLaneFromSubject(subject: string): string | null {
+  const m = subject.match(/\b(?:lane|caisse)\s*(\d+)/i)
   return m?.[1] ?? null
 }
 
@@ -30,7 +31,7 @@ export function demoPriorityLabel(sla: DemoSlaState): "High" | "Medium" | "Low" 
 export type DemoTicketMetadataBar = {
   requester: string
   smac: string
-  caisse: string
+  lane: string
   status: string
   sla: string
   lastUpdate: string
@@ -39,7 +40,7 @@ export type DemoTicketMetadataBar = {
 /** Static metadata bar tuned to the reference ticket; sensible fallbacks for other demo rows. */
 export function demoMetadataBar(row: DemoTicketQueueRow): DemoTicketMetadataBar {
   const isRef = row.ticketId === "INC-2025-0148"
-  const caisse = extractCaisseFromSubject(row.subject) ?? (isRef ? "25" : "—")
+  const lane = extractLaneFromSubject(row.subject) ?? (isRef ? "25" : "—")
   let sla = "on track"
   if (row.slaState === "breached") sla = "breached by 42m"
   else if (row.slaState === "at-risk") sla = "at risk — window closing"
@@ -47,7 +48,7 @@ export function demoMetadataBar(row: DemoTicketQueueRow): DemoTicketMetadataBar 
   return {
     requester: isRef ? "PERRET, Cath" : "—",
     smac: isRef ? "4821" : "—",
-    caisse,
+    lane,
     status: "In progress",
     sla,
     lastUpdate: row.lastUpdateLabel,
@@ -57,7 +58,7 @@ export function demoMetadataBar(row: DemoTicketQueueRow): DemoTicketMetadataBar 
 export const DEMO_HISTORICAL_MATCHES = [
   {
     ticketId: "INC-2025-0084",
-    outcome: "Traitement N2 completed successfully after KM execution.",
+    outcome: "N2 handling completed successfully after KM execution.",
     similarity: 94,
   },
   {
@@ -67,7 +68,7 @@ export const DEMO_HISTORICAL_MATCHES = [
   },
   {
     ticketId: "INC-2025-0108",
-    outcome: "Escalade N3 after failed operational validation.",
+    outcome: "N3 escalation after failed operational validation.",
     similarity: 81,
   },
 ] as const
@@ -79,17 +80,17 @@ export const DEMO_ROUTING_STEPS = [
     current: true,
   },
   {
-    title: "Escalade N3",
+    title: "N3 escalation",
     description: "No operational KM available after diagnostic validation.",
     current: false,
   },
   {
-    title: "Escalade N2",
+    title: "N2 escalation",
     description: "Procedure failure detected after KM execution.",
     current: false,
   },
   {
-    title: "Transfert Hors Périmètre",
+    title: "Transfer out of perimeter",
     description: "Another operational perimeter has been identified.",
     current: false,
   },

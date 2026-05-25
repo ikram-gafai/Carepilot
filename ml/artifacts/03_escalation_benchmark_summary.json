@@ -1,0 +1,44 @@
+{
+  "target": "escalation_required",
+  "dataset_rows": 14000,
+  "split": {
+    "train": 9800,
+    "validation": 2100,
+    "test": 2100
+  },
+  "best_model": "XGBoost",
+  "best_f1": 0.8497,
+  "best_roc_auc": 0.9538,
+  "models": [
+    {
+      "model": "XGBoost",
+      "accuracy": 0.8728571428571429,
+      "precision": 0.8057630736392742,
+      "recall": 0.8988095238095238,
+      "f1": 0.8497467642093416,
+      "roc_auc": 0.9537882653061223,
+      "training_time_s": 2.284578999999212,
+      "inference_time_ms_per_row": 0.07618995238555638
+    },
+    {
+      "model": "Random Forest",
+      "accuracy": 0.8523809523809524,
+      "precision": 0.8590785907859079,
+      "recall": 0.7547619047619047,
+      "f1": 0.8035487959442332,
+      "roc_auc": 0.9313208616780045,
+      "training_time_s": 0.3969993000064278,
+      "inference_time_ms_per_row": 0.0852189047630721
+    },
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.8171428571428572,
+      "precision": 0.875,
+      "recall": 0.6333333333333333,
+      "f1": 0.7348066298342542,
+      "roc_auc": 0.927024754346183,
+      "training_time_s": 0.20847149999463,
+      "inference_time_ms_per_row": 0.03214880952284494
+    }
+  ]
+}

@@ -96,25 +96,16 @@ function KpiTile({
   )
 }
 
-function countFromRate(rate: number, backlog: number) {
-  if (backlog <= 0) return "0"
-  return String(Math.max(0, Math.min(backlog, Math.round(rate * backlog))))
-}
-
 export function DashboardHeroKpiRow({
   metrics,
 }: {
   metrics?: DashboardMetrics | null
 }) {
   const live = metrics != null
-  const tickets = live ? String(metrics.backlog) : SCREENSHOT.tickets
+  const tickets = live ? String(metrics.openTickets) : SCREENSHOT.tickets
   const sla = live ? String(metrics.slaAtRisk) : SCREENSHOT.sla
-  const escalations = live
-    ? countFromRate(metrics.escalationRate, metrics.backlog)
-    : SCREENSHOT.escalations
-  const transfers = live
-    ? countFromRate(metrics.transferRate, metrics.backlog)
-    : SCREENSHOT.transfers
+  const escalations = live ? String(metrics.escalations) : SCREENSHOT.escalations
+  const transfers = live ? String(metrics.transfers) : SCREENSHOT.transfers
 
   return (
     <section aria-label="Key metrics">

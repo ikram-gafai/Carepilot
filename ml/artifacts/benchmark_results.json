@@ -1,0 +1,248 @@
+{
+  "dataset": {
+    "total_tickets": 14000,
+    "table_counts": {
+      "historical_tickets": 14000,
+      "historical_actions": 34856,
+      "historical_resolutions": 10356,
+      "km_articles": 92,
+      "dataset_exports": 42000
+    },
+    "class_distribution_pct": {
+      "0": 60.0,
+      "1": 40.0
+    },
+    "priority_distribution_pct": {
+      "critical": 18.0,
+      "high": 28.0,
+      "low": 15.0,
+      "medium": 39.0
+    },
+    "perimeter_distribution_pct": {
+      "back_office": 9.0,
+      "checkout": 18.0,
+      "hardware": 13.0,
+      "loyalty": 10.0,
+      "network": 13.0,
+      "payment": 13.0,
+      "sco": 15.5,
+      "store_infrastructure": 8.5
+    },
+    "split_sizes": {
+      "train": 9800,
+      "validation": 2100,
+      "test": 2100
+    },
+    "missing_description_pct": 8.1,
+    "missing_resolution_time_pct": 26.03
+  },
+  "results": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.8171,
+      "Precision": 0.875,
+      "Recall": 0.6333,
+      "F1": 0.7348,
+      "ROC-AUC": 0.927,
+      "Training Time (s)": 0.2219,
+      "Inference Time (ms/row)": 0.0325
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.8524,
+      "Precision": 0.8591,
+      "Recall": 0.7548,
+      "F1": 0.8035,
+      "ROC-AUC": 0.9313,
+      "Training Time (s)": 0.3634,
+      "Inference Time (ms/row)": 0.0658
+    },
+    {
+      "Model": "XGBoost",
+      "Accuracy": 0.8729,
+      "Precision": 0.8058,
+      "Recall": 0.8988,
+      "F1": 0.8497,
+      "ROC-AUC": 0.9538,
+      "Training Time (s)": 2.2218,
+      "Inference Time (ms/row)": 0.0739
+    }
+  ],
+  "confusion_matrices": {
+    "Logistic Regression": [
+      [
+        1184,
+        76
+      ],
+      [
+        308,
+        532
+      ]
+    ],
+    "Random Forest": [
+      [
+        1156,
+        104
+      ],
+      [
+        206,
+        634
+      ]
+    ],
+    "XGBoost": [
+      [
+        1078,
+        182
+      ],
+      [
+        85,
+        755
+      ]
+    ]
+  },
+  "normalized_confusion_matrices": {
+    "Logistic Regression": [
+      [
+        0.9396825396825397,
+        0.06031746031746032
+      ],
+      [
+        0.36666666666666664,
+        0.6333333333333333
+      ]
+    ],
+    "Random Forest": [
+      [
+        0.9174603174603174,
+        0.08253968253968254
+      ],
+      [
+        0.24523809523809523,
+        0.7547619047619047
+      ]
+    ],
+    "XGBoost": [
+      [
+        0.8555555555555555,
+        0.14444444444444443
+      ],
+      [
+        0.10119047619047619,
+        0.8988095238095238
+      ]
+    ]
+  },
+  "classification_reports": {
+    "Logistic Regression": {
+      "No escalation": {
+        "precision": 0.7935656836461126,
+        "recall": 0.9396825396825397,
+        "f1-score": 0.8604651162790697,
+        "support": 1260.0
+      },
+      "Escalation": {
+        "precision": 0.875,
+        "recall": 0.6333333333333333,
+        "f1-score": 0.7348066298342542,
+        "support": 840.0
+      },
+      "accuracy": 0.8171428571428572,
+      "macro avg": {
+        "precision": 0.8342828418230563,
+        "recall": 0.7865079365079365,
+        "f1-score": 0.797635873056662,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.8261394101876676,
+        "recall": 0.8171428571428572,
+        "f1-score": 0.8102017217011435,
+        "support": 2100.0
+      }
+    },
+    "Random Forest": {
+      "No escalation": {
+        "precision": 0.8487518355359766,
+        "recall": 0.9174603174603174,
+        "f1-score": 0.881769641495042,
+        "support": 1260.0
+      },
+      "Escalation": {
+        "precision": 0.8590785907859079,
+        "recall": 0.7547619047619047,
+        "f1-score": 0.8035487959442332,
+        "support": 840.0
+      },
+      "accuracy": 0.8523809523809524,
+      "macro avg": {
+        "precision": 0.8539152131609422,
+        "recall": 0.836111111111111,
+        "f1-score": 0.8426592187196376,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.852882537635949,
+        "recall": 0.8523809523809524,
+        "f1-score": 0.8504813032747185,
+        "support": 2100.0
+      }
+    },
+    "XGBoost": {
+      "No escalation": {
+        "precision": 0.9269131556319863,
+        "recall": 0.8555555555555555,
+        "f1-score": 0.889806025588114,
+        "support": 1260.0
+      },
+      "Escalation": {
+        "precision": 0.8057630736392742,
+        "recall": 0.8988095238095238,
+        "f1-score": 0.8497467642093416,
+        "support": 840.0
+      },
+      "accuracy": 0.8728571428571429,
+      "macro avg": {
+        "precision": 0.8663381146356303,
+        "recall": 0.8771825396825397,
+        "f1-score": 0.8697763948987278,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.8784531228349015,
+        "recall": 0.8728571428571429,
+        "f1-score": 0.873782321036605,
+        "support": 2100.0
+      }
+    }
+  },
+  "cross_validation": [
+    {
+      "Model": "Logistic Regression",
+      "Mean Accuracy": 0.8278,
+      "Std Deviation": 0.0057
+    },
+    {
+      "Model": "Random Forest",
+      "Mean Accuracy": 0.8503,
+      "Std Deviation": 0.0045
+    },
+    {
+      "Model": "XGBoost",
+      "Mean Accuracy": 0.886,
+      "Std Deviation": 0.0047
+    }
+  ],
+  "plots": {
+    "class_distribution": "C:\\Users\\ar202\\carepilot\\ml\\plots\\class_distribution.png",
+    "priority_vs_escalation": "C:\\Users\\ar202\\carepilot\\ml\\plots\\priority_vs_escalation.png",
+    "perimeter_vs_escalation": "C:\\Users\\ar202\\carepilot\\ml\\plots\\perimeter_vs_escalation.png",
+    "roc_curve": "C:\\Users\\ar202\\carepilot\\ml\\plots\\roc_curve_comparison.png",
+    "model_comparison": "C:\\Users\\ar202\\carepilot\\ml\\plots\\model_comparison.png",
+    "precision_recall": "C:\\Users\\ar202\\carepilot\\ml\\plots\\precision_recall_comparison.png",
+    "f1": "C:\\Users\\ar202\\carepilot\\ml\\plots\\f1_score_comparison.png"
+  },
+  "feature_importance_plots": {
+    "Random Forest": "C:\\Users\\ar202\\carepilot\\ml\\plots\\feature_importance_random_forest.png",
+    "XGBoost": "C:\\Users\\ar202\\carepilot\\ml\\plots\\feature_importance_xgboost.png"
+  }
+}

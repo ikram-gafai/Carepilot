@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import type { CarePilotSessionUser } from "@/lib/auth/session"
+
 import {
   CarePilotCommandMenu,
   CarePilotCommandProvider,
@@ -39,7 +41,14 @@ function CarePilotSearchShortcut() {
   return null
 }
 
-export function CarePilotShell({ children }: { children: React.ReactNode }) {
+export function CarePilotShell({
+  children,
+  sessionUser,
+}: {
+  children: React.ReactNode
+  /** When set, sidebar shows signed-in CarePilot user (requires DB + session). */
+  sessionUser?: CarePilotSessionUser | null
+}) {
   return (
     <SidebarProvider
       style={
@@ -51,7 +60,7 @@ export function CarePilotShell({ children }: { children: React.ReactNode }) {
     >
       <CarePilotCommandProvider>
         <CarePilotSearchShortcut />
-        <CarePilotSidebar variant="inset" />
+        <CarePilotSidebar variant="inset" sessionUser={sessionUser} />
         <CarePilotPageHeaderProvider>
           <SidebarInset className="bg-card text-card-foreground md:peer-data-[variant=inset]:overflow-hidden md:peer-data-[variant=inset]:rounded-2xl">
             <CarePilotShellHeaderRow />

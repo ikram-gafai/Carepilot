@@ -29,12 +29,12 @@ export function SlaStateBadge({ state }: { state: DemoSlaState }) {
     "at-risk": {
       label: "At Risk",
       className:
-        "bg-amber-500/15 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300",
+        "bg-primary/12 text-foreground dark:bg-primary/18 dark:text-foreground",
     },
     "on-track": {
       label: "On Track",
       className:
-        "bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300",
+        "bg-muted text-muted-foreground dark:bg-muted/80 dark:text-muted-foreground",
     },
   } as const
 

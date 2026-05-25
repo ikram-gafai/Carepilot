@@ -28,7 +28,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# env files
+# env files (keep secrets out of git; use .env.example as template)
+.env
 .env*.local
 
 # typescript

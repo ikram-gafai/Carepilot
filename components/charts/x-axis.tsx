@@ -9,7 +9,7 @@ export interface XAxisProps {
   numTicks?: number;
   /** Width of the date ticker box for fade calculation. Default: 50 */
   tickerHalfWidth?: number;
-  /** Override tick label text (e.g. `fr-FR` short dates). Default: en-US month + day */
+  /** Override tick label text (e.g. `en-GB` short dates). Default: en-US month + day */
   formatTick?: (date: Date) => string;
 }
 

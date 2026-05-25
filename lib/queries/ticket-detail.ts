@@ -25,12 +25,12 @@ export type MergedTimelineEntry = {
 }
 
 const PIPELINE_EVENT_LABELS: Record<string, string> = {
-  ai_analysis: "Analyse IA",
-  embedding: "Embedding ticket (pgvector)",
-  similar_tickets: "Recherche tickets similaires",
-  km_recommendation: "Recommandations KM",
-  escalation_transfer_suggestion: "Escalade & transfert — suggestion IA",
-  agent_override: "Décision agent (override)",
+  ai_analysis: "AI analysis",
+  embedding: "Ticket embedding (pgvector)",
+  similar_tickets: "Similar ticket search",
+  km_recommendation: "KM recommendations",
+  escalation_transfer_suggestion: "Escalation & transfer — AI suggestion",
+  agent_override: "Agent decision (override)",
 }
 
 export async function loadTicketDetail(db: Db, carepilotTicketId: number) {
@@ -147,8 +147,8 @@ async function buildMergedTimeline(
   entries.push({
     occurredAt: cp.createdAt,
     kind: "ticket_created",
-    title: "Ticket synchronisé dans CAREPILOT",
-    subtitle: `Réf. source CARE id ${cp.sourceTicketId} — copie opérationnelle pour analyse.`,
+    title: "Ticket synced to CAREPILOT",
+    subtitle: `Source CARE reference id ${cp.sourceTicketId} — operational copy for analysis.`,
   })
 
   if (!cp.sourceTicketId) return entries.sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
@@ -163,7 +163,7 @@ async function buildMergedTimeline(
     entries.push({
       occurredAt: c.createdAt,
       kind: "comment",
-      title: `Commentaire (${c.authorRole})`,
+      title: `Comment (${c.authorRole})`,
       subtitle: c.content,
     })
   }
@@ -180,7 +180,7 @@ async function buildMergedTimeline(
       occurredAt: a.createdAt,
       kind: isKm ? "km_apply" : "action",
       title: isKm ? `${a.description}` : `Action — ${a.actionType}`,
-      subtitle: a.result ? `Résultat: ${a.result}` : a.description,
+      subtitle: a.result ? `Result: ${a.result}` : a.description,
     })
   }
 

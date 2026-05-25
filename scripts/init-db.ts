@@ -1,12 +1,14 @@
 import "./load-env"
 import fs from "node:fs"
 import path from "node:path"
+
 import postgres from "postgres"
 
 async function main() {
-  const url = process.env.DATABASE_URL
+  const url =
+    process.env.DATABASE_URL?.trim() || process.env.POSTGRES_DATABASE_URL?.trim()
   if (!url) {
-    console.error("DATABASE_URL manquant")
+    console.error("DATABASE_URL or POSTGRES_DATABASE_URL is required.")
     process.exit(1)
   }
 
@@ -16,7 +18,7 @@ async function main() {
 
   await sql.unsafe(ddl)
   await sql.end({ timeout: 5 })
-  console.log("Schéma CAREPILOT initialisé (care_source + carepilot + pgvector).")
+  console.log("CAREPILOT schema initialized (care_source + carepilot + cp_agent + pgvector).")
 }
 
 main().catch((e) => {

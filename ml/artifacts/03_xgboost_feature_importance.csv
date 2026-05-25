@@ -1,0 +1,21 @@
+feature,importance
+num__sla_breached,0.26044858
+cat__priority_high,0.08982271
+cat__priority_medium,0.03582973
+cat__priority_critical,0.0320071
+cat__priority_low,0.021738792
+text__low,0.017563105
+text__later,0.0065408736
+cat__perimeter_hardware,0.00626846
+text__sensor fault,0.0059526833
+text__caused,0.0057417876
+cat__perimeter_network,0.005672013
+text__middleware delay,0.005610596
+cat__perimeter_store_infrastructure,0.0051456196
+cat__perimeter_checkout,0.005141499
+text__caused host,0.00500354
+text__fault triggered,0.004960531
+text__network,0.0049491967
+text__middleware,0.0049093976
+text__payment,0.0047292584
+text__paris,0.004703353

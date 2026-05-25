@@ -30,12 +30,12 @@ async function buildRawText(
   const cBlock =
     comments.length > 0
       ? comments.map((c) => `- [${c.authorRole}] ${c.content}`).join("\n")
-      : "(aucun commentaire)"
+      : "(no comments)"
 
   const aBlock =
     actions.length > 0
       ? actions.map((a) => `- ${a.actionType}: ${a.description} (${a.result ?? "—"})`).join("\n")
-      : "(aucune action)"
+      : "(no actions)"
 
   return [
     `TITLE: ${src.title}`,
@@ -65,7 +65,7 @@ export async function runCareSync(db: Db) {
 
   const logId = insertedLog[0]?.id
   if (!logId) {
-    throw new Error("Impossible de créer sync_logs")
+    throw new Error("Could not create sync_logs row")
   }
 
   let imported = 0
@@ -131,7 +131,7 @@ export async function runCareSync(db: Db) {
         await appendTimelineEvent(db, {
           ticketId: cpTicketId,
           eventType: "sync_update",
-          summary: "Ticket mis à jour depuis CARE Simulator",
+          summary: "Ticket updated from CARE Simulator",
           occurredAt: new Date(),
         })
       } else {
@@ -160,14 +160,14 @@ export async function runCareSync(db: Db) {
         await appendTimelineEvent(db, {
           ticketId: cpTicketId,
           eventType: "ticket_created",
-          summary: "Ticket créé (import CARE Simulator)",
+          summary: "Ticket created (CARE Simulator import)",
           occurredAt: src.createdAt,
         })
 
         await appendTimelineEvent(db, {
           ticketId: cpTicketId,
           eventType: "sync_import",
-          summary: "Première synchronisation CARE Simulator → CAREPILOT",
+          summary: "Initial CARE Simulator → CAREPILOT sync",
           occurredAt: new Date(),
         })
       }

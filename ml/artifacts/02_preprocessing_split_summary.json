@@ -1,0 +1,17 @@
+[
+  {
+    "split": "train",
+    "rows": 9800,
+    "positive_rate": 40.0
+  },
+  {
+    "split": "validation",
+    "rows": 2100,
+    "positive_rate": 40.0
+  },
+  {
+    "split": "test",
+    "rows": 2100,
+    "positive_rate": 40.0
+  }
+]

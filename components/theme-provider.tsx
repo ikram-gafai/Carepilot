@@ -10,9 +10,9 @@ function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="light"
       enableSystem
-      storageKey="carepilot-theme"
+      storageKey="carepilot-theme-v2"
       disableTransitionOnChange
       {...props}
     >

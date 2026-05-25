@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import {
   IconChartAreaLine,
@@ -16,6 +15,8 @@ import {
   IconTicketFilled,
 } from "@tabler/icons-react"
 
+import { CarePilotBrandMark } from "@/components/carepilot-brand-mark"
+import type { CarePilotSessionUser } from "@/lib/auth/session"
 import {
   CAREPILOT_COMMAND_TAB_VALUE,
   useCarePilotCommand,
@@ -115,7 +116,12 @@ const tabLabelClass = cn(
   "min-w-0 flex-1 truncate text-left group-data-[collapsible=icon]:sr-only"
 )
 
-export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
+export function CarePilotSidebar(
+  props: React.ComponentProps<typeof Sidebar> & {
+    sessionUser?: CarePilotSessionUser | null
+  },
+) {
+  const { sessionUser, ...sidebarProps } = props
   const pathname = usePathname()
   const router = useRouter()
   const { open: commandOpen, setOpen: setCommandOpen } = useCarePilotCommand()
@@ -126,19 +132,14 @@ export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
     : (navSectionValue(pathname, topPathNav) ?? null)
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="flex items-center gap-2 px-3 py-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
-        <Image
-          src="/logo/carrefour.svg"
-          alt=""
-          width={131}
-          height={82}
-          className="h-5 w-auto shrink-0 object-contain object-left group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:max-h-8 group-data-[collapsible=icon]:max-w-8"
+    <Sidebar collapsible="icon" {...sidebarProps}>
+      <SidebarHeader className="px-3 py-3 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
+        <CarePilotBrandMark
+          href="/dashboard"
           priority
+          logoClassName="h-5 w-auto shrink-0 object-contain object-left group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:max-h-8 group-data-[collapsible=icon]:max-w-8"
+          nameClassName="text-sm text-sidebar-foreground group-data-[collapsible=icon]:sr-only"
         />
-        <span className="min-w-0 text-sm font-semibold tracking-tight text-sidebar-foreground group-data-[collapsible=icon]:sr-only">
-          CAREPILOT
-        </span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="min-h-0 flex-1">
@@ -196,7 +197,7 @@ export function CarePilotSidebar(props: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <CarePilotSidebarFooter />
+      <CarePilotSidebarFooter sessionUser={sessionUser} />
     </Sidebar>
   )
 }

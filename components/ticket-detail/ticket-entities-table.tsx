@@ -26,8 +26,8 @@ export function TicketEntitiesTable({ entities }: { entities: Record<string, unk
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="h-8 w-[38%] text-[11px]">Attribut</TableHead>
-            <TableHead className="h-8 text-[11px]">Valeur</TableHead>
+            <TableHead className="h-8 w-[38%] text-[11px]">Attribute</TableHead>
+            <TableHead className="h-8 text-[11px]">Value</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -47,14 +47,14 @@ export function TicketEntitiesTable({ entities }: { entities: Record<string, unk
       {Array.isArray(actions) && actions.length > 0 ? (
         <div>
           <div className="mb-1 text-[11px] font-semibold text-muted-foreground">
-            Actions déjà réalisées (source)
+            Actions already performed (source)
           </div>
           <ul className="list-inside list-decimal space-y-1 rounded border border-border bg-muted/20 p-2 text-[11px] leading-relaxed">
             {actions.slice(0, 14).map((a, i) => (
               <li key={i}>{String(a)}</li>
             ))}
             {actions.length > 14 ? (
-              <li className="text-muted-foreground">… +{actions.length - 14} entrées</li>
+              <li className="text-muted-foreground">… +{actions.length - 14} more</li>
             ) : null}
           </ul>
         </div>

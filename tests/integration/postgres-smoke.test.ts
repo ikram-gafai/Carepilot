@@ -2,8 +2,8 @@ import { expect, test } from "bun:test"
 import postgres from "postgres"
 
 /**
- * Smoke test optionnel : `RUN_INTEGRATION=1` + Postgres accessible (Docker local).
- * CI minimal : non exécuté par défaut.
+ * Optional smoke test: `RUN_INTEGRATION=1` + Postgres reachable (local Docker).
+ * Minimal CI: not run by default.
  */
 test("postgres: SELECT 1 (RUN_INTEGRATION=1)", async () => {
   if (process.env.RUN_INTEGRATION !== "1") return

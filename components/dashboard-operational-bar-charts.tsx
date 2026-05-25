@@ -64,11 +64,11 @@ const predictedBarCategoryGap = `${(100 - PREDICTED_BAR_WIDTH_PCT) / 2}%`
 export function DashboardOperationalBarCharts() {
   const predicted = useMemo(
     () => [
-      { label: "Traitement N2", pct: 58, count: 32 },
-      { label: "Escalade N3", pct: 34, count: 12 },
-      { label: "Transfert Réseau", pct: 22, count: 7 },
-      { label: "Transfert Matériel", pct: 16, count: 4 },
-      { label: "Attente Magasin", pct: 9, count: 3 },
+      { label: "N2 handling", pct: 58, count: 32 },
+      { label: "N3 escalation", pct: 34, count: 12 },
+      { label: "Network transfer", pct: 22, count: 7 },
+      { label: "Hardware transfer", pct: 16, count: 4 },
+      { label: "Waiting on store", pct: 9, count: 3 },
     ],
     []
   )
@@ -84,7 +84,7 @@ export function DashboardOperationalBarCharts() {
 
   const missing = useMemo(
     () => [
-      { label: "SNAC / Caisse ID", n: 6 },
+      { label: "SMAC / Lane ID", n: 6 },
       { label: "Error code / logs", n: 4 },
       { label: "Reboot validation", n: 3 },
       { label: "Store feedback", n: 2 },
@@ -94,11 +94,11 @@ export function DashboardOperationalBarCharts() {
 
   const routing = useMemo(
     () => [
-      { label: "Traitement N2", n: 32 },
-      { label: "Escalade N3", n: 12 },
-      { label: "Transfert Réseau", n: 7 },
-      { label: "Transfert Matériel", n: 4 },
-      { label: "Attente Magasin", n: 3 },
+      { label: "N2 handling", n: 32 },
+      { label: "N3 escalation", n: 12 },
+      { label: "Network transfer", n: 7 },
+      { label: "Hardware transfer", n: 4 },
+      { label: "Waiting on store", n: 3 },
     ],
     []
   )

@@ -39,13 +39,13 @@ async function fetchSourceTicket(db: Db, sourceTicketId: number) {
   return rows[0] ?? null
 }
 
-/** Étapes séparées : analyse → embeddings → retrieval → KM → règles (pas de pipeline monolithique). */
+/** Split steps: analysis → embeddings → retrieval → KM → rules (no monolithic pipeline). */
 export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) {
   const cp = await fetchCpTicket(db, carepilotTicketId)
-  if (!cp) throw new Error("Ticket introuvable")
+  if (!cp) throw new Error("Ticket not found")
 
   const src = await fetchSourceTicket(db, cp.sourceTicketId)
-  if (!src) throw new Error("Ticket source introuvable")
+  if (!src) throw new Error("Source ticket not found")
 
   const actions = await db
     .select()
@@ -65,7 +65,7 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
   const aiSummary =
     (await llm.summarizeTicket({ title: src.title, description: src.description })) ||
     heuristic.detectedProblemType ||
-    "Résumé indisponible"
+    "Summary unavailable"
 
   await db.delete(ticketAnalysis).where(eq(ticketAnalysis.ticketId, carepilotTicketId))
   await db.insert(ticketAnalysis).values({
@@ -82,7 +82,7 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
   await appendTimelineEvent(db, {
     ticketId: carepilotTicketId,
     eventType: "ai_analysis",
-    summary: "Analyse ticket enregistrée",
+    summary: "Ticket analysis saved",
     detail: aiSummary.slice(0, 500),
   })
 
@@ -109,7 +109,7 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
   await appendTimelineEvent(db, {
     ticketId: carepilotTicketId,
     eventType: "embedding",
-    summary: "Embedding ticket mis à jour",
+    summary: "Ticket embedding updated",
     metadata: { model: embedClient.modelName },
   })
 
@@ -143,8 +143,8 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
 
     const meta = simRows[0]
     const referenceNote = meta
-      ? `Similar to Ticket #${meta.careId} — périmètre ${meta.perimeter}${meta.cash ? `, caisse ${meta.cash}` : ""}`
-      : `Similar ticket interne id=${sid}`
+      ? `Similar to Ticket #${meta.careId} — perimeter ${meta.perimeter}${meta.cash ? `, lane ${meta.cash}` : ""}`
+      : `Similar ticket internal id=${sid}`
 
     await db.insert(similarTicketResults).values({
       ticketId: carepilotTicketId,
@@ -167,7 +167,7 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
   await appendTimelineEvent(db, {
     ticketId: carepilotTicketId,
     eventType: "similar_tickets",
-    summary: `${similarHits.length} ticket(s) similaire(s) détecté(s)`,
+    summary: `${similarHits.length} similar ticket(s) detected`,
   })
 
   await db.delete(kmRecommendations).where(eq(kmRecommendations.ticketId, carepilotTicketId))
@@ -189,12 +189,12 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
 
     const km = kmRows[0]
     const explanation = km
-      ? `KM existante ${km.kmCode} (${km.title}) — similarité sémantique avec le ticket.`
-      : "KM candidate via similarité sémantique."
+      ? `Existing KM ${km.kmCode} (${km.title}) — semantic similarity to the ticket.`
+      : "KM candidate via semantic similarity."
 
     const whyFactors = [
-      km ? `Procédure ${km.kmCode} — périmètre ${km.perimeter}` : "Alignement sémantique",
-      heuristic.detectedProblemType ? `Type détecté: ${heuristic.detectedProblemType}` : "",
+      km ? `Procedure ${km.kmCode} — perimeter ${km.perimeter}` : "Semantic alignment",
+      heuristic.detectedProblemType ? `Detected type: ${heuristic.detectedProblemType}` : "",
     ].filter(Boolean)
 
     await db.insert(kmRecommendations).values({
@@ -217,7 +217,7 @@ export async function runAiPipelineForTicket(db: Db, carepilotTicketId: number) 
   await appendTimelineEvent(db, {
     ticketId: carepilotTicketId,
     eventType: "km_recommendation",
-    summary: `${kmHits.length} reco KM calculée(s)`,
+    summary: `${kmHits.length} KM recommendation(s) computed`,
   })
 
   await db

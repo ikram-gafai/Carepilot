@@ -9,7 +9,9 @@ CREATE TABLE care_source.stores (
   id SERIAL PRIMARY KEY,
   store_code TEXT NOT NULL UNIQUE,
   store_name TEXT NOT NULL,
-  city TEXT NOT NULL
+  city TEXT NOT NULL,
+  region TEXT NOT NULL DEFAULT '',
+  store_type TEXT NOT NULL DEFAULT 'Market'
 );
 
 CREATE TABLE care_source.cash_registers (
@@ -43,7 +45,8 @@ CREATE TABLE care_source.tickets (
   status TEXT NOT NULL,
   priority TEXT NOT NULL,
   channel TEXT NOT NULL DEFAULT 'PORTAL',
-  store_code TEXT,
+  store_id INTEGER NOT NULL REFERENCES care_source.stores (id),
+  store_code TEXT NOT NULL,
   cash_register_code TEXT,
   category TEXT,
   error_message TEXT,
@@ -191,3 +194,169 @@ CREATE TABLE carepilot.golden_test_cases (
   expected_km TEXT,
   expected_decision TEXT
 );
+
+CREATE TABLE carepilot.users (
+  id SERIAL PRIMARY KEY,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  avatar_url TEXT,
+  role TEXT NOT NULL,
+  department TEXT,
+  status TEXT NOT NULL DEFAULT 'active',
+  last_login_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE carepilot.sessions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES carepilot.users (id) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX carepilot_sessions_user_id_idx ON carepilot.sessions (user_id);
+
+CREATE TABLE carepilot.user_preferences (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL UNIQUE REFERENCES carepilot.users (id) ON DELETE CASCADE,
+  theme TEXT NOT NULL DEFAULT 'dark',
+  compact_mode BOOLEAN NOT NULL DEFAULT false,
+  notifications_enabled BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- CarePilot agent workspace (operational data layer)
+CREATE SCHEMA IF NOT EXISTS cp_agent;
+
+CREATE TABLE cp_agent.users (
+  id SERIAL PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  display_name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'agent',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE cp_agent.tickets (
+  id SERIAL PRIMARY KEY,
+  care_id TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  store_code TEXT,
+  category TEXT NOT NULL,
+  status TEXT NOT NULL,
+  priority TEXT NOT NULL,
+  sla_due_at TIMESTAMPTZ,
+  ttr_target_hours INTEGER,
+  assigned_user_id INTEGER REFERENCES cp_agent.users (id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX cp_agent_tickets_status ON cp_agent.tickets (status);
+CREATE INDEX cp_agent_tickets_priority ON cp_agent.tickets (priority);
+CREATE INDEX cp_agent_tickets_sla ON cp_agent.tickets (sla_due_at);
+
+CREATE TABLE cp_agent.procedures (
+  id SERIAL PRIMARY KEY,
+  code TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,
+  scope TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  prerequisites TEXT NOT NULL DEFAULT '',
+  steps JSONB NOT NULL DEFAULT '[]'::jsonb,
+  tags TEXT NOT NULL DEFAULT '',
+  relevance_score REAL NOT NULL,
+  usage_count INTEGER NOT NULL DEFAULT 0,
+  last_used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX cp_agent_procedures_category ON cp_agent.procedures (category);
+CREATE INDEX cp_agent_procedures_scope ON cp_agent.procedures (scope);
+
+CREATE TABLE cp_agent.ticket_procedure_links (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER NOT NULL REFERENCES cp_agent.tickets (id) ON DELETE CASCADE,
+  procedure_id INTEGER NOT NULL REFERENCES cp_agent.procedures (id) ON DELETE CASCADE,
+  relevance_score REAL NOT NULL,
+  reason TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX cp_agent_ticket_proc_ticket ON cp_agent.ticket_procedure_links (ticket_id);
+CREATE INDEX cp_agent_ticket_proc_procedure ON cp_agent.ticket_procedure_links (procedure_id);
+
+CREATE TABLE cp_agent.ticket_history (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER NOT NULL REFERENCES cp_agent.tickets (id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  detail TEXT,
+  actor_label TEXT NOT NULL,
+  occurred_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX cp_agent_hist_ticket_time ON cp_agent.ticket_history (ticket_id, occurred_at DESC);
+
+CREATE TABLE cp_agent.ai_analyses (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER NOT NULL REFERENCES cp_agent.tickets (id) ON DELETE CASCADE,
+  detected_issue TEXT NOT NULL,
+  suggested_action TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  escalation_risk TEXT NOT NULL DEFAULT 'low',
+  missing_info JSONB NOT NULL DEFAULT '[]'::jsonb,
+  reasoning TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX cp_agent_ai_one_active ON cp_agent.ai_analyses (ticket_id);
+
+CREATE TABLE cp_agent.km_suggestions (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER NOT NULL REFERENCES cp_agent.tickets (id) ON DELETE CASCADE,
+  km_code TEXT NOT NULL,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  steps TEXT NOT NULL DEFAULT '',
+  relevance_score REAL NOT NULL,
+  rank INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX cp_agent_km_ticket ON cp_agent.km_suggestions (ticket_id, rank);
+
+CREATE TABLE cp_agent.ai_feedback (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER NOT NULL REFERENCES cp_agent.tickets (id) ON DELETE CASCADE,
+  helpful BOOLEAN,
+  confidence_rating INTEGER,
+  comment TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE cp_agent.sync_logs (
+  id SERIAL PRIMARY KEY,
+  sync_started_at TIMESTAMPTZ NOT NULL,
+  sync_finished_at TIMESTAMPTZ,
+  status TEXT NOT NULL,
+  message TEXT,
+  records_processed INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE cp_agent.audit_logs (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER REFERENCES cp_agent.tickets (id) ON DELETE SET NULL,
+  action TEXT NOT NULL,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX cp_agent_audit_ticket ON cp_agent.audit_logs (ticket_id, created_at DESC);

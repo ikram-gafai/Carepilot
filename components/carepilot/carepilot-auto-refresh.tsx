@@ -4,11 +4,10 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 /**
- * Lightweight RSC refresh aligned with the sync scheduler (default 60s).
- * Use on supervision pages only — avoids aggressive polling elsewhere.
+ * Lightweight RSC refresh for supervision pages (default 2 min).
  */
 export function CarepilotAutoRefresh({
-  intervalMs = 60_000,
+  intervalMs = 120_000,
   children,
 }: {
   intervalMs?: number

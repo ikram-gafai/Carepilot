@@ -5,6 +5,10 @@ import {
   CLOSED_STATUS_SQL_LIST,
   N3_TICKET_STATUS,
 } from "@/lib/care-operational-actions"
+import {
+  operationalCareTicketScope,
+  operationalOpenCareTicketScope,
+} from "@/lib/care-operational/operational-ticket-scope"
 import { cpAgentTickets } from "@/lib/db/schema/cp-agent"
 
 /** CarePilot sign-in role for the support / agent workspace (not Admin or Supervisor). */
@@ -12,6 +16,10 @@ export const SUPPORT_AGENT_ROLE = "Agent" as const
 
 export const CLOSED = CLOSED_TICKET_STATUSES
 export const OPEN_FILTER = sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_STATUS_SQL_LIST)})`
+
+/** Agent-aligned scope: synchronized CARE tickets, excluding demo scenarios. */
+export const OPERATIONAL_TICKET_SCOPE = operationalCareTicketScope()
+export const OPERATIONAL_OPEN_SCOPE = operationalOpenCareTicketScope(CLOSED_STATUS_SQL_LIST)
 /** N3 escalations only — not perimeter transfers. */
 export const N3_ESCALATION_STATUSES = [N3_TICKET_STATUS] as const
 

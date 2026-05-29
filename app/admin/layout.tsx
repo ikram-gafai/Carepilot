@@ -20,14 +20,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       redirect("/agent/dashboard")
     }
     return (
-      <div className="light min-h-dvh bg-zinc-50 text-zinc-900" style={{ colorScheme: "light" }}>
+      <div className="h-dvh overflow-hidden bg-background text-foreground">
         <AdminShellWithPath sessionUser={session}>{children}</AdminShellWithPath>
       </div>
     )
   }
 
   return (
-    <div className="light min-h-dvh bg-zinc-50 text-zinc-900" style={{ colorScheme: "light" }}>
+    <div className="h-dvh overflow-hidden bg-background text-foreground">
       <AdminShellWithPath>{children}</AdminShellWithPath>
     </div>
   )

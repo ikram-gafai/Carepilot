@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { AgentShellWithPath } from "@/components/agent/layout/agent-shell-with-path"
 import { roleMatchesWorkspace } from "@/lib/auth/access"
 import { getCarePilotSession } from "@/lib/auth/session"
-import { getAgentSidebarSnapshot } from "@/lib/carepilot-api/agent-sidebar"
+import { getCachedAgentSidebarSnapshot } from "@/lib/carepilot-api/agent-sidebar"
 import { hasDatabaseUrl } from "@/lib/db"
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default async function AgentSegmentLayout({ children }: { children: React
     if (!roleMatchesWorkspace(session.role, "agent")) {
       redirect("/admin/dashboard")
     }
-    const sidebar = await getAgentSidebarSnapshot(session.email)
+    const sidebar = await getCachedAgentSidebarSnapshot(session.email)
     return (
       <AgentShellWithPath sidebar={sidebar} sessionUser={session}>
         {children}
@@ -31,6 +31,6 @@ export default async function AgentSegmentLayout({ children }: { children: React
     )
   }
 
-  const sidebar = await getAgentSidebarSnapshot()
+  const sidebar = await getCachedAgentSidebarSnapshot()
   return <AgentShellWithPath sidebar={sidebar}>{children}</AgentShellWithPath>
 }

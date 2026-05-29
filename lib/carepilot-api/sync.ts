@@ -11,7 +11,7 @@ import {
 
 import { loadSyncHealthMetrics } from "./metrics"
 
-export async function getSyncStatus() {
+export async function getSyncStatus(opts?: { includeEntityCounts?: boolean }) {
   const db = getDb()
   const syncMetrics = await loadSyncHealthMetrics()
   const latest = syncMetrics.latestLog
@@ -24,12 +24,21 @@ export async function getSyncStatus() {
     reason: syncMetrics.reason,
   }
 
-  const [[tickets], [history], [comments], [km]] = await Promise.all([
-    db.select({ c: count() }).from(cpAgentTickets),
-    db.select({ c: count() }).from(cpAgentTicketHistory),
-    db.select({ c: count() }).from(cpAgentTicketComments),
-    db.select({ c: count() }).from(cpAgentKmReferences),
-  ])
+  let entityCounts = { tickets: 0, history: 0, comments: 0, km: 0 }
+  if (opts?.includeEntityCounts !== false) {
+    const [[tickets], [history], [comments], [km]] = await Promise.all([
+      db.select({ c: count() }).from(cpAgentTickets),
+      db.select({ c: count() }).from(cpAgentTicketHistory),
+      db.select({ c: count() }).from(cpAgentTicketComments),
+      db.select({ c: count() }).from(cpAgentKmReferences),
+    ])
+    entityCounts = {
+      tickets: Number(tickets?.c ?? 0),
+      history: Number(history?.c ?? 0),
+      comments: Number(comments?.c ?? 0),
+      km: Number(km?.c ?? 0),
+    }
+  }
 
   return {
     running,
@@ -62,12 +71,7 @@ export async function getSyncStatus() {
           failed: lastSuccess.failedCount ?? lastSuccess.recordsFailed,
         }
       : null,
-    entityCounts: {
-      tickets: Number(tickets?.c ?? 0),
-      history: Number(history?.c ?? 0),
-      comments: Number(comments?.c ?? 0),
-      km: Number(km?.c ?? 0),
-    },
+    entityCounts,
   }
 }
 

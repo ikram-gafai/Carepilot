@@ -11,7 +11,6 @@ import {
   Pencil,
   Rows3,
   Sun,
-  Ticket,
   User,
 } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -47,7 +46,7 @@ import { cn } from "@/lib/utils"
 
 
 function profileName(sessionUser?: CarePilotSessionUser | null) {
-  if (!sessionUser) return "Supervisor"
+  if (!sessionUser) return "Superviseur"
   const n = `${sessionUser.firstName} ${sessionUser.lastName}`.trim()
   return n || sessionUser.email
 }
@@ -93,21 +92,21 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
     const file = e.target.files?.[0]
     e.target.value = ""
     if (!file || !file.type.startsWith("image/")) {
-      toast.message("Use an image file.")
+      toast.message("Veuillez sélectionner un fichier image.")
       return
     }
     setAvatarObjectUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev)
       return URL.createObjectURL(file)
     })
-    toast.success("Avatar updated.")
+    toast.success("Avatar mis à jour.")
   }
 
   const saveEditName = () => {
     const next = editDraft.trim() || profileName(sessionUser)
     setDisplayName(next)
     setEditOpen(false)
-    toast.success("Name updated.")
+    toast.success("Nom mis à jour.")
   }
 
   return (
@@ -117,14 +116,14 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-xs gap-3 p-4 sm:max-w-xs" showCloseButton>
           <DialogHeader className="gap-1 text-left">
-            <DialogTitle className="text-sm">Edit display name</DialogTitle>
+            <DialogTitle className="text-sm">Modifier le nom affiché</DialogTitle>
             <DialogDescription className="text-xs">
-              Updates the display name in this browser session only.
+              Met à jour le nom affiché pour cette session de navigation uniquement.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
             <Label htmlFor="admin-profile-name" className="text-xs">
-              Name
+              Nom
             </Label>
             <Input
               id="admin-profile-name"
@@ -136,10 +135,10 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
           </div>
           <DialogFooter className="gap-2 sm:justify-end">
             <Button type="button" variant="outline" size="sm" onClick={() => setEditOpen(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button type="button" size="sm" onClick={saveEditName}>
-              Save
+              Enregistrer
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -199,11 +198,11 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
 
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Profile
+              Profil
             </DropdownMenuLabel>
             <DropdownMenuItem className="gap-2 text-xs" onSelect={() => {}}>
               <User className="size-3.5 opacity-70" aria-hidden />
-              View profile
+              Voir le profil
             </DropdownMenuItem>
             <DropdownMenuItem
               className="gap-2 text-xs"
@@ -213,11 +212,11 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
               }}
             >
               <Pencil className="size-3.5 opacity-70" aria-hidden />
-              Edit name
+              Modifier le nom
             </DropdownMenuItem>
             <DropdownMenuItem className="gap-2 text-xs" onSelect={() => fileRef.current?.click()}>
               <ImagePlus className="size-3.5 opacity-70" aria-hidden />
-              Change avatar
+              Changer l'avatar
             </DropdownMenuItem>
           </DropdownMenuGroup>
 
@@ -225,20 +224,20 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
 
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Appearance
+              Apparence
             </DropdownMenuLabel>
             <DropdownMenuRadioGroup value={themeValue} onValueChange={(v) => setTheme(v)}>
               <DropdownMenuRadioItem value="light" className="gap-2 text-xs">
                 <Sun className="size-3.5 opacity-70" aria-hidden />
-                Light mode
+                Mode clair
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="dark" className="gap-2 text-xs">
                 <Moon className="size-3.5 opacity-70" aria-hidden />
-                Dark mode
+                Mode sombre
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="system" className="gap-2 text-xs">
                 <Monitor className="size-3.5 opacity-70" aria-hidden />
-                System mode
+                Mode système
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuGroup>
@@ -247,7 +246,7 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
 
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Preferences
+              Préférences
             </DropdownMenuLabel>
             <DropdownMenuCheckboxItem
               className="gap-2 text-xs"
@@ -255,7 +254,7 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
               onCheckedChange={(v) => setCompact(v === true)}
             >
               <Rows3 className="size-3.5 opacity-70" aria-hidden />
-              Compact mode
+              Mode compact
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               className="gap-2 text-xs"
@@ -263,7 +262,7 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
               onCheckedChange={(v) => setNotifyEnabled(v === true)}
             >
               <Bell className="size-3.5 opacity-70" aria-hidden />
-              Notification preferences
+              Préférences de notification
             </DropdownMenuCheckboxItem>
           </DropdownMenuGroup>
 
@@ -271,24 +270,7 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
 
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Workspaces
-            </DropdownMenuLabel>
-            <DropdownMenuItem
-              className="gap-2 text-xs"
-              onSelect={() => {
-                window.location.assign("/agent/dashboard")
-              }}
-            >
-              <Ticket className="size-3.5 opacity-70" aria-hidden />
-              Agent workspace
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Account
+              Compte
             </DropdownMenuLabel>
             <DropdownMenuItem
               variant="destructive"
@@ -301,7 +283,7 @@ export function AdminSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
               }}
             >
               <LogOut className="size-3.5" aria-hidden />
-              Logout
+              Déconnexion
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

@@ -1,8 +1,4 @@
-import {
-  N3_TICKET_STATUS,
-  TRANSFER_DESTINATIONS,
-  type TransferTicketStatus,
-} from "@/lib/care-operational-actions"
+import { mapCareSourceToWorkflowStatus } from "@/lib/cp-agent/ticket-workflow"
 
 import type { CareTicket } from "./types"
 
@@ -14,69 +10,20 @@ export type CareTicketOperational = CareTicket & {
   targetPerimeter?: string | null
 }
 
-const PERIMETER_TO_TRANSFER: Record<string, TransferTicketStatus> = {
-  MONETIQUE: "TRANSFERRED_MON",
-  PAYMENT: "TRANSFERRED_MON",
-  MATERIEL: "TRANSFERRED_MAT",
-  HARDWARE: "TRANSFERRED_MAT",
-  BO: "TRANSFERRED_BO",
-  BACK_OFFICE: "TRANSFERRED_BO",
-  RESEAU: "TRANSFERRED_RES",
-  NETWORK: "TRANSFERRED_RES",
-  BUREAUTIQUE: "TRANSFERRED_BUR",
-  WORKSTATION: "TRANSFERRED_BUR",
-  INFRASTRUCTURE: "TRANSFERRED_INF",
-  INF: "TRANSFERRED_INF",
-}
-
-function mapTargetPerimeterToTransfer(target: string | null | undefined): TransferTicketStatus {
-  if (!target?.trim()) return "TRANSFERRED_MAT"
-  const key = target.trim().toUpperCase().replace(/\s+/g, "_")
-  return PERIMETER_TO_TRANSFER[key] ?? "TRANSFERRED_MAT"
-}
-
-/** Map CARE source / API ticket into cp_agent operational status codes. */
+/** Map CARE source ticket into cp_agent workflow status (never AI predictions). */
 export function mapCareTicketToCpAgentStatus(t: CareTicketOperational): string {
-  if (t.escalationRequired) return N3_TICKET_STATUS
-  if (t.transferRequired) {
-    return mapTargetPerimeterToTransfer(t.targetPerimeter)
-  }
-
   const raw = (t.sourceStatus ?? t.status).toUpperCase().replace(/\s+/g, "_")
 
-  if (raw === N3_TICKET_STATUS || raw === "ESCALATED_N3" || /\bN3\b/.test(raw)) {
-    return N3_TICKET_STATUS
+  // Closed in CARE source with resolution timestamp stays resolved.
+  if ((raw === "RESOLVED" || raw === "CLOSED" || t.status === "resolved" || t.status === "closed") && t.resolutionDate) {
+    return "RESOLVED"
   }
 
-  if (raw === "TRANSFERRED" || t.transferRequired) {
-    return mapTargetPerimeterToTransfer(t.targetPerimeter)
-  }
+  if (t.status === "suspended" || raw === "SUSPENDED") return "SUSPENDED"
+  if (t.status === "in_progress" || raw === "IN_PROGRESS") return "IN_PROGRESS"
+  if (t.status === "open" || raw === "OPEN" || raw === "NEW") return "OPEN"
 
-  for (const dest of TRANSFER_DESTINATIONS) {
-    if (raw === dest.status) return dest.status
-  }
-
-  if (raw === "OPEN" || raw === "NEW") return "OPEN"
-  if (raw === "IN_PROGRESS" || raw === "INPROGRESS") return "IN_PROGRESS"
-  if (raw === "ESCALATED") return "ESCALATED"
-  if (raw === "MONITORING") return "MONITORING"
-  if (raw === "WAITING_STORE") return "WAITING_STORE"
-  if (raw === "SUSPENDED" || raw === "SUSPEND") return "SUSPENDED"
-  if (raw === "RESOLVED" || raw === "CLOSED") return "RESOLVED"
-
-  switch (t.status) {
-    case "open":
-      return "OPEN"
-    case "in_progress":
-      return "IN_PROGRESS"
-    case "suspended":
-      return "SUSPENDED"
-    case "resolved":
-    case "closed":
-      return "RESOLVED"
-    default:
-      return "OPEN"
-  }
+  return mapCareSourceToWorkflowStatus(t.sourceStatus ?? t.status)
 }
 
 export function mapCareTicketToCpAgentPriority(t: CareTicketOperational): string {

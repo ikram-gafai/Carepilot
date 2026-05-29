@@ -20,7 +20,7 @@ export const AGENT_PROCEDURE_SAMPLES: AgentProcedureSample[] = [
     kmCode: "KM-OP-ISO",
     title: "Lane isolation and session diagnostics",
     category: "CHECKOUT",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     summary:
       "Checkout isolation sequence: session lock, context capture, application diagnostics, and minimal network perimeter.",
     prerequisites: "Cashier identity, store code, lane number",
@@ -56,7 +56,7 @@ export const AGENT_PROCEDURE_SAMPLES: AgentProcedureSample[] = [
     kmCode: "KM-OP-SCO",
     title: "SCO controlled restart",
     category: "CHECKOUT",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     summary:
       "Controlled SCO module restart: shutdown order, local queue flush, post-restart integrity check.",
     prerequisites: "Empty customer queue or neighbor-lane fallback",
@@ -73,7 +73,7 @@ export const AGENT_PROCEDURE_SAMPLES: AgentProcedureSample[] = [
     kmCode: "KM-OP-VLP",
     title: "VLP synchronization verification",
     category: "DATA",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     summary:
       "Catalog/item sync job checks: windows, load, middleware errors, and idempotent retry.",
     prerequisites: "Start time of slowdown or sync error",
@@ -90,7 +90,7 @@ export const AGENT_PROCEDURE_SAMPLES: AgentProcedureSample[] = [
     kmCode: "KM-OP-TPE",
     title: "Bank PIN pad checks",
     category: "PIN_PAD",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     summary:
       "Field PIN pad test: line, acquirer contract, hardware swap, test transaction then production.",
     prerequisites: "PIN pad error code and timestamped trace",
@@ -107,7 +107,7 @@ export const AGENT_PROCEDURE_SAMPLES: AgentProcedureSample[] = [
     kmCode: "KM-OP-VCC",
     title: "VCC upload validation",
     category: "DATA",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     summary:
       "VCC upload checks: field consistency, anomaly filtering, validation against regional reference.",
     prerequisites: "Batch ID or ticket range",

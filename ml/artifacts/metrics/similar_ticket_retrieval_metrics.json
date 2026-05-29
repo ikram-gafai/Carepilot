@@ -1,0 +1,46 @@
+{
+  "dataset": {
+    "test_queries": 1584,
+    "corpus_tickets": 14000,
+    "validation": {
+      "tickets_with_group_id": 14000,
+      "unique_groups": 792,
+      "min_group_size": 9,
+      "max_group_size": 35,
+      "avg_group_size": 17.67676767676768,
+      "query_count": 1584,
+      "queries_with_min_relevant_peers": 1584,
+      "queries_below_min_relevant_peers": 0
+    }
+  },
+  "results": [
+    {
+      "method": "TF-IDF + Cosine",
+      "precision_at_1": 0.3611111111111111,
+      "precision_at_3": 0.3114478114478114,
+      "recall_at_3": 0.0511939056635838,
+      "mrr": 0.4456018518518518,
+      "ndcg_at_3": 0.3223896358445262,
+      "avg_retrieval_time_ms": 45.90853705812693
+    },
+    {
+      "method": "BM25",
+      "precision_at_1": 0.57260101010101,
+      "precision_at_3": 0.46170033670033667,
+      "recall_at_3": 0.0904159795948198,
+      "mrr": 0.6508838383838383,
+      "ndcg_at_3": 0.4861962802290334,
+      "avg_retrieval_time_ms": 591.2255581440857
+    },
+    {
+      "method": "Sentence Transformers",
+      "precision_at_1": 0.2657828282828283,
+      "precision_at_3": 0.18055555555555555,
+      "recall_at_3": 0.032929149590896774,
+      "mrr": 0.3297558922558923,
+      "ndcg_at_3": 0.1995834913558547,
+      "avg_retrieval_time_ms": 1.7884603533302927
+    }
+  ],
+  "best_method": "BM25"
+}

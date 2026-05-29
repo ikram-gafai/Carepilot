@@ -7,8 +7,15 @@ import {
   cpAgentTicketHistory,
   cpAgentTickets,
 } from "@/lib/db/schema/cp-agent"
-import { carepilotFetchSafe } from "@/lib/carepilot-api/server-fetch"
+import { listKmReferencesForTicketContext } from "@/lib/carepilot-api/km"
+import {
+  getSynchronizedTicket,
+  getSynchronizedTicketComments,
+  getSynchronizedTicketHistory,
+} from "@/lib/carepilot-api/tickets"
 import { cpAgentGetTicketAiEnrichment } from "@/lib/queries/cp-agent"
+import { getDb } from "@/lib/db"
+import { eq } from "drizzle-orm"
 
 export class TicketNotFoundError extends Error {
   constructor() {
@@ -22,11 +29,6 @@ type HistoryRow = InferSelectModel<typeof cpAgentTicketHistory>
 type CommentRow = InferSelectModel<typeof cpAgentTicketComments>
 type KmSuggestion = InferSelectModel<typeof cpAgentKmSuggestions>
 
-type ApiTicket = TicketRow & {
-  assigneeName: string | null
-  assigneeEmail: string | null
-}
-
 type ApiKmRef = {
   id: number
   externalId: string
@@ -38,8 +40,8 @@ type ApiKmRef = {
   summary: string
   procedureSteps: string
   status: string
-  createdAt: string
-  updatedAt: string
+  createdAt: string | Date
+  updatedAt: string | Date
 }
 
 function parseDate(v: string | Date | null | undefined): Date | null {
@@ -49,29 +51,8 @@ function parseDate(v: string | Date | null | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d
 }
 
-function mapTicketFromApi(raw: ApiTicket): {
-  ticket: TicketRow
-  assigneeName: string | null
-  assigneeEmail: string | null
-} {
-  const { assigneeName, assigneeEmail, ...rest } = raw
-  const ticket: TicketRow = {
-    ...rest,
-    slaDueAt: parseDate(rest.slaDueAt),
-    resolutionDate: parseDate(rest.resolutionDate),
-    externalCreatedAt: parseDate(rest.externalCreatedAt),
-    externalUpdatedAt: parseDate(rest.externalUpdatedAt),
-    lastSyncedAt: parseDate(rest.lastSyncedAt),
-    createdAt: parseDate(rest.createdAt) ?? new Date(),
-    updatedAt: parseDate(rest.updatedAt) ?? new Date(),
-    title: englishLegacyCopy(rest.title),
-    description: englishLegacyCopy(rest.description),
-  }
-  return { ticket, assigneeName, assigneeEmail }
-}
-
-function mapHistoryFromApi(items: HistoryRow[]): HistoryRow[] {
-  return items.map((h) => ({
+function mapHistoryRow(h: HistoryRow): HistoryRow {
+  return {
     ...h,
     occurredAt: parseDate(h.occurredAt) ?? new Date(),
     performedAt: parseDate(h.performedAt),
@@ -81,11 +62,11 @@ function mapHistoryFromApi(items: HistoryRow[]): HistoryRow[] {
     createdAt: parseDate(h.createdAt) ?? new Date(),
     summary: englishLegacyCopy(h.summary),
     detail: h.detail ? englishLegacyCopy(h.detail) : null,
-  }))
+  }
 }
 
-function mapCommentsFromApi(items: CommentRow[]): CommentRow[] {
-  return items.map((c) => ({
+function mapCommentRow(c: CommentRow): CommentRow {
+  return {
     ...c,
     createdAt: parseDate(c.createdAt) ?? new Date(),
     updatedAt: parseDate(c.updatedAt) ?? new Date(),
@@ -93,7 +74,7 @@ function mapCommentsFromApi(items: CommentRow[]): CommentRow[] {
     externalUpdatedAt: parseDate(c.externalUpdatedAt) ?? new Date(),
     lastSyncedAt: parseDate(c.lastSyncedAt) ?? new Date(),
     body: englishLegacyCopy(c.body),
-  }))
+  }
 }
 
 function procedureStepsToText(procedureSteps: string): string {
@@ -106,24 +87,8 @@ function procedureStepsToText(procedureSteps: string): string {
   return procedureSteps
 }
 
-function mapSyncKmToSuggestions(
-  items: ApiKmRef[],
-  ticket: TicketRow,
-): KmSuggestion[] {
-  const perimeter = ticket.perimeter?.toUpperCase() ?? ""
-  const category = ticket.category?.toUpperCase() ?? ""
-
-  const matched = items.filter((k) => {
-    const p = k.perimeter.toUpperCase()
-    const c = k.category.toUpperCase()
-    if (perimeter && p === perimeter) return true
-    if (category && c === category) return true
-    return false
-  })
-
-  const pool = matched.length > 0 ? matched : items
-
-  return pool.slice(0, 5).map((k, i) => ({
+function mapSyncKmToSuggestions(items: ApiKmRef[], ticket: TicketRow): KmSuggestion[] {
+  return items.slice(0, 5).map((k, i) => ({
     id: -1000 - k.id,
     ticketId: ticket.id,
     kmCode: k.code,
@@ -153,31 +118,50 @@ export type AgentTicketDetailPageData = {
   comments: CommentRow[]
   km: KmSuggestion[]
   relatedIncidents: Awaited<ReturnType<typeof cpAgentGetTicketAiEnrichment>>["relatedIncidents"]
+  feedback: Awaited<ReturnType<typeof cpAgentGetTicketAiEnrichment>>["feedback"]
+}
+
+/** Lightweight title lookup for metadata (avoids full detail load). */
+export async function getAgentTicketTitle(ticketId: number): Promise<string | null> {
+  const db = getDb()
+  const [row] = await db
+    .select({ title: cpAgentTickets.title })
+    .from(cpAgentTickets)
+    .where(eq(cpAgentTickets.id, ticketId))
+    .limit(1)
+  return row?.title ?? null
 }
 
 export async function loadAgentTicketDetailPage(ticketId: number): Promise<AgentTicketDetailPageData> {
-  const [ticketRes, historyRes, commentsRes, kmRes] = await Promise.all([
-    carepilotFetchSafe<ApiTicket>(`/api/tickets/${ticketId}`),
-    carepilotFetchSafe<{ items: HistoryRow[]; total: number }>(`/api/tickets/${ticketId}/history`),
-    carepilotFetchSafe<{ items: CommentRow[]; total: number }>(`/api/tickets/${ticketId}/comments`),
-    carepilotFetchSafe<{ items: ApiKmRef[]; total: number }>("/api/km"),
-  ])
+  const apiTicket = await getSynchronizedTicket(ticketId)
+  if (!apiTicket) throw new TicketNotFoundError()
 
-  if (!ticketRes.ok) {
-    if (ticketRes.error.toLowerCase().includes("not found")) {
-      throw new TicketNotFoundError()
-    }
-    throw new Error(ticketRes.error)
+  const { assigneeName, assigneeEmail, ...ticketFields } = apiTicket
+  const ticket: TicketRow = {
+    ...ticketFields,
+    slaDueAt: parseDate(ticketFields.slaDueAt),
+    resolutionDate: parseDate(ticketFields.resolutionDate),
+    externalCreatedAt: parseDate(ticketFields.externalCreatedAt),
+    externalUpdatedAt: parseDate(ticketFields.externalUpdatedAt),
+    lastSyncedAt: parseDate(ticketFields.lastSyncedAt),
+    createdAt: parseDate(ticketFields.createdAt) ?? new Date(),
+    updatedAt: parseDate(ticketFields.updatedAt) ?? new Date(),
   }
 
-  const { ticket, assigneeName, assigneeEmail } = mapTicketFromApi(ticketRes.data)
+  const [historyRes, commentsRes, kmRes, ai] = await Promise.all([
+    getSynchronizedTicketHistory(ticketId),
+    getSynchronizedTicketComments(ticketId),
+    listKmReferencesForTicketContext({
+      perimeter: ticket.perimeter,
+      category: ticket.category,
+      limit: 12,
+    }),
+    cpAgentGetTicketAiEnrichment(ticketId, ticket.category),
+  ])
 
-  const history = historyRes.ok ? mapHistoryFromApi(historyRes.data.items) : []
-  const comments = commentsRes.ok ? mapCommentsFromApi(commentsRes.data.items) : []
-
-  const syncKm = kmRes.ok ? mapSyncKmToSuggestions(kmRes.data.items, ticket) : []
-
-  const ai = await cpAgentGetTicketAiEnrichment(ticketId, ticket.category)
+  const history = historyRes.items.map(mapHistoryRow)
+  const comments = commentsRes.items.map(mapCommentRow)
+  const syncKm = mapSyncKmToSuggestions(kmRes.items as ApiKmRef[], ticket)
   const km = mergeKmSuggestions(ai.km, syncKm)
 
   return {
@@ -189,5 +173,6 @@ export async function loadAgentTicketDetailPage(ticketId: number): Promise<Agent
     comments,
     km,
     relatedIncidents: ai.relatedIncidents,
+    feedback: ai.feedback,
   }
 }

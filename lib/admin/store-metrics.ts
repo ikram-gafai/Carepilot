@@ -1,14 +1,12 @@
 import { and, count, desc, eq, isNotNull, sql } from "drizzle-orm"
 
 import { CLOSED_STATUS_SQL_LIST } from "@/lib/care-operational-actions"
+import { SLA_PREDICTION_ENABLED } from "@/lib/ai-phase"
 import { SLA_RISK_FILTER } from "@/lib/carepilot-api/metrics"
 import { getDb } from "@/lib/db"
 import { cpAgentTickets } from "@/lib/db/schema/cp-agent"
 
-import { OPEN_FILTER } from "./shared"
-
-const CARE_SOURCE = eq(cpAgentTickets.source, "CARE")
-const CARE_OPEN = and(CARE_SOURCE, OPEN_FILTER, isNotNull(cpAgentTickets.storeCode))!
+import { OPERATIONAL_OPEN_SCOPE, OPERATIONAL_TICKET_SCOPE } from "./shared"
 
 export type TopMagasinRow = {
   storeCode: string
@@ -23,6 +21,7 @@ export type TopMagasinRow = {
 }
 
 export type RecentSynchronizedTicketRow = {
+  id: number
   careId: string
   title: string
   status: string
@@ -45,11 +44,17 @@ export async function adminTopMagasins(limit = 8): Promise<TopMagasinRow[]> {
       region: cpAgentTickets.storeRegion,
       storeType: cpAgentTickets.storeType,
       ticketCount: count(),
-      openCount: sql<number>`count(*) FILTER (WHERE ${cpAgentTickets.source} = 'CARE' AND ${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_STATUS_SQL_LIST)}))`,
-      slaRisk: sql<number>`count(*) FILTER (WHERE ${SLA_RISK_FILTER})`,
+      openCount: sql<number>`count(*) FILTER (WHERE ${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_STATUS_SQL_LIST)}))`,
+      slaRisk: SLA_PREDICTION_ENABLED
+        ? sql<number>`count(*) FILTER (WHERE EXISTS (
+            SELECT 1 FROM cp_agent.ai_sla_predictions sp
+            WHERE sp.ticket_id = ${cpAgentTickets.id}
+            AND (sp.predicted_sla_breach = true OR sp.risk_level = 'HIGH')
+          ))`
+        : sql<number>`count(*) FILTER (WHERE ${SLA_RISK_FILTER})`,
     })
     .from(cpAgentTickets)
-    .where(and(CARE_SOURCE, isNotNull(cpAgentTickets.storeName))!)
+    .where(and(OPERATIONAL_TICKET_SCOPE, isNotNull(cpAgentTickets.storeName))!)
     .groupBy(
       cpAgentTickets.storeCode,
       cpAgentTickets.storeName,
@@ -84,6 +89,7 @@ export async function adminRecentSynchronizedTickets(
   const db = getDb()
   const rows = await db
     .select({
+      id: cpAgentTickets.id,
       careId: cpAgentTickets.careId,
       title: cpAgentTickets.title,
       status: cpAgentTickets.status,
@@ -94,11 +100,12 @@ export async function adminRecentSynchronizedTickets(
       updatedAt: cpAgentTickets.updatedAt,
     })
     .from(cpAgentTickets)
-    .where(and(CARE_SOURCE, isNotNull(cpAgentTickets.storeName))!)
+    .where(and(OPERATIONAL_TICKET_SCOPE, isNotNull(cpAgentTickets.storeName))!)
     .orderBy(desc(cpAgentTickets.updatedAt))
     .limit(limit)
 
   return rows.map((r) => ({
+    id: r.id,
     careId: r.careId,
     title: r.title,
     status: r.status,
@@ -120,10 +127,16 @@ export async function adminStoreOpenWorkload(): Promise<
       storeName: cpAgentTickets.storeName,
       city: cpAgentTickets.storeCity,
       open: count(),
-      slaRisk: sql<number>`count(*) FILTER (WHERE ${SLA_RISK_FILTER})`,
+      slaRisk: SLA_PREDICTION_ENABLED
+        ? sql<number>`count(*) FILTER (WHERE EXISTS (
+            SELECT 1 FROM cp_agent.ai_sla_predictions sp
+            WHERE sp.ticket_id = ${cpAgentTickets.id}
+            AND (sp.predicted_sla_breach = true OR sp.risk_level = 'HIGH')
+          ))`
+        : sql<number>`count(*) FILTER (WHERE ${SLA_RISK_FILTER})`,
     })
     .from(cpAgentTickets)
-    .where(CARE_OPEN)
+    .where(and(OPERATIONAL_OPEN_SCOPE, isNotNull(cpAgentTickets.storeCode))!)
     .groupBy(cpAgentTickets.storeName, cpAgentTickets.storeCity)
     .orderBy(desc(count()))
 

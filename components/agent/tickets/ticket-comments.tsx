@@ -13,7 +13,7 @@ function formatDt(d: Date) {
 
 export function TicketComments({ comments }: { comments: CommentRow[] }) {
   if (!comments.length) {
-    return <p className="text-xs text-muted-foreground">No comments.</p>
+    return <p className="text-xs text-muted-foreground">Aucun commentaire.</p>
   }
 
   return (

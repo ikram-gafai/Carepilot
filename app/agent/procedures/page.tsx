@@ -7,11 +7,16 @@ import { fetchCarepilotPage } from "@/lib/carepilot-api/fetch-page"
 import type { AgentProcedureRow } from "@/lib/agent-procedures-view"
 import { getDbOrNull } from "@/lib/db"
 
-export const metadata: Metadata = { title: "Procedures" }
+export const metadata: Metadata = { title: "Procédures" }
 
 export const dynamic = "force-dynamic"
 
-export default async function AgentProceduresPage() {
+export default async function AgentProceduresPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ km?: string }>
+}) {
+  const { km } = await searchParams
   const res = getDbOrNull()
     ? await fetchCarepilotPage<{ items: AgentProcedureRow[] }>("/api/agent/procedures")
     : { ok: false as const, error: "offline" }
@@ -24,21 +29,14 @@ export default async function AgentProceduresPage() {
       className="mb-2 shrink-0 rounded-lg border border-border/90 bg-muted/30 px-3 py-2.5 text-xs leading-snug text-muted-foreground"
       role="status"
     >
-      Database offline — procedures load when DATABASE_URL is configured.
-    </div>
-  ) : procedures.length === 0 ? (
-    <div
-      className="mb-2 shrink-0 rounded-lg border border-border/90 bg-muted/30 px-3 py-2.5 text-xs leading-snug text-muted-foreground"
-      role="status"
-    >
-      No synchronized KM procedures yet. Run CARE sync after seeding operational data.
+      Base de données hors ligne — les procédures se chargent lorsque DATABASE_URL est configurée.
     </div>
   ) : null
 
   return (
     <>
       {res.ok ? <CarepilotAutoRefresh intervalMs={60_000} /> : null}
-      <ProceduresPageShell runbooks={runbooks} dbBanner={dbBanner} />
+      <ProceduresPageShell runbooks={runbooks} dbBanner={dbBanner} initialKm={km ?? null} />
     </>
   )
 }

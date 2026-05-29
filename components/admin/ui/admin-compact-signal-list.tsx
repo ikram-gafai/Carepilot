@@ -2,12 +2,14 @@
 
 import type { CompactSignalItem } from "@/lib/admin/signal-display"
 import { severityLabel } from "@/lib/admin/signal-display"
+import { operationalSeverityTextClass } from "@/lib/ai/operational-ui"
+import type { SignalSeverity } from "@/lib/ai/orchestration/types"
 import { cn } from "@/lib/utils"
 
-const SEVERITY_CLASS: Record<CompactSignalItem["severity"], string> = {
-  critical: "text-red-600 dark:text-red-400",
-  warning: "text-amber-700 dark:text-amber-500",
-  info: "text-blue-700 dark:text-blue-400",
+const ADMIN_TO_OPERATIONAL: Record<CompactSignalItem["severity"], SignalSeverity> = {
+  critical: "high",
+  warning: "medium",
+  info: "neutral",
 }
 
 function formatRelativeTime(d: Date) {
@@ -22,7 +24,7 @@ function formatRelativeTime(d: Date) {
 
 export function AdminCompactSignalList({
   items,
-  emptyMessage = "No signals in the current window.",
+  emptyMessage = "Aucun signal sur la période.",
 }: {
   items: CompactSignalItem[]
   emptyMessage?: string
@@ -39,7 +41,7 @@ export function AdminCompactSignalList({
             <p
               className={cn(
                 "text-[10px] font-semibold uppercase tracking-wide",
-                SEVERITY_CLASS[item.severity],
+                operationalSeverityTextClass(ADMIN_TO_OPERATIONAL[item.severity]),
               )}
             >
               {severityLabel(item.severity)}

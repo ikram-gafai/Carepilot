@@ -16,7 +16,7 @@ export function SectionHeader({
       <div className="min-w-0">
         <h2 className="text-sm font-medium text-foreground">{title}</h2>
         {subtitle ? (
-          <p className="mt-0.5 text-[10px] leading-snug text-zinc-400 dark:text-zinc-500">{subtitle}</p>
+          <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{subtitle}</p>
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}

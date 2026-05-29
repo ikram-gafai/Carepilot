@@ -1,43 +1,44 @@
 import {
-  cpAgentHighRiskTickets,
-  cpAgentRecentActivity,
-  cpAgentSlaRiskBuckets,
-  cpAgentTicketCountsByPriority,
-  cpAgentTicketCountsByStatus,
-} from "@/lib/queries/cp-agent"
+  buildAgentDecisionFeedback,
+  buildAgentOperationalQueue,
+  buildDecisionDistributionChart,
+  buildNextTicketsQueue,
+  buildPriorityChart,
+  buildSlaExposureChartFromQueue,
+  computeAgentDashboardKpis,
+} from "./agent-dashboard-data"
+import { getCachedAgentOperationalQueue } from "./cached-operational-queue"
+import { refreshOperationalSlaTimestamps } from "@/lib/care-operational/refresh-sla-timestamps"
+import { getDb } from "@/lib/db"
 
-import { getCarePilotOperationalMetrics } from "./metrics"
+async function loadOperationalQueue() {
+  let queue = await getCachedAgentOperationalQueue()
+  const breached = queue.filter((r) => r.slaLabel === "Breached").length
+  const driftThreshold = Math.max(10, Math.round(queue.length * 0.18))
+  if (queue.length > 0 && breached > driftThreshold) {
+    await refreshOperationalSlaTimestamps(getDb())
+    queue = await buildAgentOperationalQueue()
+  }
+  return queue
+}
 
-/** Synchronized operational metrics for the agent dashboard (cp_agent store). */
+/** Agent dashboard — decision-support cockpit for N1/N2 agents. */
 export async function getAgentDashboardBundle() {
-  const [operational, byStatus, byPriority, slaBuckets, highRisk, activity] = await Promise.all([
-    getCarePilotOperationalMetrics(),
-    cpAgentTicketCountsByStatus(),
-    cpAgentTicketCountsByPriority(),
-    cpAgentSlaRiskBuckets(),
-    cpAgentHighRiskTickets(10),
-    cpAgentRecentActivity(14),
-  ])
+  const queue = await loadOperationalQueue()
+  const kpis = computeAgentDashboardKpis(queue)
 
-  const { kpis, aiAcceptance } = operational
+  const decisionFeedback = await buildAgentDecisionFeedback(queue)
+  const priorityChart = buildPriorityChart(queue)
 
   return {
-    metrics: {
-      openTickets: kpis.openTickets,
-      slaAtRisk: kpis.slaRisk,
-      synchronizedTotal: kpis.totalSynchronized,
-      transfers: kpis.transfers,
-      escalations: kpis.escalations,
-      actionRequired: kpis.openTickets + kpis.slaRisk,
+    kpis,
+    nextTickets: buildNextTicketsQueue(queue, 8),
+    decisionFeedback,
+    charts: {
+      slaExposure: buildSlaExposureChartFromQueue(queue),
+      priorityChart,
+      actionDistribution: buildDecisionDistributionChart(queue),
     },
-    byStatus,
-    byPriority,
-    slaBuckets,
-    outcomes: [],
-    highRisk,
-    activity,
-    syncHealth: operational.sync,
-    aiAcceptance,
   }
 }
 

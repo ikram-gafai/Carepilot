@@ -192,6 +192,229 @@ export const cpAgentKmReferences = cpAgent.table(
   }),
 )
 
+export const cpAgentAiEscalationPredictions = cpAgent.table(
+  "ai_escalation_predictions",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    modelName: text("model_name").notNull(),
+    predictedEscalationRequired: boolean("predicted_escalation_required").notNull(),
+    confidenceScore: real("confidence_score").notNull(),
+    probabilityScore: real("probability_score").notNull(),
+    predictionLabel: text("prediction_label").notNull(),
+    modelVersion: text("model_version").notNull(),
+    topFeatures: jsonb("top_features").$type<Record<string, unknown> | null>(),
+    explanation: jsonb("explanation").$type<Record<string, unknown> | null>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_esc_pred_ticket").on(t.ticketId),
+    modelVersionIdx: index("cp_agent_ai_esc_pred_version").on(t.modelVersion),
+    escalationIdx: index("cp_agent_ai_esc_pred_escalation").on(
+      t.predictedEscalationRequired,
+      t.createdAt,
+    ),
+  }),
+)
+
+export const cpAgentAiTransferPredictions = cpAgent.table(
+  "ai_transfer_predictions",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    modelName: text("model_name").notNull(),
+    predictedTransferRequired: boolean("predicted_transfer_required").notNull(),
+    confidenceScore: real("confidence_score").notNull(),
+    probabilityScore: real("probability_score").notNull(),
+    predictionLabel: text("prediction_label").notNull(),
+    modelVersion: text("model_version").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_transfer_pred_ticket").on(t.ticketId),
+    modelVersionIdx: index("cp_agent_ai_transfer_pred_version").on(t.modelVersion),
+    transferIdx: index("cp_agent_ai_transfer_pred_transfer").on(
+      t.predictedTransferRequired,
+      t.createdAt,
+    ),
+  }),
+)
+
+export const cpAgentAiActionRecommendations = cpAgent.table(
+  "ai_action_recommendations",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    modelName: text("model_name").notNull(),
+    recommendedAction: text("recommended_action").notNull(),
+    confidenceScore: real("confidence_score").notNull(),
+    probabilityDistribution: jsonb("probability_distribution")
+      .$type<Record<string, number>>()
+      .notNull()
+      .default({}),
+    modelVersion: text("model_version").notNull(),
+    reason: text("reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_action_rec_ticket").on(t.ticketId),
+    actionIdx: index("cp_agent_ai_action_rec_action").on(t.recommendedAction, t.createdAt),
+    modelVersionIdx: index("cp_agent_ai_action_rec_version").on(t.modelVersion),
+  }),
+)
+
+export const cpAgentAiSlaPredictions = cpAgent.table(
+  "ai_sla_predictions",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    modelName: text("model_name").notNull(),
+    predictedSlaBreach: boolean("predicted_sla_breach").notNull(),
+    probabilityScore: real("probability_score").notNull(),
+    confidenceScore: real("confidence_score").notNull(),
+    riskLevel: text("risk_level").notNull(),
+    modelVersion: text("model_version").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_sla_pred_ticket").on(t.ticketId),
+    riskIdx: index("cp_agent_ai_sla_pred_risk").on(t.predictedSlaBreach, t.riskLevel, t.createdAt),
+    modelVersionIdx: index("cp_agent_ai_sla_pred_version").on(t.modelVersion),
+  }),
+)
+
+export const cpAgentAiPriorityPredictions = cpAgent.table(
+  "ai_priority_predictions",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    modelName: text("model_name").notNull(),
+    predictedPriority: text("predicted_priority").notNull(),
+    confidenceScore: real("confidence_score").notNull(),
+    probabilityDistribution: jsonb("probability_distribution")
+      .$type<Record<string, number>>()
+      .notNull()
+      .default({}),
+    modelVersion: text("model_version").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_priority_pred_ticket").on(t.ticketId),
+    priorityIdx: index("cp_agent_ai_priority_pred_priority").on(t.predictedPriority, t.createdAt),
+    modelVersionIdx: index("cp_agent_ai_priority_pred_version").on(t.modelVersion),
+  }),
+)
+
+export const cpAgentAiKmRecommendations = cpAgent.table(
+  "ai_km_recommendations",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    kmId: text("km_id").notNull(),
+    kmTitle: text("km_title").notNull(),
+    methodName: text("method_name").notNull(),
+    similarityScore: real("similarity_score").notNull(),
+    rank: integer("rank").notNull(),
+    confidenceLevel: text("confidence_level").notNull(),
+    reason: text("reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketRankIdx: index("cp_agent_ai_km_rec_ticket").on(t.ticketId, t.rank),
+    methodIdx: index("cp_agent_ai_km_rec_method").on(t.methodName, t.createdAt),
+    ticketRankUnique: uniqueIndex("cp_agent_ai_km_rec_ticket_rank").on(t.ticketId, t.rank),
+  }),
+)
+
+export const cpAgentAiSimilarTicketResults = cpAgent.table(
+  "ai_similar_ticket_results",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    similarTicketId: integer("similar_ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    similarityScore: real("similarity_score").notNull(),
+    retrievalMethod: text("retrieval_method").notNull(),
+    rankPosition: integer("rank_position").notNull(),
+    linkedResolution: text("linked_resolution"),
+    linkedAction: text("linked_action"),
+    linkedKmId: text("linked_km_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketRankIdx: index("cp_agent_ai_similar_ticket_ticket").on(t.ticketId, t.rankPosition),
+    methodIdx: index("cp_agent_ai_similar_ticket_method").on(t.retrievalMethod, t.createdAt),
+    ticketRankUnique: uniqueIndex("cp_agent_ai_similar_ticket_ticket_rank").on(t.ticketId, t.rankPosition),
+  }),
+)
+
+export const cpAgentAiMissingInformationAnalysis = cpAgent.table(
+  "ai_missing_information_analysis",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    missingFields: jsonb("missing_fields").$type<string[]>().notNull().default([]),
+    completenessScore: real("completeness_score").notNull(),
+    qualityLevel: text("quality_level").notNull(),
+    confidenceScore: real("confidence_score").notNull(),
+    detectionMethod: text("detection_method").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_missing_info_ticket").on(t.ticketId),
+    qualityIdx: index("cp_agent_ai_missing_info_quality").on(t.qualityLevel, t.createdAt),
+    methodIdx: index("cp_agent_ai_missing_info_method").on(t.detectionMethod, t.createdAt),
+  }),
+)
+
+export const cpAgentAiOperationalExplanations = cpAgent.table(
+  "ai_operational_explanations",
+  {
+    id: serial("id").primaryKey(),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => cpAgentTickets.id, { onDelete: "cascade" }),
+    modelName: text("model_name").notNull(),
+    operationalSummary: text("operational_summary").notNull(),
+    recommendedActionExplanation: text("recommended_action_explanation").notNull(),
+    reasoning: text("reasoning").notNull(),
+    missingInformationNote: text("missing_information_note").notNull().default(""),
+    nextSteps: text("next_steps").notNull(),
+    latencyMs: integer("latency_ms").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    ticketUnique: uniqueIndex("cp_agent_ai_operational_explanations_ticket").on(t.ticketId),
+    modelIdx: index("cp_agent_ai_operational_explanations_model").on(t.modelName, t.createdAt),
+  }),
+)
+
 export const cpAgentAiAnalyses = cpAgent.table(
   "ai_analyses",
   {

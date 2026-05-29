@@ -1,13 +1,13 @@
 /**
- * CARE / CarePilot operational wording and status model.
+ * Modèle opérationnel CARE / CarePilot — libellés UI en français.
  *
- * Escalate N3 = higher support level (same perimeter).
- * Transfer = another operational perimeter / team (never N3).
+ * Escalade N3 = niveau de support supérieur (même périmètre).
+ * Transfert = autre périmètre opérationnel / équipe (jamais N3).
  */
 
 export const N3_TICKET_STATUS = "ESCALATED_N3" as const
 
-/** Ticket statuses for perimeter transfers (closed from agent queue). */
+/** Statuts ticket pour transferts de périmètre (fermés depuis la file agent). */
 export const TRANSFER_TICKET_STATUSES = [
   "TRANSFERRED_MON",
   "TRANSFERRED_MAT",
@@ -24,6 +24,7 @@ export const CLOSED_TICKET_STATUSES = ["RESOLVED", ...TRANSFER_TICKET_STATUSES] 
 export type OperationalActionKind =
   | "resolve"
   | "suspend"
+  | "request_information"
   | "escalate_n3"
   | "transfer_monetique"
   | "transfer_materiel"
@@ -32,24 +33,24 @@ export type OperationalActionKind =
   | "transfer_bureautique"
   | "transfer_infrastructure"
 
-/** Canonical UI labels (English) — no arrows. */
+/** Libellés UI canoniques (français). */
 export const OPERATIONAL_ACTION_LABELS: Record<OperationalActionKind, string> = {
-  resolve: "Resolve",
-  suspend: "Suspend",
-  escalate_n3: "Escalate N3",
-  transfer_monetique: "Transfer Payment",
-  transfer_materiel: "Transfer Hardware",
-  transfer_bo: "Transfer Back office",
-  transfer_reseau: "Transfer Network",
-  transfer_bureautique: "Transfer Workstation",
-  transfer_infrastructure: "Transfer Infrastructure",
+  resolve: "Résoudre",
+  suspend: "Suspendre",
+  request_information: "Demander des informations",
+  escalate_n3: "Escalade N3",
+  transfer_monetique: "Transfert Monétique",
+  transfer_materiel: "Transfert Matériel",
+  transfer_bo: "Transfert Back Office",
+  transfer_reseau: "Transfert Réseau",
+  transfer_bureautique: "Transfert Bureautique",
+  transfer_infrastructure: "Transfert Infrastructure",
 }
 
-export const AGENT_RESOLUTION_ACTIONS = ["resolve", "suspend"] as const satisfies readonly OperationalActionKind[]
+export const AGENT_RESOLUTION_ACTIONS = ["resolve", "request_information", "suspend"] as const satisfies readonly OperationalActionKind[]
 
 export const AGENT_ESCALATION_ACTIONS = ["escalate_n3"] as const satisfies readonly OperationalActionKind[]
 
-/** Transfers exposed on the agent ticket action panel. */
 export const AGENT_QUEUE_TRANSFER_ACTIONS = [
   "transfer_materiel",
   "transfer_monetique",
@@ -57,7 +58,6 @@ export const AGENT_QUEUE_TRANSFER_ACTIONS = [
   "transfer_reseau",
 ] as const satisfies readonly OperationalActionKind[]
 
-/** All perimeter transfers (agent queue + admin monitoring). */
 export const AGENT_TRANSFER_ACTIONS = [
   ...AGENT_QUEUE_TRANSFER_ACTIONS,
   "transfer_bureautique",
@@ -67,6 +67,7 @@ export const AGENT_TRANSFER_ACTIONS = [
 const STATUS_BY_ACTION: Record<OperationalActionKind, string> = {
   resolve: "RESOLVED",
   suspend: "SUSPENDED",
+  request_information: "WAITING_STORE",
   escalate_n3: N3_TICKET_STATUS,
   transfer_monetique: "TRANSFERRED_MON",
   transfer_materiel: "TRANSFERRED_MAT",
@@ -77,42 +78,42 @@ const STATUS_BY_ACTION: Record<OperationalActionKind, string> = {
 }
 
 const HISTORY_SUMMARY_BY_ACTION: Record<OperationalActionKind, string> = {
-  resolve: "Resolution",
+  resolve: "Résolution",
   suspend: "Suspension",
-  escalate_n3: "Escalate N3",
-  transfer_monetique: "Transfer Payment",
-  transfer_materiel: "Transfer Hardware",
-  transfer_bo: "Transfer Back office",
-  transfer_reseau: "Transfer Network",
-  transfer_bureautique: "Transfer Workstation",
-  transfer_infrastructure: "Transfer Infrastructure",
+  request_information: "Demande d'informations",
+  escalate_n3: "Escalade N3",
+  transfer_monetique: "Transfert Monétique",
+  transfer_materiel: "Transfert Matériel",
+  transfer_bo: "Transfert Back Office",
+  transfer_reseau: "Transfert Réseau",
+  transfer_bureautique: "Transfert Bureautique",
+  transfer_infrastructure: "Transfert Infrastructure",
 }
 
-/** Transfer destinations for monitoring charts (order preserved). */
 export const TRANSFER_DESTINATIONS = [
-  { status: "TRANSFERRED_MON" as const, label: "Payment" },
-  { status: "TRANSFERRED_MAT" as const, label: "Hardware" },
-  { status: "TRANSFERRED_BO" as const, label: "Back office" },
-  { status: "TRANSFERRED_RES" as const, label: "Network" },
-  { status: "TRANSFERRED_BUR" as const, label: "Workstation" },
+  { status: "TRANSFERRED_MON" as const, label: "Monétique" },
+  { status: "TRANSFERRED_MAT" as const, label: "Matériel" },
+  { status: "TRANSFERRED_BO" as const, label: "Back Office" },
+  { status: "TRANSFERRED_RES" as const, label: "Réseau" },
+  { status: "TRANSFERRED_BUR" as const, label: "Bureautique" },
   { status: "TRANSFERRED_INF" as const, label: "Infrastructure" },
 ] as const
 
 const STATUS_UI_LABELS: Record<string, string> = {
-  OPEN: "Open",
-  IN_PROGRESS: "In progress",
-  ESCALATED: "Escalated",
-  MONITORING: "Monitoring",
-  WAITING_STORE: "Waiting store",
-  SUSPENDED: "Suspended",
-  RESOLVED: "Resolved",
-  ESCALATED_N3: "Escalated N3",
-  TRANSFERRED_MON: "Transfer Payment",
-  TRANSFERRED_MAT: "Transfer Hardware",
-  TRANSFERRED_BO: "Transfer Back office",
-  TRANSFERRED_RES: "Transfer Network",
-  TRANSFERRED_BUR: "Transfer Workstation",
-  TRANSFERRED_INF: "Transfer Infrastructure",
+  OPEN: "Ouvert",
+  IN_PROGRESS: "En cours",
+  ESCALATED: "Escaladé",
+  MONITORING: "Surveillance",
+  WAITING_STORE: "En attente magasin",
+  SUSPENDED: "Suspendu",
+  RESOLVED: "Résolu",
+  ESCALATED_N3: "Escaladé N3",
+  TRANSFERRED_MON: "Transfert Monétique",
+  TRANSFERRED_MAT: "Transfert Matériel",
+  TRANSFERRED_BO: "Transfert Back Office",
+  TRANSFERRED_RES: "Transfert Réseau",
+  TRANSFERRED_BUR: "Transfert Bureautique",
+  TRANSFERRED_INF: "Transfert Infrastructure",
 }
 
 export const OPERATIONAL_ACTION_KINDS = Object.keys(OPERATIONAL_ACTION_LABELS) as OperationalActionKind[]
@@ -146,28 +147,37 @@ export function transferLabelForStatus(status: string): string | null {
   return hit?.label ?? null
 }
 
-/** SQL fragment values for NOT IN open-ticket filters (legacy raw SQL). */
 export const CLOSED_STATUS_SQL_LIST = CLOSED_TICKET_STATUSES.map((s) => `'${s}'`).join(",")
 
 export function normalizeSuggestedActionText(text: string): string {
   let t = text.trim()
   if (!t) return t
-  t = t.replace(/\bEscalate\s*→\s*N3\b/gi, "Escalate N3")
-  t = t.replace(/\bTransfer\s*→\s*Matériel\b/gi, "Transfer Hardware")
-  t = t.replace(/\bTransfer\s*→\s*Monétique\b/gi, "Transfer Payment")
-  t = t.replace(/\bTransfer\s*→\s*Bureautique\b/gi, "Transfer Workstation")
-  t = t.replace(/\bTransfer\s*→\s*BO\b/gi, "Transfer Back office")
-  t = t.replace(/\bTransfer\s*→\s*Réseau\b/gi, "Transfer Network")
-  t = t.replace(/\bTransfer\s*→\s*Infrastructure\b/gi, "Transfer Infrastructure")
-  t = t.replace(/\bTransfer\s+Monétique\b/gi, "Transfer Payment")
-  t = t.replace(/\bTransfer\s+Matériel\b/gi, "Transfer Hardware")
-  t = t.replace(/\bTransfer\s+Bureautique\b/gi, "Transfer Workstation")
-  t = t.replace(/\bTransfer\s+Réseau\b/gi, "Transfer Network")
-  t = t.replace(/\bTransfer\s+N3\b/gi, "Escalate N3")
-  t = t.replace(/\bEscalate\s+Matériel\b/gi, "Transfer Hardware")
-  t = t.replace(/\bTransfert\s+Monétique\b/gi, "Transfer Payment")
-  t = t.replace(/\bTransfert\s+Matériel\b/gi, "Transfer Hardware")
-  t = t.replace(/\bTransfert\s+Bureautique\b/gi, "Transfer Workstation")
-  t = t.replace(/\bTransfert\s+Réseau\b/gi, "Transfer Network")
+  t = t.replace(/\bEscalate\s*→\s*N3\b/gi, "Escalade N3")
+  t = t.replace(/\bEscalate N3\b/gi, "Escalade N3")
+  t = t.replace(/\bResolve\b/gi, "Résoudre")
+  t = t.replace(/\bSuspend\b/gi, "Suspendre")
+  t = t.replace(/\bRequest information\b/gi, "Demander des informations")
+  t = t.replace(/\bTransfer\s*→\s*Matériel\b/gi, "Transfert → Matériel")
+  t = t.replace(/\bTransfer\s*→\s*Monétique\b/gi, "Transfert → Monétique")
+  t = t.replace(/\bTransfer\s*→\s*Bureautique\b/gi, "Transfert → Bureautique")
+  t = t.replace(/\bTransfer\s*→\s*Back Office\b/gi, "Transfert → Back Office")
+  t = t.replace(/\bTransfer\s*→\s*Réseau\b/gi, "Transfert → Réseau")
+  t = t.replace(/\bTransfer\s*→\s*Infrastructure\b/gi, "Transfert → Infrastructure")
+  t = t.replace(/\bTransfer\s*→\s*Fidélité\b/gi, "Transfert → Fidélité")
+  t = t.replace(/\bTransfer Hardware\b/gi, "Transfert Matériel")
+  t = t.replace(/\bTransfer Payment\b/gi, "Transfert Monétique")
+  t = t.replace(/\bTransfer Network\b/gi, "Transfert Réseau")
+  t = t.replace(/\bTransfer Workstation\b/gi, "Transfert Bureautique")
+  t = t.replace(/\bTransfer Back office\b/gi, "Transfert Back Office")
+  t = t.replace(/\bTransfer Infrastructure\b/gi, "Transfert Infrastructure")
+  t = t.replace(/\bTransfer\s+Monétique\b/gi, "Transfert Monétique")
+  t = t.replace(/\bTransfer\s+Matériel\b/gi, "Transfert Matériel")
+  t = t.replace(/\bTransfer\s+Bureautique\b/gi, "Transfert Bureautique")
+  t = t.replace(/\bTransfer\s+Réseau\b/gi, "Transfert Réseau")
+  t = t.replace(/\bTransfer\s+N3\b/gi, "Escalade N3")
+  t = t.replace(/\bTransfert\s+Monétique\b/gi, "Transfert Monétique")
+  t = t.replace(/\bTransfert\s+Matériel\b/gi, "Transfert Matériel")
+  t = t.replace(/\bTransfert\s+Bureautique\b/gi, "Transfert Bureautique")
+  t = t.replace(/\bTransfert\s+Réseau\b/gi, "Transfert Réseau")
   return t
 }

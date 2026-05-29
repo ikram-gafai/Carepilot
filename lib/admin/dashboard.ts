@@ -1,323 +1,147 @@
-import { getCarePilotOperationalMetrics } from "@/lib/carepilot-api/metrics"
-
-import { PENDING_AI_TRAINING } from "@/lib/ai-phase"
-
-import {
-
-  adminAiSupervisionCompact,
-
-  adminEscalationMonitoringBlock,
-
-  adminTransferMonitoringBlock,
-
-  adminSyncStatusCompact,
-
-  buildSyncSupervisionRows,
-
-} from "./dashboard-detail"
-
-import { adminSlaEscalationTrend7d } from "./chart-data"
-
-import {
-
-  adminRecentSynchronizedTickets,
-
-  adminTopMagasins,
-
-} from "./store-metrics"
-
-
+import { loadOrchestratedAdminContext } from "@/lib/admin/orchestrated-supervision"
+import { loadAiPipelineHealth } from "@/lib/admin/ai-pipeline-health"
+import { adminLatestSync } from "@/lib/admin/sync"
+import { adminSlaEscalationTrend7d } from "@/lib/admin/chart-data"
+import { adminRecentSynchronizedTickets, adminTopMagasins } from "@/lib/admin/store-metrics"
+import { buildSyncSupervisionRows, adminSyncStatusCompact } from "@/lib/admin/dashboard-detail"
 
 export type AdminKpiStatus = "healthy" | "watch" | "critical"
 
-
-
 export type AdminDashboardKpi = {
-
   value: string
-
   subtitle: string
-
   status: AdminKpiStatus
-
 }
-
-
 
 export type DashboardPressureRow = {
-
   name: string
-
   open: number
-
   slaRisk: number
-
 }
-
-
 
 function healthyKpi(value: string, subtitle = ""): AdminDashboardKpi {
-
   return { value, subtitle, status: "healthy" }
-
 }
-
-
 
 function kpiStatusForCount(n: number, warnAt: number, criticalAt: number): AdminKpiStatus {
-
   if (n >= criticalAt) return "critical"
-
   if (n >= warnAt) return "watch"
-
   return "healthy"
-
 }
 
-
-
-/** Admin dashboard — single source: cp_agent tickets + sync_logs (CARE sync MVP). */
-
+/** Admin dashboard — même orchestration et KPIs que l'espace agent. */
 export async function adminDashboardBundle() {
+  const ctx = await loadOrchestratedAdminContext()
+  const { kpis, decisionFeedback, diagnostics, decisionDistribution, transferByTarget } =
+    ctx
 
-  const operational = await getCarePilotOperationalMetrics()
+  const [topMagasins, recentTickets, latestSync, syncSources, slaEscalationTrend] = await Promise.all([
+    adminTopMagasins(8),
+    adminRecentSynchronizedTickets(10),
+    adminLatestSync(),
+    adminSyncStatusCompact(),
+    adminSlaEscalationTrend7d(),
+  ])
 
-  const { kpis, pressure, sync, aiAcceptance, syncSummary } = operational
-
-
-
-  const operationalPressure: DashboardPressureRow[] = pressure.map((r) => ({
-
-    name: r.name,
-
-    open: r.open,
-
-    slaRisk: r.slaRisk,
-
-  }))
-
-
-
-  const [topMagasins, recentTickets, escalation, transfers, aiReliability, syncSources, slaEscalationTrend] =
-
-    await Promise.all([
-
-      adminTopMagasins(8),
-
-      adminRecentSynchronizedTickets(10),
-
-      adminEscalationMonitoringBlock(),
-
-      adminTransferMonitoringBlock(),
-
-      adminAiSupervisionCompact(),
-
-      adminSyncStatusCompact(),
-
-      adminSlaEscalationTrend7d(),
-
-    ])
-
-
-
-  const syncHealthLabel =
-
-    sync.running
-
-      ? "Synchronizing"
-
-      : kpis.totalSynchronized > 0 && syncSummary.pendingCareRecords === 0
-
-        ? "Healthy"
-
-        : sync.label
-
-
+  const syncRunning = latestSync?.status === "running"
+  const syncHealthLabel = syncRunning
+    ? "Synchronisation en cours"
+    : ctx.synchronizedTickets > 0
+      ? "Sain"
+      : "En attente"
 
   const syncSupervision = buildSyncSupervisionRows(
-
     syncHealthLabel,
-
-    sync.running,
-
-    sync.lastIngestionAt,
-
+    syncRunning,
+    latestSync?.syncFinishedAt ?? null,
     syncSources.map((s) => ({ label: s.label, state: s.state })),
-
   )
 
+  const { summary: kmSummary, procedures: kmProcedures } = ctx.kmUsage
+  const kmWaiting = kmProcedures.reduce((sum, row) => sum + row.waitingCount, 0)
 
-
-  const aiAcceptancePct = aiReliability.acceptancePct ?? aiAcceptance.displayValue
-
-  const aiRejectionPct = aiReliability.rejectionPct ?? "—"
-
-
+  const aiPipelineHealth = await loadAiPipelineHealth(
+    ctx.synchronizedTickets,
+    diagnostics.withAgentAction,
+    { kmAnalysisCompleted: ctx.kmUsage.summary.ticketsMatched },
+  )
 
   return {
-
     kpiStrip: {
-
-      openTickets: healthyKpi(
-
-        String(kpis.openTickets),
-
-        `${kpis.totalSynchronized} synchronized`,
-
-      ),
-
+      openTickets: healthyKpi(String(kpis.openTickets)),
       slaRisk: {
-
-        value: String(kpis.slaRisk),
-
-        subtitle: "Next 4 hours",
-
-        status: kpiStatusForCount(kpis.slaRisk, 3, 8) as AdminKpiStatus,
-
+        value: String(kpis.slaAttention),
+        subtitle: "",
+        status: kpiStatusForCount(kpis.slaAttention, 3, 8),
       },
-
       transfers: {
-
-        value: String(kpis.transfers),
-
-        subtitle: transfers.topDestination !== "—" ? `Top: ${transfers.topDestination}` : "Perimeter routing",
-
-        status: kpiStatusForCount(kpis.transfers, 2, 6) as AdminKpiStatus,
-
+        value: String(kpis.transfer),
+        subtitle: "",
+        status: kpiStatusForCount(kpis.transfer, 2, 6),
       },
-
       escalateN3: {
-
-        value: String(kpis.escalations),
-
-        subtitle: escalation.topCategory !== "—" ? escalation.topCategory : "N3 queue",
-
-        status: kpiStatusForCount(kpis.escalations, 1, 4) as AdminKpiStatus,
-
+        value: String(kpis.escalation),
+        subtitle: "",
+        status: kpiStatusForCount(kpis.escalation, 1, 4),
       },
-
+      suspend: {
+        value: String(kpis.suspend),
+        subtitle: "",
+        status: kpiStatusForCount(kpis.suspend, 2, 5),
+      },
       syncHealth: {
-
         value: syncHealthLabel,
-
-        subtitle: sync.lastIngestionAt
-
-          ? `Last ${new Intl.DateTimeFormat("en-GB", { timeStyle: "short" }).format(sync.lastIngestionAt)}`
-
-          : "Awaiting ingestion",
-
-        status: (syncHealthLabel === "Healthy" ? "healthy" : sync.running ? "watch" : "critical") as AdminKpiStatus,
-
+        subtitle: latestSync?.syncFinishedAt
+          ? new Intl.DateTimeFormat("fr-FR", { timeStyle: "short" }).format(latestSync.syncFinishedAt)
+          : "",
+        status: (syncHealthLabel === "Sain" ? "healthy" : syncRunning ? "watch" : "critical") as AdminKpiStatus,
       },
-
-      aiStatus: healthyKpi(aiAcceptance.displayValue, PENDING_AI_TRAINING),
-
+      aiStatus: {
+        value: String(decisionFeedback.actionsCompleted),
+        subtitle: "",
+        status:
+          decisionFeedback.adjustedDecisions > 0
+            ? ("watch" as const)
+            : ("healthy" as const),
+      },
     },
-
+    decisionFeedback,
     supervision: {
-
-      escalation: {
-
-        rows: [
-
-          { label: "Open", value: String(escalation.open) },
-
-          { label: "Top category", value: escalation.topCategory },
-
-          { label: "Aging > 4h", value: String(escalation.agingOver4h) },
-
-          { label: "Unresolved P1", value: String(escalation.criticalUnresolved) },
-
-        ],
-
-        tone: escalation.criticalUnresolved > 0 || escalation.agingOver4h > 0 ? "critical" : "primary",
-
+      decisionAlignment: {
+        tone: decisionFeedback.adjustedDecisions > 0 ? ("critical" as const) : ("primary" as const),
       },
-
       transfers: {
-
+        rows: transferByTarget.slice(0, 4).map((t) => ({
+          label: t.target,
+          value: String(t.count),
+        })),
+        tone: "neutral" as const,
+      },
+      kmEffectiveness: {
         rows: [
-
-          { label: "Volume", value: String(transfers.total) },
-
-          { label: "Top destination", value: transfers.topDestination },
-
-          { label: "Routing imbalance", value: transfers.routingImbalance },
-
-          { label: "Repeated", value: String(transfers.repeatedWrongPerimeter) },
-
+          { label: "Tickets avec KM", value: String(kmSummary.ticketsMatched) },
+          { label: "Taux de succès", value: `${kmSummary.overallSuccessRatePct}%` },
+          { label: "Escalade après KM", value: String(kmSummary.escalatedAfterKm) },
+          { label: "En attente", value: String(kmWaiting) },
         ],
-
-        tone: transfers.total > 4 ? "primary" : "neutral",
-
+        tone: kmSummary.escalatedAfterKm > 0 ? ("critical" as const) : ("primary" as const),
       },
-
-      aiReliability: {
-
-        rows: [
-
-          {
-
-            label: "Acceptance",
-
-            value: typeof aiAcceptancePct === "number" ? `${aiAcceptancePct}%` : String(aiAcceptancePct),
-
-          },
-
-          {
-
-            label: "Rejection",
-
-            value: typeof aiRejectionPct === "number" ? `${aiRejectionPct}%` : String(aiRejectionPct),
-
-          },
-
-          {
-
-            label: "Confidence",
-
-            value: aiReliability.avgConfidencePct > 0 ? `${aiReliability.avgConfidencePct}%` : PENDING_AI_TRAINING,
-
-          },
-
-          {
-
-            label: "Latest rejected",
-
-            value: aiReliability.latestRejectedCategory ?? "—",
-
-          },
-
-        ],
-
-        tone: "primary",
-
-      },
-
-      syncHealth: {
-
-        rows: syncSupervision.rows.map((r) => ({ label: r.label, value: r.value })),
-
-        tone: syncSupervision.tone,
-
-      },
-
     },
-
+    decisionDistribution,
+    slaExposure: ctx.slaExposure,
+    transferByTarget: ctx.transferByTarget,
+    diagnostics,
+    aiPipelineHealth,
+    systemHealth: {
+      sync: {
+        rows: syncSupervision.rows.map((r) => ({ label: r.label, value: r.value })),
+        tone: syncSupervision.tone,
+      },
+    },
     slaEscalationTrend,
-
-    operationalPressure,
-
     topMagasins,
-
     recentTickets,
-
-    lastSyncAt: sync.lastIngestionAt,
-
-    synchronizedTotal: kpis.totalSynchronized,
-
+    lastSyncAt: latestSync?.syncFinishedAt ?? null,
+    synchronizedTotal: ctx.synchronizedTickets,
   }
-
 }
-
-

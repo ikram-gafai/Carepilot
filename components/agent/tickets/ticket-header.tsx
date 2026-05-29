@@ -20,7 +20,12 @@ export function TicketHeader({
   ticket: CpAgentTicketRow
   assigneeName: string | null
 }) {
-  const sla = cpAgentSlaLabel(ticket.slaDueAt, ticket.status)
+  const sla = cpAgentSlaLabel(ticket.slaDueAt, ticket.status, {
+    priority: ticket.priority,
+    createdAt: ticket.createdAt,
+    externalCreatedAt: ticket.externalCreatedAt,
+    ttrTargetHours: ticket.ttrTargetHours,
+  })
   return (
     <div className="space-y-3 border-b border-zinc-200 pb-4 dark:border-zinc-800">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -36,20 +41,20 @@ export function TicketHeader({
       </div>
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
         <span>
-          <span className="text-zinc-400">Assigned · </span>
+          <span className="text-zinc-400">Assigné · </span>
           {assigneeName ?? "—"}
         </span>
         <span>
-          <span className="text-zinc-400">Created · </span>
+          <span className="text-zinc-400">Créé · </span>
           {formatDt(ticket.createdAt)}
         </span>
         <span>
-          <span className="text-zinc-400">Updated · </span>
+          <span className="text-zinc-400">Mis à jour · </span>
           {formatDt(ticket.updatedAt)}
         </span>
         {ticket.ttrTargetHours != null ? (
           <span>
-            <span className="text-zinc-400">TTR target · </span>
+            <span className="text-zinc-400">Objectif TTR · </span>
             {ticket.ttrTargetHours}h
           </span>
         ) : null}

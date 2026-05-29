@@ -8,16 +8,16 @@ import {
 } from "lucide-react"
 
 export const ADMIN_NAV = {
-  overview: [{ href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard }],
+  overview: [{ href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard }],
   operations: [
-    { href: "/admin/queues", label: "Queues", icon: Layers },
-    { href: "/admin/escalations", label: "Escalations", icon: ArrowUpRight },
+    { href: "/admin/queues", label: "Files d'attente", icon: Layers },
+    { href: "/admin/escalations", label: "Escalades", icon: ArrowUpRight },
   ],
   ai: [
-    { href: "/admin/recommendations", label: "Recommendations", icon: Sparkles },
-    { href: "/admin/feedback", label: "Feedback", icon: MessageSquare },
+    { href: "/admin/recommendations", label: "Recommandations", icon: Sparkles },
+    { href: "/admin/feedback", label: "Retours", icon: MessageSquare },
   ],
   team: [{ href: "/admin/users", label: "Agents", icon: Users }],
 } as const
 
-export const ADMIN_ROLES = ["Admin", "Supervisor"] as const
+export const ADMIN_ROLES = ["Admin", "Superviseur"] as const

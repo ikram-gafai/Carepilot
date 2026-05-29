@@ -1,0 +1,36 @@
+{
+  "dataset": {
+    "test_tickets": 2100,
+    "km_articles": 102
+  },
+  "results": [
+    {
+      "method": "TF-IDF + Cosine",
+      "precision_at_1": 0.7976190476190477,
+      "precision_at_3": 0.779126984126984,
+      "recall_at_3": 0.779126984126984,
+      "mrr": 0.8884920634920634,
+      "ndcg_at_3": 0.7647524461645565,
+      "avg_retrieval_time_ms": 2.3364770475780547
+    },
+    {
+      "method": "BM25",
+      "precision_at_1": 0.8904761904761904,
+      "precision_at_3": 0.7887301587301587,
+      "recall_at_3": 0.7887301587301587,
+      "mrr": 0.9371428571428572,
+      "ndcg_at_3": 0.7945241999263303,
+      "avg_retrieval_time_ms": 2.6182190953390783
+    },
+    {
+      "method": "Sentence Transformers",
+      "precision_at_1": 0.9323809523809524,
+      "precision_at_3": 0.7892857142857143,
+      "recall_at_3": 0.7892857142857143,
+      "mrr": 0.9594444444444444,
+      "ndcg_at_3": 0.8032720432113399,
+      "avg_retrieval_time_ms": 42.006333000019715
+    }
+  ],
+  "best_method": "Sentence Transformers"
+}

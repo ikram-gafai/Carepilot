@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 
+import { formatPerimeterLabel } from "@/lib/care-operational/perimeter-codes"
 import { cn } from "@/lib/utils"
 import type { DemoSlaState } from "@/lib/tickets-demo-queue"
 import { DEMO_TICKETS_QUEUE } from "@/lib/tickets-demo-queue"
@@ -120,7 +121,7 @@ export function TicketsDemoQueueTable() {
                     <span className="line-clamp-2 whitespace-normal">{row.subject}</span>
                   </TableCell>
                 <TableCell className="px-3 py-2.5 text-muted-foreground">
-                  {row.perimeter}
+                  {formatPerimeterLabel(row.perimeter)}
                 </TableCell>
                 <TableCell className="px-3 py-2.5">
                   <SlaStateBadge state={row.slaState} />

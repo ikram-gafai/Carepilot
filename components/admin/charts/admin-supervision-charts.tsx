@@ -35,14 +35,15 @@ import {
   ADMIN_PIE_BLUE_STEPS,
 } from "./admin-chart-theme"
 import { AdminChartShell } from "./admin-chart-shell"
+import { ADMIN_SECTION_SUBTITLES } from "@/lib/operational-ui-copy"
 
 const blueConfig = {
-  value: { label: "Count", color: ADMIN_CHART_BLUE.base },
+  value: { label: "Tickets", color: ADMIN_CHART_BLUE.base },
 } satisfies ChartConfig
 
 const workloadConfig = {
-  active: { label: "Active", color: ADMIN_CHART_BLUE.base },
-  sla: { label: "SLA exposure", color: ADMIN_CHART_BLUE.soft },
+  active: { label: "Actifs", color: ADMIN_CHART_BLUE.base },
+  sla: { label: "Exposition SLA", color: ADMIN_CHART_BLUE.soft },
 } satisfies ChartConfig
 
 export function AdminQueueWorkloadChart({
@@ -194,7 +195,7 @@ export function AdminAgentWorkloadChart({
 }) {
   const chartData = data.length > 0 ? data : [{ name: "—", value: 0 }]
   return (
-    <AdminChartShell title="Open workload by agent">
+    <AdminChartShell title="Charge ouverte par agent" subtitle={ADMIN_SECTION_SUBTITLES.agentWorkload}>
       <ChartContainer config={blueConfig} className="h-[160px] w-full min-w-0">
         <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
           <CartesianGrid vertical={false} {...ADMIN_CHART_GRID} />

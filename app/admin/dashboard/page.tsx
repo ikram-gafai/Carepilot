@@ -1,5 +1,6 @@
 import { AdminDashboardToolbar } from "@/components/admin/layout/admin-dashboard-toolbar"
-import { AdminHeader, AdminPageBody } from "@/components/admin/layout/admin-header"
+import { AdminSetHeaderActions } from "@/components/admin/layout/admin-header-context"
+import { AdminPageBody } from "@/components/admin/layout/admin-header"
 import { AdminDashboardView } from "@/components/admin/views/admin-dashboard-view"
 import { AdminUnavailable } from "@/components/admin/ui/admin-unavailable"
 import { CarepilotAutoRefresh } from "@/components/carepilot/carepilot-auto-refresh"
@@ -14,9 +15,9 @@ export default async function AdminDashboardPage() {
   return (
     <>
       {workspace.ok ? <CarepilotAutoRefresh intervalMs={60_000} /> : null}
-      <AdminHeader title="Dashboard">
+      <AdminSetHeaderActions>
         <AdminDashboardToolbar />
-      </AdminHeader>
+      </AdminSetHeaderActions>
       <AdminPageBody>
         {!workspace.ok ? (
           <AdminUnavailable reason={workspace.reason} />

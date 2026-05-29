@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/chart"
 
 const config = {
-  open: { label: "Open", color: ADMIN_CHART_BLUE.soft },
-  slaRisk: { label: "SLA risk", color: ADMIN_CHART_BLUE.deep },
+  open: { label: "Ouverts", color: ADMIN_CHART_BLUE.soft },
+  slaRisk: { label: "Risque SLA", color: ADMIN_CHART_BLUE.deep },
 } satisfies ChartConfig
 
 export function AdminOperationalPressureChart({ data }: { data: DashboardPressureRow[] }) {
@@ -29,7 +29,7 @@ export function AdminOperationalPressureChart({ data }: { data: DashboardPressur
   if (chartData.length === 0) {
     return (
       <div className="flex h-[220px] items-center justify-center text-sm text-muted-foreground">
-        No active workload by perimeter.
+        Aucune charge active par périmètre.
       </div>
     )
   }

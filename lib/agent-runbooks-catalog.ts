@@ -1,5 +1,5 @@
 /**
- * Runbooks derived from synchronized CARE KM procedures (no static catalog).
+ * Runbooks derived from operational KM catalog + ticket telemetry.
  */
 
 import type { AgentProcedureRow } from "@/lib/agent-procedures-view"
@@ -10,65 +10,65 @@ export type AgentRunbook = {
   procedureCode: string | null
   title: string
   category: string
+  perimeter: string
   contextLine: string
-  frequencyLabel: string
-  severity: "critical" | "elevated" | "standard"
   incidentContext: string
-  firstChecks: string[]
-  escalateWhen: string[]
-  transferMatWhen: string[]
-  requiredEvidence: string[]
+  beforeApplying: string[]
+  procedureSteps: string[]
+  ifFailed: string[]
+  estimatedMinutes: number
+  successRatePct: number
   relatedKm: string[]
-  operationalNotes: string
-  baselineWeight: number
 }
 
 export type EnrichedRunbook = AgentRunbook & {
   usageCount: number
   relevanceScore: number
   lastUsedAt: string | null
+  successfulCount?: number
+  escalatedAfterCount?: number
+  waitingCount?: number
 }
 
-function severityFromScore(score: number): AgentRunbook["severity"] {
-  if (score >= 0.9) return "critical"
-  if (score >= 0.75) return "elevated"
-  return "standard"
-}
-
-function tagsToRelatedKm(tags: string, code: string): string[] {
-  const fromTags = tags
-    .split(/[,;]/)
-    .map((t) => t.trim())
-    .filter((t) => /^KM-/i.test(t))
-  return fromTags.length > 0 ? fromTags : [code]
-}
-
-/** Build runbook cards from synchronized KM rows returned by `/api/agent/procedures`. */
+/** Build runbook cards from agent procedure rows. */
 export function runbooksFromProcedures(procedures: AgentProcedureRow[]): EnrichedRunbook[] {
   return procedures.map((p) => {
-    const checks = p.steps.filter(Boolean)
-    const score = p.relevanceScore > 0 ? p.relevanceScore : 0.8
+    const beforeApplying = p.beforeApplying?.length
+      ? p.beforeApplying
+      : p.prerequisites
+          .split(/[•\n;|·]/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+    const procedureSteps = p.steps.filter(Boolean)
+    const ifFailed = p.ifFailed?.length
+      ? p.ifFailed
+      : [
+          "Collecter logs et captures d'écran",
+          "Documenter les tentatives FO",
+          "Escalader N3 ou transférer selon périmètre",
+        ]
+
     return {
-      id: `km-${p.id}`,
-      code: `RB-${p.code}`,
+      id: `km-${p.code}`,
+      code: p.code,
       procedureCode: p.code,
       title: p.title,
       category: p.category,
+      perimeter: p.scope,
       contextLine: p.summary.trim() || p.title,
-      frequencyLabel: p.usageCount > 0 ? `${p.usageCount} uses` : "Synchronized",
-      severity: severityFromScore(score),
-      incidentContext: p.summary.trim() || `${p.title} — ${p.scope}`,
-      firstChecks:
-        checks.length > 0 ? checks.slice(0, 6) : [`Open ${p.code} and follow synchronized steps.`],
-      escalateWhen: [],
-      transferMatWhen: [],
-      requiredEvidence: p.prerequisites ? [p.prerequisites] : [],
-      relatedKm: tagsToRelatedKm(p.tags, p.code),
-      operationalNotes: p.prerequisites.trim() || p.scope,
-      baselineWeight: score,
+      incidentContext: p.summary.trim() || p.title,
+      beforeApplying,
+      procedureSteps,
+      ifFailed,
+      estimatedMinutes: p.estimatedMinutes ?? 5,
+      successRatePct: p.successRatePct ?? Math.round(p.relevanceScore * 100),
+      relatedKm: [p.code],
       usageCount: p.usageCount,
-      relevanceScore: score,
+      relevanceScore: p.relevanceScore,
       lastUsedAt: p.lastUsedAt,
+      successfulCount: p.successfulCount,
+      escalatedAfterCount: p.escalatedAfterCount,
+      waitingCount: p.waitingCount,
     }
   })
 }

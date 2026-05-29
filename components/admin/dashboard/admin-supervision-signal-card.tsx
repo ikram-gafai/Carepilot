@@ -19,10 +19,12 @@ const TONE_DOT: Record<SupervisionSignalTone, string> = {
 
 export function AdminSupervisionSignalCard({
   title,
+  subtitle,
   rows,
   tone = "primary",
 }: {
   title: string
+  subtitle?: string
   rows: readonly SupervisionSignalRow[]
   tone?: SupervisionSignalTone
 }) {
@@ -33,9 +35,14 @@ export function AdminSupervisionSignalCard({
         "flex flex-col overflow-hidden border-primary/15 bg-gradient-to-b from-primary/[0.04] to-card",
       )}
     >
-      <header className="flex items-center justify-between gap-2 border-b border-primary/10 px-4 py-3">
-        <h3 className="text-sm font-semibold tracking-tight text-foreground">{title}</h3>
-        <span className={cn("size-2 shrink-0 rounded-full", TONE_DOT[tone])} aria-hidden />
+      <header className="flex items-start justify-between gap-2 border-b border-primary/10 px-4 py-3">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">{title}</h3>
+          {subtitle ? (
+            <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{subtitle}</p>
+          ) : null}
+        </div>
+        <span className={cn("mt-1 size-2 shrink-0 rounded-full", TONE_DOT[tone])} aria-hidden />
       </header>
       <dl className="grid flex-1 gap-0 divide-y divide-border/50 px-4 py-1">
         {rows.map((row) => (

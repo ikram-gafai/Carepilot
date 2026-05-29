@@ -1,5 +1,6 @@
 import { count, eq } from "drizzle-orm"
 
+import { operationalCareTicketScope } from "@/lib/care-operational/operational-ticket-scope"
 import { getDb } from "@/lib/db"
 import { careSourceTickets } from "@/lib/db/schema/care-source"
 import { cpAgentTickets } from "@/lib/db/schema/cp-agent"
@@ -16,7 +17,7 @@ export async function getSynchronizedTicketTotals() {
   const [row] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.source, "CARE"))
+    .where(operationalCareTicketScope())
   return Number(row?.c ?? 0)
 }
 

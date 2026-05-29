@@ -1,10 +1,10 @@
-import { SUPPORT_AGENT_DEPARTMENT } from "@/lib/data/support-agents"
+import { SUPPORT_AGENT_DEPARTMENT, SUPPORT_AGENTS, demoLastLoginForEmail } from "@/lib/data/support-agents"
 import { normalizeAgentEmail } from "@/lib/cp-agent/user-match"
 import { getDb } from "@/lib/db"
 import { cpAgentTickets, cpAgentUsers } from "@/lib/db/schema/cp-agent"
 import { carepilotUsers } from "@/lib/db/schema/carepilot"
 
-import { OPEN_FILTER } from "./shared"
+import { OPERATIONAL_OPEN_SCOPE } from "./shared"
 
 export type SupportAgentRow = {
   id: number
@@ -20,7 +20,7 @@ export async function adminWorkforceSupervision() {
 
   const [roster, openTickets, careProfiles] = await Promise.all([
     db.select().from(cpAgentUsers).orderBy(cpAgentUsers.displayName),
-    db.select({ ticket: cpAgentTickets }).from(cpAgentTickets).where(OPEN_FILTER),
+    db.select({ ticket: cpAgentTickets }).from(cpAgentTickets).where(OPERATIONAL_OPEN_SCOPE),
     db.select().from(carepilotUsers).orderBy(carepilotUsers.lastName, carepilotUsers.firstName),
   ])
 
@@ -51,7 +51,7 @@ export async function adminWorkforceSupervision() {
       email: profile?.email ?? agent.email,
       department: profile?.department ?? SUPPORT_AGENT_DEPARTMENT,
       status: profile?.status ?? "active",
-      lastSignIn: profile?.lastLoginAt ?? null,
+      lastSignIn: profile?.lastLoginAt ?? demoLastLoginForEmail(profile?.email ?? agent.email),
     }
   })
 

@@ -10,10 +10,6 @@ import {
   Cell,
   Pie,
   PieChart,
-  PolarAngleAxis,
-  PolarGrid,
-  RadialBar,
-  RadialBarChart,
   XAxis,
   YAxis,
 } from "recharts"
@@ -26,14 +22,14 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-/** Dashboard chart buckets (English UI) — DB codes map into these six rows. */
+/** Libellés graphiques tableau de bord — les codes DB sont mappés sur ces six lignes. */
 const STATUS_CHART_ORDER = [
-  "In progress",
-  "Open",
-  "Resolved",
-  "Suspended",
-  "Transferred",
-  "Waiting store",
+  "En cours",
+  "Ouvert",
+  "Résolu",
+  "Suspendu",
+  "Transféré",
+  "Attente magasin",
 ] as const
 
 const STATUS_CHART_ORDER_SET = new Set<string>(STATUS_CHART_ORDER)
@@ -43,23 +39,23 @@ const SLA_BUCKET_ORDER = ["breached", "at_risk", "on_track", "unknown", "closed"
 function chartBucketForDbStatus(code: string): string {
   switch (code) {
     case "OPEN":
-      return "Open"
+      return "Ouvert"
     case "IN_PROGRESS":
     case "ESCALATED_N3":
-      return "In progress"
+      return "En cours"
     case "WAITING_STORE":
-      return "Waiting store"
+      return "Attente magasin"
     case "RESOLVED":
-      return "Resolved"
+      return "Résolu"
     case "SUSPENDED":
-      return "Suspended"
+      return "Suspendu"
     case "TRANSFERRED_MON":
     case "TRANSFERRED_MAT":
     case "TRANSFERRED_BO":
     case "TRANSFERRED_RES":
     case "TRANSFERRED_BUR":
     case "TRANSFERRED_INF":
-      return "Transferred"
+      return "Transféré"
     default:
       return code
         .replaceAll("_", " ")
@@ -96,13 +92,6 @@ const ENTERPRISE_CHART_BLUE = {
   soft: "hsl(210 14% 68%)",
 } as const
 
-const OUTCOME_FILL_STEPS = [
-  ENTERPRISE_CHART_BLUE.deep,
-  ENTERPRISE_CHART_BLUE.base,
-  ENTERPRISE_CHART_BLUE.mid,
-  ENTERPRISE_CHART_BLUE.soft,
-] as const
-
 const statusChartConfig = {
   value: {
     label: "Tickets",
@@ -114,18 +103,12 @@ const priorityChartConfig = {
   P1: { label: "P1", color: ENTERPRISE_CHART_BLUE.deep },
   P2: { label: "P2", color: ENTERPRISE_CHART_BLUE.base },
   P3: { label: "P3", color: ENTERPRISE_CHART_BLUE.mid },
+  P4: { label: "P4", color: ENTERPRISE_CHART_BLUE.soft },
 } satisfies ChartConfig
 
 const slaChartConfig = {
   value: {
-    label: "Count",
-    color: ENTERPRISE_CHART_BLUE.base,
-  },
-} satisfies ChartConfig
-
-const outcomesChartConfig = {
-  value: {
-    label: "Responses",
+    label: "Nombre",
     color: ENTERPRISE_CHART_BLUE.base,
   },
 } satisfies ChartConfig
@@ -137,18 +120,16 @@ export function DashboardCharts({
   byStatus,
   byPriority,
   slaBuckets,
-  outcomes,
 }: {
   byStatus: { status: string; count: number }[]
   byPriority: { priority: string; count: number }[]
   slaBuckets: { bucket: string; count: number }[]
-  outcomes: { outcome: string; count: number }[]
 }) {
   const slaGradientId = React.useId().replace(/:/g, "")
 
   const statusData = buildStatusChartData(byStatus)
 
-  const priOrder = ["P1", "P2", "P3"]
+  const priOrder = ["P1", "P2", "P3", "P4"]
   const priData = [...byPriority]
     .sort((a, b) => priOrder.indexOf(a.priority) - priOrder.indexOf(b.priority))
     .map((r) => ({
@@ -168,17 +149,11 @@ export function DashboardCharts({
       value: r.count,
     }))
 
-  const outRadialData = outcomes.map((r, i) => ({
-    name: r.outcome.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-    value: r.count,
-    fill: OUTCOME_FILL_STEPS[i % OUTCOME_FILL_STEPS.length]!,
-  }))
-
   const statusMax = Math.max(1, ...statusData.map((d) => d.value))
 
   return (
     <div className="grid min-w-0 gap-4 lg:grid-cols-2">
-      <ChartCard title="By status">
+      <ChartCard title="Par statut">
         <ChartContainer config={statusChartConfig} className={statusChartShell}>
           <BarChart
             accessibilityLayer
@@ -218,7 +193,7 @@ export function DashboardCharts({
         </ChartContainer>
       </ChartCard>
 
-      <ChartCard title="By priority">
+      <ChartCard title="Par priorité">
         <ChartContainer config={priorityChartConfig} className={chartShell}>
           <PieChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
             <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
@@ -240,7 +215,7 @@ export function DashboardCharts({
         </ChartContainer>
       </ChartCard>
 
-      <ChartCard title="SLA risk">
+      <ChartCard title="Risque SLA">
         <ChartContainer config={slaChartConfig} className={chartShell}>
           <AreaChart data={slaData} margin={{ top: 10, right: 10, left: 0, bottom: 2 }}>
             <defs>
@@ -278,34 +253,6 @@ export function DashboardCharts({
               activeDot={{ r: 3.5 }}
             />
           </AreaChart>
-        </ChartContainer>
-      </ChartCard>
-
-      <ChartCard title="AI feedback">
-        <ChartContainer config={outcomesChartConfig} className={chartShell}>
-          <RadialBarChart
-            cx="50%"
-            cy="50%"
-            data={outRadialData}
-            innerRadius="22%"
-            outerRadius="100%"
-            startAngle={100}
-            endAngle={-260}
-          >
-            <PolarGrid gridType="circle" className="stroke-border/30" radialLines={false} />
-            <RadialBar
-              dataKey="value"
-              cornerRadius={2}
-              background={{ className: "fill-muted/30" }}
-              className="stroke-transparent"
-            />
-            <PolarAngleAxis
-              type="category"
-              dataKey="name"
-              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-            />
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-          </RadialBarChart>
         </ChartContainer>
       </ChartCard>
     </div>

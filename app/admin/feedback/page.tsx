@@ -1,4 +1,4 @@
-import { AdminHeader, AdminPageBody } from "@/components/admin/layout/admin-header"
+import { AdminPageBody } from "@/components/admin/layout/admin-header"
 import { AdminFeedbackView } from "@/components/admin/views/admin-feedback-view"
 import { AdminUnavailable } from "@/components/admin/ui/admin-unavailable"
 import { CarepilotAutoRefresh } from "@/components/carepilot/carepilot-auto-refresh"
@@ -13,7 +13,6 @@ export default async function AdminFeedbackPage() {
   return (
     <>
       {workspace.ok ? <CarepilotAutoRefresh intervalMs={60_000} /> : null}
-      <AdminHeader title="Feedback" />
       <AdminPageBody>
         {!workspace.ok ? (
           <AdminUnavailable reason={workspace.reason} />

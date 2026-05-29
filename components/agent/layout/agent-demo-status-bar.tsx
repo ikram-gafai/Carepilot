@@ -21,9 +21,9 @@ export function AgentDemoStatusBar() {
           className="size-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_0_3px] shadow-primary/25"
           aria-hidden
         />
-        Queue live
+        File en direct
       </span>
-      <span className="hidden tabular-nums sm:inline">Last sync {syncMins} min ago</span>
+      <span className="hidden tabular-nums sm:inline">Dernière synchro il y a {syncMins} min</span>
     </div>
   )
 }

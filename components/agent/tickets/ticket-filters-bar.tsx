@@ -2,29 +2,30 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useState, useTransition } from "react"
+import { Search } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { cpAgentCategoryLabel } from "@/lib/cp-agent-legacy-copy-en"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  TICKET_QUEUE_QUICK_FILTERS,
+  type TicketQueueQuickFilter,
+} from "@/lib/agent/ticket-queue-display"
+import { cn } from "@/lib/utils"
 
-type Opt = {
-  statuses: string[]
-  priorities: string[]
-  categories: string[]
-  agents: { id: number; name: string }[]
+const FILTER_LABEL_FR: Record<TicketQueueQuickFilter, string> = {
+  all: "Tous",
+  p1: "P1",
+  attention: "Attention",
+  escalation: "Escalade",
+  transfer: "Transfert",
+  missing_context: "Contexte manquant",
 }
 
 function readFilters(sp: URLSearchParams) {
   const mine = sp.get("mine") === "1"
+  const quick = (sp.get("filter") as TicketQueueQuickFilter) ?? "all"
   return {
     q: sp.get("q") ?? "",
-    status: sp.get("status") ?? "all",
-    priority: sp.get("priority") ?? "all",
-    category: sp.get("category") ?? "all",
-    assignedUserId: mine ? "mine" : (sp.get("assigned") ?? "all"),
-    slaState: (sp.get("sla") as "all" | "at_risk" | "breached" | "ok") ?? "all",
+    quick: TICKET_QUEUE_QUICK_FILTERS.some((f) => f.id === quick) ? quick : "all",
     mine,
   }
 }
@@ -32,16 +33,12 @@ function readFilters(sp: URLSearchParams) {
 function toQueryString(f: ReturnType<typeof readFilters>) {
   const p = new URLSearchParams()
   if (f.q.trim()) p.set("q", f.q.trim())
-  if (f.status !== "all") p.set("status", f.status)
-  if (f.priority !== "all") p.set("priority", f.priority)
-  if (f.category !== "all") p.set("category", f.category)
+  if (f.quick !== "all") p.set("filter", f.quick)
   if (f.mine) p.set("mine", "1")
-  else if (f.assignedUserId !== "all") p.set("assigned", f.assignedUserId)
-  if (f.slaState !== "all") p.set("sla", f.slaState)
   return p.toString()
 }
 
-export function TicketFiltersBar({ options }: { options: Opt }) {
+export function TicketFiltersBar() {
   const router = useRouter()
   const sp = useSearchParams()
   const [pending, start] = useTransition()
@@ -61,106 +58,50 @@ export function TicketFiltersBar({ options }: { options: Opt }) {
     })
   }
 
+  function submitSearch() {
+    navigate({ q })
+  }
+
   return (
-    <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end">
-      <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row sm:items-end">
-        <div className="grid flex-1 gap-2">
-          <Label className="text-xs text-zinc-600">Search</Label>
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="CARE ID, title, store…" className="h-9" />
-        </div>
-        <Button type="button" variant="secondary" className="h-9 shrink-0" disabled={pending} onClick={() => navigate({ q })}>
-          Search
-        </Button>
+    <div className="space-y-3">
+      <div className="relative">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        />
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submitSearch()
+          }}
+          placeholder="Rechercher CARE ID ou titre…"
+          className="h-11 pl-9 text-sm"
+          disabled={pending}
+        />
       </div>
-      <div className="grid gap-2 sm:min-w-[140px]">
-        <Label className="text-xs text-zinc-600">Status</Label>
-        <Select value={fromUrl.status} onValueChange={(v) => navigate({ status: v })}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {options.statuses.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s.replaceAll("_", " ")}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+
+      <div className="flex flex-wrap gap-1.5">
+        {TICKET_QUEUE_QUICK_FILTERS.map((chip) => {
+          const active = fromUrl.quick === chip.id
+          return (
+            <button
+              key={chip.id}
+              type="button"
+              disabled={pending}
+              onClick={() => navigate({ quick: chip.id })}
+              className={cn(
+                "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                active
+                  ? "border-primary/40 bg-primary/10 text-foreground"
+                  : "border-border/80 bg-background text-muted-foreground hover:border-primary/25 hover:bg-primary/[0.04] hover:text-foreground",
+              )}
+            >
+              {FILTER_LABEL_FR[chip.id]}
+            </button>
+          )
+        })}
       </div>
-      <div className="grid gap-2 sm:min-w-[120px]">
-        <Label className="text-xs text-zinc-600">Priority</Label>
-        <Select value={fromUrl.priority} onValueChange={(v) => navigate({ priority: v })}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {options.priorities.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="grid gap-2 sm:min-w-[140px]">
-        <Label className="text-xs text-zinc-600">Category</Label>
-        <Select value={fromUrl.category} onValueChange={(v) => navigate({ category: v })}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {options.categories.map((s) => (
-              <SelectItem key={s} value={s}>
-                {cpAgentCategoryLabel(s)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="grid gap-2 sm:min-w-[160px]">
-        <Label className="text-xs text-zinc-600">Assigned agent</Label>
-        <Select
-          value={fromUrl.mine ? "mine" : fromUrl.assignedUserId}
-          onValueChange={(v) =>
-            v === "mine"
-              ? navigate({ mine: true, assignedUserId: "all" })
-              : navigate({ mine: false, assignedUserId: v })
-          }
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All agents</SelectItem>
-            <SelectItem value="mine">My queue</SelectItem>
-            {options.agents.map((a) => (
-              <SelectItem key={a.id} value={String(a.id)}>
-                {a.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="grid gap-2 sm:min-w-[150px]">
-        <Label className="text-xs text-zinc-600">SLA / TTR</Label>
-        <Select value={fromUrl.slaState} onValueChange={(v) => navigate({ slaState: v as typeof fromUrl.slaState })}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="at_risk">At risk</SelectItem>
-            <SelectItem value="breached">Breached</SelectItem>
-            <SelectItem value="ok">On track / closed</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <Button type="button" variant="ghost" size="sm" className="h-9" disabled={pending} onClick={() => router.push("/agent/tickets")}>
-        Reset
-      </Button>
     </div>
   )
 }

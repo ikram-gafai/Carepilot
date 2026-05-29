@@ -60,6 +60,7 @@ const adminUsers = [
     role: "Admin" as const,
     department: SUPPORT_AGENT_DEPARTMENT,
     password: DEFAULT_AGENT_PASSWORD,
+    lastLoginAt: new Date("2026-05-29T08:15:00+02:00"),
   },
 ] as const
 
@@ -80,6 +81,7 @@ async function main() {
       role: agent.authRole,
       department: agent.department,
       password: DEFAULT_AGENT_PASSWORD,
+      lastLoginAt: new Date(agent.demoLastLoginAt),
     })),
     ...adminUsers,
   ]
@@ -95,6 +97,7 @@ async function main() {
         role: u.role,
         department: u.department,
         status: "active",
+        lastLoginAt: u.lastLoginAt ?? null,
       })
       .returning({ id: carepilotUsers.id })
 

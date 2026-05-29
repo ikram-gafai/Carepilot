@@ -44,6 +44,20 @@ CREATE TABLE IF NOT EXISTS cp_agent.ticket_history (
 
 CREATE INDEX IF NOT EXISTS cp_agent_hist_ticket_time ON cp_agent.ticket_history (ticket_id, occurred_at DESC);
 
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS external_id TEXT;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS previous_value TEXT;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS new_value TEXT;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS performed_by TEXT;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS performed_at TIMESTAMPTZ;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS external_created_at TIMESTAMPTZ;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS external_updated_at TIMESTAMPTZ;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS last_synced_at TIMESTAMPTZ;
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'CARE';
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+CREATE UNIQUE INDEX IF NOT EXISTS cp_agent_hist_external_id ON cp_agent.ticket_history (external_id);
+
 CREATE TABLE IF NOT EXISTS cp_agent.ticket_comments (
   id SERIAL PRIMARY KEY,
   ticket_id INTEGER NOT NULL REFERENCES cp_agent.tickets (id) ON DELETE CASCADE,

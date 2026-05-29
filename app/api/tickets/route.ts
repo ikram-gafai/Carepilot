@@ -8,11 +8,8 @@ export async function GET(req: Request) {
     const sp = new URL(req.url).searchParams
     const filters: TicketListFilters = {
       q: sp.get("q") ?? undefined,
-      status: sp.get("status") ?? undefined,
-      priority: sp.get("priority") ?? undefined,
-      category: sp.get("category") ?? undefined,
       assignedUserId: sp.get("assigned") ?? undefined,
-      slaState: (sp.get("sla") as TicketListFilters["slaState"]) ?? undefined,
+      quickFilter: (sp.get("filter") as TicketListFilters["quickFilter"]) ?? undefined,
     }
     const data = await listSynchronizedTickets(filters)
     return NextResponse.json(data)

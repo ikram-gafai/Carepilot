@@ -3,31 +3,56 @@ import {
   asc,
   desc,
   eq,
-  gt,
-  gte,
   ilike,
-  isNotNull,
-  lt,
-  lte,
-  ne,
+  inArray,
   or,
   sql,
 } from "drizzle-orm"
 
-import { CLOSED_STATUS_SQL_LIST } from "@/lib/care-operational-actions"
+import {
+  buildTicketSignals,
+  formatSuggestedActionWithTarget,
+  normalizeUntreatedTicketStatus,
+} from "@/lib/cp-agent/ticket-workflow"
+import { resolveApplicableKm } from "@/lib/ai/orchestration/km-applicability"
+import { plannedOperationalOutcomeForCareId } from "@/lib/care-operational/catalog-operational-outcome"
+import { isOrchestratedSlaAttention } from "@/lib/ai/orchestration/resolve-operational-decision"
+import { isDemoCareTicketId, operationalCareTicketScope } from "@/lib/care-operational/operational-ticket-scope"
+import {
+  compareAgentTicketListItems,
+} from "@/lib/carepilot-api/ticket-list-sort"
+import {
+  matchesTicketQueueQuickFilter,
+  type TicketQueueQuickFilter,
+} from "@/lib/agent/ticket-queue-display"
 import { englishLegacyCopy } from "@/lib/cp-agent-legacy-copy-en"
+import { cpAgentSlaLabel } from "@/lib/queries/cp-agent"
 import { getDb } from "@/lib/db"
 import {
-  cpAgentAiAnalyses,
-  cpAgentAiFeedback,
-  cpAgentKmSuggestions,
+  cpAgentAiActionRecommendations,
+  cpAgentAiEscalationPredictions,
+  cpAgentAiKmRecommendations,
+  cpAgentAiMissingInformationAnalysis,
+  cpAgentAiPriorityPredictions,
+  cpAgentAiSlaPredictions,
+  cpAgentAiTransferPredictions,
   cpAgentTicketComments,
   cpAgentTicketHistory,
   cpAgentTickets,
   cpAgentUsers,
 } from "@/lib/db/schema/cp-agent"
+import type { TicketSignalKey } from "@/lib/cp-agent/ticket-workflow"
 
-const CLOSED_SQL = CLOSED_STATUS_SQL_LIST
+const AGENT_OUTCOME_EVENTS = [
+  "resolve",
+  "escalate_n3",
+  "transfer_monetique",
+  "transfer_materiel",
+  "transfer_bo",
+  "transfer_reseau",
+  "transfer_bureautique",
+  "transfer_infrastructure",
+] as const
 
 export type TicketListFilters = {
   q?: string
@@ -36,12 +61,49 @@ export type TicketListFilters = {
   category?: string
   assignedUserId?: string
   slaState?: "all" | "breached" | "at_risk" | "ok"
+  quickFilter?: TicketQueueQuickFilter
+}
+
+export type AgentTicketListItem = {
+  id: number
+  careId: string
+  title: string
+  description: string
+  category: string
+  status: string
+  priority: string
+  predictedPriority: string | null
+  storeName: string | null
+  storeCode: string | null
+  slaDueAt: Date | null
+  slaLabel: string
+  slaTone: "critical" | "warning" | "success" | "neutral"
+  suggestedAction: string | null
+  suggestedActionLabel: string
+  signals: TicketSignalKey[]
+  assigneeName: string | null
+  updatedAt: Date
+  createdAt: Date
+}
+
+async function loadAgentOutcomeTicketIds(ticketIds: number[]): Promise<Set<number>> {
+  if (ticketIds.length === 0) return new Set()
+  const db = getDb()
+  const rows = await db
+    .selectDistinct({ ticketId: cpAgentTicketHistory.ticketId })
+    .from(cpAgentTicketHistory)
+    .where(
+      and(
+        inArray(cpAgentTicketHistory.ticketId, ticketIds),
+        inArray(cpAgentTicketHistory.eventType, [...AGENT_OUTCOME_EVENTS]),
+        eq(cpAgentTicketHistory.actorLabel, "Agent"),
+      ),
+    )
+  return new Set(rows.map((r) => r.ticketId))
 }
 
 export async function listSynchronizedTickets(filters: TicketListFilters = {}) {
   const db = getDb()
-  const nowDate = new Date()
-  const soonDate = new Date(nowDate.getTime() + 8 * 3600 * 1000)
   const clauses = [] as ReturnType<typeof and>[]
 
   if (filters.q?.trim()) {
@@ -67,59 +129,163 @@ export async function listSynchronizedTickets(filters: TicketListFilters = {}) {
   if (filters.assignedUserId && filters.assignedUserId !== "all") {
     clauses.push(eq(cpAgentTickets.assignedUserId, Number(filters.assignedUserId)))
   }
-  if (filters.slaState && filters.slaState !== "all") {
-    if (filters.slaState === "breached") {
-      clauses.push(
-        and(
-          isNotNull(cpAgentTickets.slaDueAt),
-          lt(cpAgentTickets.slaDueAt, nowDate),
-          sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        )!,
-      )
-    } else if (filters.slaState === "at_risk") {
-      clauses.push(
-        and(
-          isNotNull(cpAgentTickets.slaDueAt),
-          gte(cpAgentTickets.slaDueAt, nowDate),
-          lte(cpAgentTickets.slaDueAt, soonDate),
-          sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        )!,
-      )
-    } else if (filters.slaState === "ok") {
-      clauses.push(
-        or(
-          sql`${cpAgentTickets.status} IN (${sql.raw(CLOSED_SQL)})`,
-          sql`${cpAgentTickets.slaDueAt} IS NULL`,
-          gt(cpAgentTickets.slaDueAt, soonDate),
-        )!,
-      )
-    }
-  }
-
   const where = clauses.length ? and(...clauses) : undefined
-
-  const careOnly = eq(cpAgentTickets.source, "CARE")
-  const whereClause = where ? and(careOnly, where) : careOnly
+  const whereClause = where
+    ? operationalCareTicketScope(where)
+    : operationalCareTicketScope()
 
   const rows = await db
     .select({
       ticket: cpAgentTickets,
       assigneeName: cpAgentUsers.displayName,
+      recommendedAction: cpAgentAiActionRecommendations.recommendedAction,
+      actionConfidence: cpAgentAiActionRecommendations.confidenceScore,
+      probabilityDistribution: cpAgentAiActionRecommendations.probabilityDistribution,
+      escalationRequired: cpAgentAiEscalationPredictions.predictedEscalationRequired,
+      escalationConfidence: cpAgentAiEscalationPredictions.confidenceScore,
+      transferRequired: cpAgentAiTransferPredictions.predictedTransferRequired,
+      transferConfidence: cpAgentAiTransferPredictions.confidenceScore,
+      qualityLevel: cpAgentAiMissingInformationAnalysis.qualityLevel,
+      completenessScore: cpAgentAiMissingInformationAnalysis.completenessScore,
+      missingFields: cpAgentAiMissingInformationAnalysis.missingFields,
+      missingContextConfidence: cpAgentAiMissingInformationAnalysis.confidenceScore,
+      slaRiskLevel: cpAgentAiSlaPredictions.riskLevel,
+      slaPredictedBreach: cpAgentAiSlaPredictions.predictedSlaBreach,
+      slaConfidence: cpAgentAiSlaPredictions.confidenceScore,
+      predictedPriority: cpAgentAiPriorityPredictions.predictedPriority,
+      priorityConfidence: cpAgentAiPriorityPredictions.confidenceScore,
     })
     .from(cpAgentTickets)
     .leftJoin(cpAgentUsers, eq(cpAgentTickets.assignedUserId, cpAgentUsers.id))
+    .leftJoin(cpAgentAiActionRecommendations, eq(cpAgentTickets.id, cpAgentAiActionRecommendations.ticketId))
+    .leftJoin(cpAgentAiEscalationPredictions, eq(cpAgentTickets.id, cpAgentAiEscalationPredictions.ticketId))
+    .leftJoin(cpAgentAiTransferPredictions, eq(cpAgentTickets.id, cpAgentAiTransferPredictions.ticketId))
+    .leftJoin(cpAgentAiMissingInformationAnalysis, eq(cpAgentTickets.id, cpAgentAiMissingInformationAnalysis.ticketId))
+    .leftJoin(cpAgentAiSlaPredictions, eq(cpAgentTickets.id, cpAgentAiSlaPredictions.ticketId))
+    .leftJoin(cpAgentAiPriorityPredictions, eq(cpAgentTickets.id, cpAgentAiPriorityPredictions.ticketId))
     .where(whereClause)
-    .orderBy(desc(cpAgentTickets.updatedAt))
 
-  return {
-    items: rows.map((r) => ({
-      ...r.ticket,
+  const ticketIds = [...new Set(rows.map((r) => r.ticket.id))]
+  const [agentOutcomeIds, kmRows] = await Promise.all([
+    loadAgentOutcomeTicketIds(ticketIds),
+    ticketIds.length > 0
+      ? db
+          .select({
+            ticketId: cpAgentAiKmRecommendations.ticketId,
+            kmId: cpAgentAiKmRecommendations.kmId,
+            kmTitle: cpAgentAiKmRecommendations.kmTitle,
+            similarityScore: cpAgentAiKmRecommendations.similarityScore,
+          })
+          .from(cpAgentAiKmRecommendations)
+          .where(inArray(cpAgentAiKmRecommendations.ticketId, ticketIds))
+      : Promise.resolve([]),
+  ])
+  const kmByTicket = new Map(kmRows.map((r) => [r.ticketId, r]))
+
+  const seenTicketIds = new Set<number>()
+  const items: AgentTicketListItem[] = []
+  for (const r of rows) {
+    if (seenTicketIds.has(r.ticket.id)) continue
+    seenTicketIds.add(r.ticket.id)
+    const hasAgentOutcome = agentOutcomeIds.has(r.ticket.id)
+    const displayStatus = normalizeUntreatedTicketStatus(r.ticket.status, hasAgentOutcome)
+    const sla = cpAgentSlaLabel(r.ticket.slaDueAt, displayStatus, {
+      priority: r.ticket.priority,
+      createdAt: r.ticket.createdAt,
+      externalCreatedAt: r.ticket.externalCreatedAt,
+      ttrTargetHours: r.ticket.ttrTargetHours,
+    })
+    const missingContext =
+      r.qualityLevel === "INCOMPLETE" || r.qualityLevel === "POOR"
+    const slaAttention = isOrchestratedSlaAttention(sla.label, r.slaRiskLevel)
+
+    const missingFields = Array.isArray(r.missingFields) ? r.missingFields.map(String) : []
+    const kmRow = kmByTicket.get(r.ticket.id)
+    const catalogPlan = plannedOperationalOutcomeForCareId(r.ticket.careId)
+    const kmApplicable = resolveApplicableKm({
+      category: r.ticket.category,
+      perimeter: r.ticket.perimeter,
+      aiKmId: kmRow?.kmId ?? catalogPlan?.kmCode ?? null,
+      aiKmTitle: kmRow?.kmTitle ?? null,
+      aiSimilarity: kmRow?.similarityScore ?? null,
+    })
+
+    const signals = buildTicketSignals({
+      escalationRequired: r.escalationRequired ?? false,
+      transferRequired: r.transferRequired ?? false,
+      missingContext,
+      slaAttention,
+      kmOpportunity: kmApplicable.hasKm,
+    })
+
+    const suggestedAction = r.recommendedAction ?? null
+
+    items.push({
+      id: r.ticket.id,
+      careId: r.ticket.careId,
       title: englishLegacyCopy(r.ticket.title),
       description: englishLegacyCopy(r.ticket.description),
+      category: r.ticket.category,
+      status: displayStatus,
+      priority: r.ticket.priority,
+      predictedPriority: r.predictedPriority ?? null,
+      storeName: r.ticket.storeName,
+      storeCode: r.ticket.storeCode,
+      slaDueAt: r.ticket.slaDueAt,
+      slaLabel: sla.label,
+      slaTone: sla.tone,
+      suggestedAction,
+      suggestedActionLabel: formatSuggestedActionWithTarget(suggestedAction, null, {
+        careId: r.ticket.careId,
+        title: r.ticket.title,
+        description: r.ticket.description,
+        ticketStatus: displayStatus,
+        category: r.ticket.category,
+        perimeter: r.ticket.perimeter,
+        priority: r.ticket.priority,
+        predictedPriority: r.predictedPriority ?? null,
+        qualityLevel: r.qualityLevel ?? null,
+        completenessScore: r.completenessScore ?? null,
+        missingFields,
+        escalationSignal: r.escalationRequired ?? false,
+        transferSignal: r.transferRequired ?? false,
+        escalationConfidence: r.escalationConfidence ?? null,
+        transferConfidence: r.transferConfidence ?? null,
+        aiKmId: kmApplicable.kmId,
+        aiKmTitle: kmApplicable.kmTitle,
+        slaLabel: sla.label,
+        slaRiskLevel: r.slaRiskLevel ?? null,
+        slaPredictedBreach: r.slaPredictedBreach ?? false,
+        slaConfidence: r.slaConfidence ?? null,
+        priorityConfidence: r.priorityConfidence ?? null,
+        missingContextConfidence: r.missingContextConfidence ?? null,
+      }),
+      signals,
       assigneeName: r.assigneeName,
-    })),
-    total: rows.length,
+      updatedAt: r.ticket.updatedAt,
+      createdAt: r.ticket.createdAt,
+    })
   }
+
+  const slaFilter = filters.slaState && filters.slaState !== "all" ? filters.slaState : null
+  const quickFilter =
+    filters.quickFilter && filters.quickFilter !== "all" ? filters.quickFilter : null
+
+  let filtered = slaFilter
+    ? items.filter((item) => {
+        if (slaFilter === "breached") return item.slaLabel === "Breached"
+        if (slaFilter === "at_risk") return item.slaLabel === "At risk"
+        return item.slaLabel === "On track"
+      })
+    : items
+
+  if (quickFilter) {
+    filtered = filtered.filter((item) => matchesTicketQueueQuickFilter(item, quickFilter))
+  }
+
+  filtered.sort(compareAgentTicketListItems)
+
+  return { items: filtered, total: filtered.length }
 }
 
 export async function getSynchronizedTicket(id: number) {
@@ -135,10 +301,17 @@ export async function getSynchronizedTicket(id: number) {
     .where(eq(cpAgentTickets.id, id))
     .limit(1)
 
-  if (!row) return null
+  if (!row || isDemoCareTicketId(row.ticket.careId)) return null
+
+  const agentOutcomeIds = await loadAgentOutcomeTicketIds([id])
+  const displayStatus = normalizeUntreatedTicketStatus(
+    row.ticket.status,
+    agentOutcomeIds.has(id),
+  )
 
   return {
     ...row.ticket,
+    status: displayStatus,
     title: englishLegacyCopy(row.ticket.title),
     description: englishLegacyCopy(row.ticket.description),
     assigneeName: row.assigneeName,
@@ -167,3 +340,5 @@ export async function getSynchronizedTicketComments(ticketId: number) {
 
   return { items: rows, total: rows.length }
 }
+
+export { isDemoCareTicketId, isOperationalCareTicketId } from "@/lib/care-operational/operational-ticket-scope"

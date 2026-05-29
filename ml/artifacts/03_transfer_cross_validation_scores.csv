@@ -1,0 +1,4 @@
+Model,Mean Accuracy,Std Deviation
+Logistic Regression,0.7398,0.0101
+Random Forest,0.8083,0.0059
+XGBoost,0.8426,0.0058

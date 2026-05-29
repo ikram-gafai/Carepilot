@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 function slaTtrExposureLabel(label: string): string {
   const t = label.trim()
-  if (t === "—" || t === "Not set") return t === "—" ? "Not applicable" : "Not set"
+  if (t === "—" || t === "Not set") return t === "—" ? "Non applicable" : "Non renseigné"
   return t
 }
 
@@ -27,18 +27,18 @@ export function OperationalStateCard({
   const risk = escalationRisk.charAt(0).toUpperCase() + escalationRisk.slice(1).toLowerCase()
 
   const rows: { k: string; v: string }[] = [
-    { k: "Status", v: agentTicketStatusLabel(status) },
-    { k: "Next step", v: recommendedAction },
-    { k: "Escalation", v: risk },
-    { k: "SLA", v: slaTtrExposureLabel(slaTtrLabel) },
-    { k: "To do", v: requiredNextStep },
-    { k: "Owner", v: assigneeName?.trim() || "Unassigned" },
+    { k: "Statut", v: agentTicketStatusLabel(status) },
+    { k: "Décision suggérée", v: recommendedAction },
+    { k: "Signal N3", v: risk },
+    { k: "Attention SLA", v: slaTtrExposureLabel(slaTtrLabel) },
+    { k: "Prochaine étape", v: requiredNextStep },
+    { k: "Responsable", v: assigneeName?.trim() || "Non assigné" },
   ]
 
   return (
     <Card className="border-border/80 bg-muted/15 shadow-none ring-1 ring-border/50 dark:bg-muted/10">
       <CardHeader className="space-y-0 pb-2 pt-3">
-        <CardTitle className="text-xs font-medium text-muted-foreground">Status</CardTitle>
+        <CardTitle className="text-xs font-medium text-muted-foreground">Statut</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-2 px-3 pb-3 pt-0 sm:grid-cols-2">
         {rows.map((row) => (

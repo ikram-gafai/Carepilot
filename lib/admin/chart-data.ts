@@ -1,19 +1,21 @@
 import { and, count, desc, eq, gt, gte, inArray, isNotNull, isNull, lt, lte, sql } from "drizzle-orm"
 
 import { N3_TICKET_STATUS, TRANSFER_DESTINATIONS } from "@/lib/care-operational-actions"
+import { ESCALATION_PREDICTION_ENABLED, SLA_PREDICTION_ENABLED } from "@/lib/ai-phase"
 import { cpAgentCategoryLabel } from "@/lib/cp-agent-legacy-copy-en"
 import { getDb } from "@/lib/db"
-import { cpAdminEscalationRecords } from "@/lib/db/schema/cp-admin"
 import {
   cpAgentAiAnalyses,
+  cpAgentAiEscalationPredictions,
   cpAgentAiFeedback,
+  cpAgentAiSlaPredictions,
   cpAgentSyncLogs,
   cpAgentTicketHistory,
   cpAgentTickets,
   cpAgentUsers,
 } from "@/lib/db/schema/cp-agent"
 
-import { hoursAgo, OPEN_FILTER } from "./shared"
+import { hoursAgo, OPEN_FILTER, OPERATIONAL_OPEN_SCOPE, OPERATIONAL_TICKET_SCOPE } from "./shared"
 
 export type SeriesPoint = { label: string; value: number }
 
@@ -55,7 +57,7 @@ export async function adminTicketVolumeSeries(days = 7): Promise<SeriesPoint[]> 
       count: count(),
     })
     .from(cpAgentTickets)
-    .where(gte(cpAgentTickets.createdAt, since))
+    .where(and(OPERATIONAL_TICKET_SCOPE, gte(cpAgentTickets.createdAt, since))!)
     .groupBy(sql`date_trunc('day', ${cpAgentTickets.createdAt})`)
     .orderBy(sql`date_trunc('day', ${cpAgentTickets.createdAt})`)
 
@@ -99,6 +101,30 @@ export const adminQueuePressureChartRows = adminCategoryPressureChart
 export async function adminEscalationDailySeries7d(): Promise<SeriesPoint[]> {
   const db = getDb()
   const since = hoursAgo(7 * 24)
+
+  if (ESCALATION_PREDICTION_ENABLED) {
+    const escRows = await db
+      .select({
+        day: sql<Date>`date_trunc('day', ${cpAgentAiEscalationPredictions.createdAt})`,
+        count: count(),
+      })
+      .from(cpAgentAiEscalationPredictions)
+      .innerJoin(cpAgentTickets, eq(cpAgentTickets.id, cpAgentAiEscalationPredictions.ticketId))
+      .where(
+        and(
+          OPERATIONAL_TICKET_SCOPE,
+          eq(cpAgentAiEscalationPredictions.predictedEscalationRequired, true),
+          gte(cpAgentAiEscalationPredictions.createdAt, since),
+        )!,
+      )
+      .groupBy(sql`date_trunc('day', ${cpAgentAiEscalationPredictions.createdAt})`)
+
+    return fillDailySeries(
+      escRows.map((r) => ({ day: r.day, count: Number(r.count) })),
+      7,
+    )
+  }
+
   const escRows = await db
     .select({
       day: sql<Date>`date_trunc('day', ${cpAgentTickets.updatedAt})`,
@@ -107,7 +133,7 @@ export async function adminEscalationDailySeries7d(): Promise<SeriesPoint[]> {
     .from(cpAgentTickets)
     .where(
       and(
-        eq(cpAgentTickets.source, "CARE"),
+        OPERATIONAL_TICKET_SCOPE,
         eq(cpAgentTickets.status, N3_TICKET_STATUS),
         gte(cpAgentTickets.updatedAt, since),
       )!,
@@ -131,7 +157,7 @@ export async function adminTransferDailySeries7d(): Promise<SeriesPoint[]> {
     .from(cpAgentTickets)
     .where(
       and(
-        eq(cpAgentTickets.source, "CARE"),
+        OPERATIONAL_TICKET_SCOPE,
         eq(cpAgentTickets.aiRecommendedAction, "transfer"),
         gte(cpAgentTickets.createdAt, since),
       )!,
@@ -162,7 +188,7 @@ export async function adminTransferPerimeterDistribution() {
     const [row] = await db
       .select({ c: count() })
       .from(cpAgentTickets)
-      .where(eq(cpAgentTickets.status, dest.status))
+      .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, dest.status))!)
     out.push({ name: dest.label, value: Number(row?.c ?? 0) })
   }
   return out.filter((d) => d.value > 0)
@@ -174,18 +200,29 @@ export async function adminCategoryPressureBars() {
   const categories = await db
     .select({ category: cpAgentTickets.category })
     .from(cpAgentTickets)
-    .where(OPEN_FILTER)
+    .where(OPERATIONAL_OPEN_SCOPE)
     .groupBy(cpAgentTickets.category)
 
   const bars = await Promise.all(
     categories.map(async ({ category }) => {
       const base = eq(cpAgentTickets.category, category)
-      const open = and(base, OPEN_FILTER)!
+      const open = and(base, OPERATIONAL_OPEN_SCOPE)!
       const [active] = await db.select({ c: count() }).from(cpAgentTickets).where(open)
-      const [slaRisk] = await db
-        .select({ c: count() })
-        .from(cpAgentTickets)
-        .where(and(open, SLA_AT_RISK_FILTER)!)
+      const [slaRisk] = SLA_PREDICTION_ENABLED
+        ? await db
+            .select({ c: count() })
+            .from(cpAgentAiSlaPredictions)
+            .innerJoin(cpAgentTickets, eq(cpAgentTickets.id, cpAgentAiSlaPredictions.ticketId))
+            .where(
+              and(
+                open,
+                sql`(${cpAgentAiSlaPredictions.predictedSlaBreach} = true OR ${cpAgentAiSlaPredictions.riskLevel} = 'HIGH')`,
+              )!,
+            )
+        : await db
+            .select({ c: count() })
+            .from(cpAgentTickets)
+            .where(and(open, SLA_AT_RISK_FILTER)!)
       const [escalated] = await db
         .select({ c: count() })
         .from(cpAgentTickets)
@@ -208,7 +245,7 @@ export async function adminEscalationDonut() {
   const categoryRows = await db
     .select({ category: cpAgentTickets.category, c: count() })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.status, N3_TICKET_STATUS))
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS))!)
     .groupBy(cpAgentTickets.category)
     .orderBy(desc(count()))
 
@@ -217,7 +254,7 @@ export async function adminEscalationDonut() {
     .filter((d) => d.value > 0)
 }
 
-const CARE_OPEN = and(eq(cpAgentTickets.source, "CARE"), OPEN_FILTER, isNotNull(cpAgentTickets.storeCode))!
+const CARE_OPEN = and(OPERATIONAL_OPEN_SCOPE, isNotNull(cpAgentTickets.storeCode))!
 
 export async function adminStoreImpact() {
   const db = getDb()
@@ -241,14 +278,14 @@ export async function adminStoreImpact() {
       const [recent] = await db
         .select({ c: count() })
         .from(cpAgentTickets)
-        .where(and(storeEq, eq(cpAgentTickets.source, "CARE"), gte(cpAgentTickets.createdAt, hoursAgo(72)))!)
+        .where(and(storeEq, OPERATIONAL_TICKET_SCOPE, gte(cpAgentTickets.createdAt, hoursAgo(72)))!)
       const [prior] = await db
         .select({ c: count() })
         .from(cpAgentTickets)
         .where(
           and(
             storeEq,
-            eq(cpAgentTickets.source, "CARE"),
+            OPERATIONAL_TICKET_SCOPE,
             gte(cpAgentTickets.createdAt, hoursAgo(144)),
             lt(cpAgentTickets.createdAt, hoursAgo(72)),
           )!,
@@ -272,21 +309,37 @@ export async function adminKpiSparklines() {
   const db = getDb()
   const since = hoursAgo(7 * 24)
 
-  const slaRows = await db
-    .select({
-      day: sql<Date>`date_trunc('day', ${cpAgentTickets.createdAt})`,
-      count: count(),
-    })
-    .from(cpAgentTickets)
-    .where(
-      and(
-        gte(cpAgentTickets.createdAt, since),
-        isNotNull(cpAgentTickets.slaDueAt),
-        SLA_AT_RISK_FILTER,
-        OPEN_FILTER,
-      )!,
-    )
-    .groupBy(sql`date_trunc('day', ${cpAgentTickets.createdAt})`)
+  const slaRows = SLA_PREDICTION_ENABLED
+    ? await db
+        .select({
+          day: sql<Date>`date_trunc('day', ${cpAgentAiSlaPredictions.createdAt})`,
+          count: count(),
+        })
+        .from(cpAgentAiSlaPredictions)
+        .innerJoin(cpAgentTickets, eq(cpAgentTickets.id, cpAgentAiSlaPredictions.ticketId))
+        .where(
+          and(
+            gte(cpAgentAiSlaPredictions.createdAt, since),
+            OPERATIONAL_OPEN_SCOPE,
+            sql`(${cpAgentAiSlaPredictions.predictedSlaBreach} = true OR ${cpAgentAiSlaPredictions.riskLevel} = 'HIGH')`,
+          )!,
+        )
+        .groupBy(sql`date_trunc('day', ${cpAgentAiSlaPredictions.createdAt})`)
+    : await db
+        .select({
+          day: sql<Date>`date_trunc('day', ${cpAgentTickets.createdAt})`,
+          count: count(),
+        })
+        .from(cpAgentTickets)
+        .where(
+          and(
+            gte(cpAgentTickets.createdAt, since),
+            isNotNull(cpAgentTickets.slaDueAt),
+            SLA_AT_RISK_FILTER,
+            OPERATIONAL_OPEN_SCOPE,
+          )!,
+        )
+        .groupBy(sql`date_trunc('day', ${cpAgentTickets.createdAt})`)
 
   const feedbackRows = await db
     .select({
@@ -436,14 +489,14 @@ export async function adminAgentOpenWorkloadSeries() {
     })
     .from(cpAgentTickets)
     .innerJoin(cpAgentUsers, eq(cpAgentTickets.assignedUserId, cpAgentUsers.id))
-    .where(OPEN_FILTER)
+    .where(OPERATIONAL_OPEN_SCOPE)
     .groupBy(cpAgentUsers.id, cpAgentUsers.displayName)
     .orderBy(desc(count()))
 
   const [unassigned] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
-    .where(and(OPEN_FILTER, isNull(cpAgentTickets.assignedUserId))!)
+    .where(and(OPERATIONAL_OPEN_SCOPE, isNull(cpAgentTickets.assignedUserId))!)
 
   const series = rows.map((r) => ({
     name: r.name.split(/\s+/)[0] ?? r.name,

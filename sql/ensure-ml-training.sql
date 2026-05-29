@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS ml_training.historical_tickets (
   sla_breached BOOLEAN NOT NULL,
   escalation_required BOOLEAN NOT NULL,
   transfer_required BOOLEAN NOT NULL,
+  recommended_action TEXT NOT NULL,
   incident_category TEXT NOT NULL,
   environment_type TEXT NOT NULL,
   ticket_source TEXT NOT NULL,
@@ -33,11 +34,57 @@ CREATE TABLE IF NOT EXISTS ml_training.historical_tickets (
   vectorization_text TEXT
 );
 
-CREATE INDEX IF NOT EXISTS ml_training_tickets_perimeter ON ml_training.historical_tickets (perimeter);
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS recommended_action TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS ticket_age_minutes INTEGER;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS queue_load REAL;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS store_size TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS operational_complexity REAL;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS expected_km_id TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS relevant_km_ids JSONB NOT NULL DEFAULT '[]'::jsonb;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS similar_case_group_id TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS incident_cluster TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS semantic_group TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS incident_family TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS root_cause_family TEXT;
+
+ALTER TABLE ml_training.historical_tickets
+  ADD COLUMN IF NOT EXISTS resolution_pattern TEXT;
+
+CREATE INDEX IF NOT EXISTS ml_training_tickets_similar_group
+  ON ml_training.historical_tickets (similar_case_group_id);
+
+CREATE INDEX IF NOT EXISTS ml_training_tickets_semantic_group
+  ON ml_training.historical_tickets (semantic_group);
 CREATE INDEX IF NOT EXISTS ml_training_tickets_priority ON ml_training.historical_tickets (priority);
 CREATE INDEX IF NOT EXISTS ml_training_tickets_split ON ml_training.historical_tickets (split);
 CREATE INDEX IF NOT EXISTS ml_training_tickets_labels
   ON ml_training.historical_tickets (escalation_required, transfer_required, sla_breached);
+
+CREATE INDEX IF NOT EXISTS ml_training_tickets_action
+  ON ml_training.historical_tickets (recommended_action);
 
 CREATE TABLE IF NOT EXISTS ml_training.historical_actions (
   action_id SERIAL PRIMARY KEY,
@@ -69,6 +116,7 @@ CREATE INDEX IF NOT EXISTS ml_training_resolutions_category ON ml_training.histo
 
 CREATE TABLE IF NOT EXISTS ml_training.km_articles (
   km_id SERIAL PRIMARY KEY,
+  km_code TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
   procedure_steps TEXT NOT NULL,
   perimeter TEXT NOT NULL,
@@ -78,7 +126,10 @@ CREATE TABLE IF NOT EXISTS ml_training.km_articles (
   applicability_score REAL NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS ml_training_km_perimeter ON ml_training.km_articles (perimeter);
+ALTER TABLE ml_training.km_articles
+  ADD COLUMN IF NOT EXISTS km_code TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ml_training_km_code ON ml_training.km_articles (km_code);
 CREATE INDEX IF NOT EXISTS ml_training_km_category ON ml_training.km_articles (incident_category);
 
 CREATE TABLE IF NOT EXISTS ml_training.model_predictions (

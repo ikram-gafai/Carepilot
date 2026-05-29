@@ -1,33 +1,28 @@
 import { Suspense } from "react"
 
-import { AgentHeader, AgentPageBody } from "@/components/agent/layout/agent-header"
+import { AgentPageBody } from "@/components/agent/layout/agent-header"
 import { TicketFiltersBar } from "@/components/agent/tickets/ticket-filters-bar"
 import { TicketTable } from "@/components/agent/tickets/ticket-table"
 import { EmptyState } from "@/components/agent/ui/empty-state"
 import { CarepilotAutoRefresh } from "@/components/carepilot/carepilot-auto-refresh"
 import { findCpAgentUserByAuthEmail } from "@/lib/cp-agent/user-match"
-import { fetchCarepilotPage } from "@/lib/carepilot-api/fetch-page"
-import { parseTicketRow } from "@/lib/carepilot-api/serialize"
+import type { TicketQueueQuickFilter } from "@/lib/agent/ticket-queue-display"
+import { listSynchronizedTickets } from "@/lib/carepilot-api/tickets"
 import { getCarePilotSession } from "@/lib/auth/session"
-import type { CpAgentTicketFilters } from "@/lib/queries/cp-agent"
 import { getDb, getDbOrNull } from "@/lib/db"
 import { DB_UNAVAILABLE_TITLE, dbUnavailableDescription } from "@/lib/ui-messages"
-import type { cpAgentTickets } from "@/lib/db/schema/cp-agent"
 
 export const dynamic = "force-dynamic"
 
-function parseFilters(sp: URLSearchParams): CpAgentTicketFilters {
+function parseSearchParams(sp: URLSearchParams) {
+  const mine = sp.get("mine") === "1"
+  const filter = sp.get("filter") as TicketQueueQuickFilter | null
   return {
     q: sp.get("q") ?? undefined,
-    status: sp.get("status") ?? undefined,
-    priority: sp.get("priority") ?? undefined,
-    category: sp.get("category") ?? undefined,
-    assignedUserId: sp.get("assigned") ?? undefined,
-    slaState: (sp.get("sla") as CpAgentTicketFilters["slaState"]) ?? undefined,
+    quickFilter: filter && filter !== "all" ? filter : undefined,
+    mine,
   }
 }
-
-type TicketRow = typeof cpAgentTickets.$inferSelect & { assigneeName: string | null }
 
 export default async function AgentTicketsPage({
   searchParams,
@@ -44,7 +39,6 @@ export default async function AgentTicketsPage({
   if (!getDbOrNull()) {
     return (
       <>
-        <AgentHeader title="Tickets" />
         <AgentPageBody className="p-4">
           <EmptyState title={DB_UNAVAILABLE_TITLE} description={dbUnavailableDescription("offline")} />
         </AgentPageBody>
@@ -52,56 +46,48 @@ export default async function AgentTicketsPage({
     )
   }
 
-  let filters = parseFilters(sp)
-  const mine = sp.get("mine") === "1"
-  if (mine && getDbOrNull()) {
+  const parsed = parseSearchParams(sp)
+  let assignedUserId: string | undefined
+
+  if (parsed.mine) {
     const session = await getCarePilotSession()
     if (session?.email) {
       const agent = await findCpAgentUserByAuthEmail(getDb(), session.email)
-      if (agent) filters = { ...filters, assignedUserId: String(agent.id) }
+      if (agent) assignedUserId = String(agent.id)
     }
   }
 
-  const qs = new URLSearchParams()
-  if (filters.q) qs.set("q", filters.q)
-  if (filters.status) qs.set("status", filters.status)
-  if (filters.priority) qs.set("priority", filters.priority)
-  if (filters.category) qs.set("category", filters.category)
-  if (filters.assignedUserId) qs.set("assigned", filters.assignedUserId)
-  if (filters.slaState) qs.set("sla", filters.slaState)
-  if (mine) qs.set("mine", "1")
-
-  const [optionsRes, ticketsRes] = await Promise.all([
-    fetchCarepilotPage<Awaited<ReturnType<typeof import("@/lib/carepilot-api/ticket-filters").getTicketFilterOptions>>>(
-      "/api/tickets/filters",
-    ),
-    fetchCarepilotPage<{ items: TicketRow[]; total: number }>(`/api/tickets?${qs.toString()}`),
-  ])
-
-  if (!optionsRes.ok || !ticketsRes.ok) {
+  let ticketsRes: Awaited<ReturnType<typeof listSynchronizedTickets>>
+  try {
+    ticketsRes = await listSynchronizedTickets({
+      q: parsed.q,
+      quickFilter: parsed.quickFilter,
+      assignedUserId,
+    })
+  } catch {
     return (
-      <>
-        <AgentHeader title="Tickets" />
-        <AgentPageBody className="p-4">
-          <EmptyState
-            title={DB_UNAVAILABLE_TITLE}
-            description={dbUnavailableDescription("unavailable")}
-          />
-        </AgentPageBody>
-      </>
+      <AgentPageBody className="p-4">
+        <EmptyState
+          title={DB_UNAVAILABLE_TITLE}
+          description={dbUnavailableDescription("unavailable")}
+        />
+      </AgentPageBody>
     )
   }
 
-  const options = optionsRes.data
-  const tickets = ticketsRes.data.items.map((t) => parseTicketRow(t))
+  const tickets = ticketsRes.items.map((t) => ({
+    ...t,
+    slaDueAt: t.slaDueAt ? new Date(t.slaDueAt) : null,
+    updatedAt: new Date(t.updatedAt),
+    createdAt: new Date(t.createdAt),
+  }))
 
   return (
     <>
-      <CarepilotAutoRefresh intervalMs={60_000} />
-      <AgentHeader title="Tickets" />
-      <AgentPageBody className="mx-auto max-w-[1600px] space-y-3 p-4">
+      <CarepilotAutoRefresh />
+      <AgentPageBody className="mx-auto max-w-[1400px] space-y-3 p-4">
         <Suspense fallback={null}>
-          <TicketFiltersBar options={options} />
+          <TicketFiltersBar />
         </Suspense>
         <TicketTable rows={tickets} />
       </AgentPageBody>

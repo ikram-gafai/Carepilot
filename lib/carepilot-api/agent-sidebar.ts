@@ -1,5 +1,7 @@
 import { and, asc, count, eq, sql } from "drizzle-orm"
+import { cache } from "react"
 
+import { operationalCareTicketScope } from "@/lib/care-operational/operational-ticket-scope"
 import { CLOSED_STATUS_SQL_LIST } from "@/lib/care-operational-actions"
 import { findCpAgentUserByAuthEmail } from "@/lib/cp-agent/user-match"
 import { getSyncStatus } from "@/lib/carepilot-api/sync"
@@ -35,7 +37,7 @@ export async function getAgentSidebarSnapshot(sessionEmail?: string | null): Pro
   const db = getDb()
   const [metrics, sync, matchedAgent, fallbackAgents] = await Promise.all([
     cpAgentDashboardTopMetrics(),
-    getSyncStatus(),
+    getSyncStatus({ includeEntityCounts: false }),
     sessionEmail ? findCpAgentUserByAuthEmail(db, sessionEmail) : Promise.resolve(null),
     db
       .select({ displayName: cpAgentUsers.displayName, role: cpAgentUsers.role })
@@ -52,8 +54,7 @@ export async function getAgentSidebarSnapshot(sessionEmail?: string | null): Pro
       .select({ c: count() })
       .from(cpAgentTickets)
       .where(
-        and(
-          eq(cpAgentTickets.source, "CARE"),
+        operationalCareTicketScope(
           eq(cpAgentTickets.assignedUserId, matchedAgent.id),
           sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
         )!,
@@ -87,3 +88,6 @@ export async function getAgentSidebarSnapshot(sessionEmail?: string | null): Pro
     agentRole: agent?.role === "agent" ? "Carrefour Support" : (agent?.role ?? "Support"),
   }
 }
+
+/** Per-request cache — layout + pages share one sidebar fetch. */
+export const getCachedAgentSidebarSnapshot = cache(getAgentSidebarSnapshot)

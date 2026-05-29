@@ -1,0 +1,286 @@
+{
+  "dataset": {
+    "total_tickets": 14000,
+    "table_counts": {
+      "historical_tickets": 14000,
+      "historical_actions": 32782,
+      "historical_resolutions": 8276,
+      "km_articles": 92,
+      "dataset_exports": 42000
+    },
+    "class_distribution_pct": {
+      "P1": 15.3,
+      "P2": 26.99,
+      "P3": 41.76,
+      "P4": 15.95
+    },
+    "split_sizes": {
+      "train": 9800,
+      "validation": 2100,
+      "test": 2100
+    },
+    "missing_description_pct": 8.01,
+    "missing_resolution_time_pct": 40.89
+  },
+  "results": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.7381,
+      "Macro Precision": 0.7801,
+      "Macro Recall": 0.7039,
+      "Macro F1": 0.7298,
+      "Weighted F1": 0.7336,
+      "Training Time (s)": 0.8576,
+      "Inference Time (ms/row)": 0.0802
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.7386,
+      "Macro Precision": 0.741,
+      "Macro Recall": 0.7685,
+      "Macro F1": 0.7526,
+      "Weighted F1": 0.7381,
+      "Training Time (s)": 2.1247,
+      "Inference Time (ms/row)": 0.1856
+    },
+    {
+      "Model": "XGBoost",
+      "Accuracy": 0.8295,
+      "Macro Precision": 0.8679,
+      "Macro Recall": 0.8099,
+      "Macro F1": 0.8318,
+      "Weighted F1": 0.8279,
+      "Training Time (s)": 8.72,
+      "Inference Time (ms/row)": 0.1142
+    }
+  ],
+  "best_model": "XGBoost",
+  "confusion_matrices": {
+    "Logistic Regression": [
+      [
+        246,
+        69,
+        7,
+        0
+      ],
+      [
+        45,
+        348,
+        173,
+        0
+      ],
+      [
+        0,
+        83,
+        768,
+        26
+      ],
+      [
+        0,
+        1,
+        146,
+        188
+      ]
+    ],
+    "Random Forest": [
+      [
+        294,
+        26,
+        0,
+        2
+      ],
+      [
+        46,
+        402,
+        116,
+        2
+      ],
+      [
+        2,
+        148,
+        597,
+        130
+      ],
+      [
+        3,
+        14,
+        60,
+        258
+      ]
+    ],
+    "XGBoost": [
+      [
+        288,
+        33,
+        1,
+        0
+      ],
+      [
+        21,
+        420,
+        125,
+        0
+      ],
+      [
+        0,
+        60,
+        804,
+        13
+      ],
+      [
+        0,
+        3,
+        102,
+        230
+      ]
+    ]
+  },
+  "classification_reports": {
+    "Logistic Regression": {
+      "P1": {
+        "precision": 0.845360824742268,
+        "recall": 0.7639751552795031,
+        "f1-score": 0.802610114192496,
+        "support": 322.0
+      },
+      "P2": {
+        "precision": 0.6946107784431138,
+        "recall": 0.6148409893992933,
+        "f1-score": 0.6522961574507966,
+        "support": 566.0
+      },
+      "P3": {
+        "precision": 0.7020109689213894,
+        "recall": 0.8757126567844926,
+        "f1-score": 0.7792998477929984,
+        "support": 877.0
+      },
+      "P4": {
+        "precision": 0.8785046728971962,
+        "recall": 0.5611940298507463,
+        "f1-score": 0.6848816029143898,
+        "support": 335.0
+      },
+      "accuracy": 0.7380952380952381,
+      "macro avg": {
+        "precision": 0.7801218112509918,
+        "recall": 0.7039307078285089,
+        "f1-score": 0.7297719305876702,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.750151700633539,
+        "recall": 0.7380952380952381,
+        "f1-score": 0.7335816120847214,
+        "support": 2100.0
+      }
+    },
+    "Random Forest": {
+      "P1": {
+        "precision": 0.8521739130434782,
+        "recall": 0.9130434782608695,
+        "f1-score": 0.881559220389805,
+        "support": 322.0
+      },
+      "P2": {
+        "precision": 0.6813559322033899,
+        "recall": 0.7102473498233216,
+        "f1-score": 0.6955017301038062,
+        "support": 566.0
+      },
+      "P3": {
+        "precision": 0.7723156532988357,
+        "recall": 0.6807297605473204,
+        "f1-score": 0.7236363636363636,
+        "support": 877.0
+      },
+      "P4": {
+        "precision": 0.6581632653061225,
+        "recall": 0.7701492537313432,
+        "f1-score": 0.7097661623108665,
+        "support": 335.0
+      },
+      "accuracy": 0.7385714285714285,
+      "macro avg": {
+        "precision": 0.7410021909629566,
+        "recall": 0.7685424605907136,
+        "f1-score": 0.7526158691102104,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.7418347521179756,
+        "recall": 0.7385714285714285,
+        "f1-score": 0.7380556207083346,
+        "support": 2100.0
+      }
+    },
+    "XGBoost": {
+      "P1": {
+        "precision": 0.9320388349514563,
+        "recall": 0.8944099378881988,
+        "f1-score": 0.9128367670364501,
+        "support": 322.0
+      },
+      "P2": {
+        "precision": 0.813953488372093,
+        "recall": 0.7420494699646644,
+        "f1-score": 0.7763401109057301,
+        "support": 566.0
+      },
+      "P3": {
+        "precision": 0.7790697674418605,
+        "recall": 0.9167616875712656,
+        "f1-score": 0.8423258250392875,
+        "support": 877.0
+      },
+      "P4": {
+        "precision": 0.9465020576131687,
+        "recall": 0.6865671641791045,
+        "f1-score": 0.7958477508650519,
+        "support": 335.0
+      },
+      "accuracy": 0.8295238095238096,
+      "macro avg": {
+        "precision": 0.8678910370946447,
+        "recall": 0.8099470649008083,
+        "f1-score": 0.8318376134616299,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.8386364545809032,
+        "recall": 0.8295238095238096,
+        "f1-score": 0.827938422313156,
+        "support": 2100.0
+      }
+    }
+  },
+  "cross_validation": [
+    {
+      "Model": "Logistic Regression",
+      "Mean Macro F1": 0.715,
+      "Std Deviation": 0.0093
+    },
+    {
+      "Model": "Random Forest",
+      "Mean Macro F1": 0.7577,
+      "Std Deviation": 0.008
+    },
+    {
+      "Model": "XGBoost",
+      "Mean Macro F1": 0.8185,
+      "Std Deviation": 0.0071
+    }
+  ],
+  "plots": {
+    "priority_distribution": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_distribution.png",
+    "model_comparison": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_model_comparison.png",
+    "macro_f1": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_macro_f1.png",
+    "per_class_metrics": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_per_class_metrics.png",
+    "benchmark_results_table": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_benchmark_results_table.png",
+    "correlation_heatmap": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_correlation_heatmap.png"
+  },
+  "feature_importance_plots": {
+    "Random Forest": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_feature_importance_random_forest.png",
+    "XGBoost": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_feature_importance_xgboost.png"
+  }
+}

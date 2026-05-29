@@ -1,8 +1,9 @@
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 
 import { buildAssigneeLookup } from "@/lib/cp-agent/assignee-link"
+import { normalizeUntreatedTicketStatuses, resolveSyncStatus } from "@/lib/cp-agent/normalize-ticket-statuses"
 import type { Db } from "@/lib/db"
-import { cpAgentTickets } from "@/lib/db/schema/cp-agent"
+import { cpAgentTicketHistory, cpAgentTickets } from "@/lib/db/schema/cp-agent"
 import type { CareClient } from "@/lib/integrations/care/care-client"
 import { ticketToSyncRow } from "@/lib/integrations/care/normalizers"
 import type { SyncCounters } from "./sync-logger"
@@ -15,9 +16,10 @@ function isNewer(careUpdated: Date, localUpdated: Date | null) {
 function operationalFieldsChanged(
   existing: typeof cpAgentTickets.$inferSelect,
   row: ReturnType<typeof ticketToSyncRow>,
+  nextStatus: string,
 ) {
   return (
-    existing.status !== row.status ||
+    existing.status !== nextStatus ||
     existing.priority !== row.priority ||
     existing.title !== row.title ||
     existing.description !== row.description ||
@@ -84,6 +86,25 @@ export async function syncTicketsFromCare(
 
       const assignedUserId = assignees.resolve(row.assignedAgent)
 
+      let hasAgentOutcomeHistory = false
+      if (existing) {
+        const [historyRow] = await db
+          .select({ id: cpAgentTicketHistory.id })
+          .from(cpAgentTicketHistory)
+          .where(
+            and(
+              eq(cpAgentTicketHistory.ticketId, existing.id),
+              eq(cpAgentTicketHistory.actorLabel, "Agent"),
+            ),
+          )
+          .limit(1)
+        hasAgentOutcomeHistory = Boolean(historyRow)
+      }
+
+      const syncStatus = existing
+        ? resolveSyncStatus(existing.status, careTicket.sourceStatus ?? row.status, hasAgentOutcomeHistory)
+        : row.status
+
       const ticketValues = {
         externalId: row.externalId,
         careId: row.careId,
@@ -99,12 +120,13 @@ export async function syncTicketsFromCare(
         storeType: row.storeType,
         category: row.category,
         subCategory: row.subCategory,
-        status: row.status,
+        status: syncStatus,
         priority: row.priority,
         assignedGroup: row.assignedGroup,
         assignedAgent: row.assignedAgent,
         assignedUserId,
         slaDueAt: row.slaDueAt,
+        ttrTargetHours: row.ttrTargetHours,
         resolutionDate: row.resolutionDate,
         externalCreatedAt: row.externalCreatedAt,
         externalUpdatedAt: row.externalUpdatedAt,
@@ -148,7 +170,7 @@ export async function syncTicketsFromCare(
 
       if (
         !isNewer(row.externalUpdatedAt, existing.externalUpdatedAt) &&
-        !operationalFieldsChanged(existing, row) &&
+        !operationalFieldsChanged(existing, row, syncStatus) &&
         existing.assignedUserId === assignedUserId
       ) {
         if (storeStale || contentStale) {
@@ -204,6 +226,8 @@ export async function syncTicketsFromCare(
       })
     }
   }
+
+  await normalizeUntreatedTicketStatuses(db)
 
   return { ticketIdByExternal, changedExternalIds, careSourceTotal }
 }

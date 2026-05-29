@@ -1,0 +1,45 @@
+{
+  "ollama_available": true,
+  "cases_evaluated": 50,
+  "skipped_models": [],
+  "best_model": "mistral:latest",
+  "results": [
+    {
+      "model": "mistral:latest",
+      "clarity": 4.3,
+      "relevance": 3.9,
+      "completeness": 4.55,
+      "hallucination_control": 4.0,
+      "avg_latency_ms": 7847,
+      "overall": 4.07,
+      "cases_evaluated": 50,
+      "hallucination_rate": 0.0,
+      "status": "measured"
+    },
+    {
+      "model": "llama3:latest",
+      "clarity": 4.3,
+      "relevance": 3.9,
+      "completeness": 4.55,
+      "hallucination_control": 4.0,
+      "avg_latency_ms": 9622,
+      "overall": 4.07,
+      "cases_evaluated": 50,
+      "hallucination_rate": 0.0,
+      "status": "measured"
+    },
+    {
+      "model": "deepseek-r1:latest",
+      "clarity": 4.0,
+      "relevance": 3.74,
+      "completeness": 3.98,
+      "hallucination_control": 4.0,
+      "avg_latency_ms": 12519,
+      "overall": 3.86,
+      "cases_evaluated": 50,
+      "hallucination_rate": 0.0,
+      "status": "measured"
+    }
+  ],
+  "plot_path": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_llm_explanation_benchmark_results_table.png"
+}

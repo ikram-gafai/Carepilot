@@ -1,3 +1,4 @@
+import { normalizePerimeterForStorage } from "@/lib/care-operational/perimeter-codes"
 import type {
   CareKmReference,
   CareTicket,
@@ -44,7 +45,7 @@ export function mapCareSourceTicket(row: SrcTicket, store: SrcStore): CareTicket
     description: row.description,
     status: normalizeStatus(row.status),
     priority: normalizePriority(row.priority),
-    perimeter: row.perimeter,
+    perimeter: normalizePerimeterForStorage(row.perimeter) ?? row.perimeter,
     category: row.category,
     subCategory: row.incidentCategory,
     careStoreId: store.id,
@@ -118,7 +119,7 @@ export function mapCareSourceKm(row: SrcKm): CareKmReference {
     id: row.kmCode,
     code: row.kmCode,
     title: row.title,
-    perimeter: row.perimeter,
+    perimeter: normalizePerimeterForStorage(row.perimeter) ?? row.perimeter,
     category: row.category,
     keywords,
     summary: row.content.slice(0, 500),

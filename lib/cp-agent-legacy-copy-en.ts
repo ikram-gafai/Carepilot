@@ -1,14 +1,16 @@
 /**
- * Maps deprecated French seed / CARE copy to English for the agent workspace.
- * Prefer `bun run db:seed:cp-agent` for a full English dataset; this keeps older DB rows readable.
+ * Affichage français pour l'espace agent — conserve le texte FR des seeds CARE
+ * et reconvertit les libellés anglais connus vers le français.
  */
 
 import { normalizeSuggestedActionText } from "@/lib/care-operational-actions"
+import { formatPerimeterLabel } from "@/lib/care-operational/perimeter-codes"
 
 function normalizeKey(s: string): string {
   return s.replace(/\u2019/g, "'").replace(/\u2018/g, "'").replace(/\s+/g, " ").trim()
 }
 
+/** Paires FR (source) → EN (seed anglais) — inversées à l'affichage. */
 const LEGACY_ENTRIES: [string, string][] = [
   ["Caisse offline — poste 3", "Checkout offline — lane 3"],
   ["Caisse offline - poste 3", "Checkout offline — lane 3"],
@@ -37,48 +39,55 @@ const LEGACY_ENTRIES: [string, string][] = [
   ],
 ]
 
-const LEGACY = new Map<string, string>()
+const EN_TO_FR = new Map<string, string>()
 for (const [fr, en] of LEGACY_ENTRIES) {
-  LEGACY.set(normalizeKey(fr), en)
+  EN_TO_FR.set(normalizeKey(en), fr)
 }
 
-/** Replace known legacy French strings; otherwise return original. */
+/** Texte affiché en français (alias historique `englishLegacyCopy`). */
 export function englishLegacyCopy(text: string | null | undefined): string {
   if (text == null) return ""
   const raw = String(text)
-  const hit = LEGACY.get(normalizeKey(raw))
+  const hit = EN_TO_FR.get(normalizeKey(raw))
   return normalizeSuggestedActionText(hit ?? raw)
 }
 
+export const displayCopy = englishLegacyCopy
+
 const CATEGORY_LABELS: Record<string, string> = {
-  CAISSE: "Checkout",
-  CHECKOUT: "Checkout",
-  RESEAU: "Network",
-  NETWORK: "Network",
-  PERIPH: "Peripheral",
-  PERIPHERAL: "Peripheral",
-  PÉRIPH: "Peripheral",
+  CAISSE: "Caisse",
+  CHECKOUT: "Caisse",
+  RESEAU: "Réseau",
+  NETWORK: "Réseau",
+  PERIPH: "Périphérique",
+  PERIPHERAL: "Périphérique",
+  PÉRIPH: "Périphérique",
   SCO: "SCO",
-  PAYMENT: "Payment",
-  TPE: "Payment terminal",
-  DATA: "Data",
-  SYNC: "Synchronization",
-  IAM: "Identity / access",
-  INV: "Inventory",
-  PRINT: "Print",
-  LOGISTICS: "Logistics",
-  PROJECT: "Project",
-  HARDWARE: "Hardware",
-  LOYALTY: "Loyalty",
-  BACK_OFFICE: "Back office",
-  STORE_INFRA: "Store infrastructure",
-  IT_DESK: "IT desk",
-  BUREAUTIQUE: "IT desk",
+  PAYMENT: "Monétique",
+  TPE: "TPE",
+  DATA: "Données",
+  SYNC: "Synchronisation",
+  IAM: "Identité / accès",
+  INV: "Inventaire",
+  PRINT: "Impression",
+  LOGISTICS: "Logistique",
+  PROJECT: "Projet",
+  HARDWARE: "Matériel",
+  LOYALTY: "Fidélité",
+  BACK_OFFICE: "Back Office",
+  STORE_INFRA: "Infrastructure magasin",
+  IT_DESK: "Bureautique",
+  BUREAUTIQUE: "Bureautique",
 }
 
-/** English label for ticket category codes (legacy French or English codes). */
+/** Libellé français pour les codes catégorie ticket. */
 export function cpAgentCategoryLabel(category: string | null | undefined): string {
   if (category == null || category === "") return "—"
   const k = category.trim().toUpperCase().replace(/\s+/g, "_")
   return CATEGORY_LABELS[k] ?? category.replaceAll("_", " ")
+}
+
+/** Libellé d'affichage pour les codes périmètre. */
+export function cpAgentPerimeterLabel(perimeter: string | null | undefined): string {
+  return formatPerimeterLabel(perimeter)
 }

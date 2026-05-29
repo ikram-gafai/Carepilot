@@ -5,7 +5,9 @@ export async function register() {
       return
     }
     const { startSyncScheduler } = await import("@/lib/jobs/sync-scheduler")
-    startSyncScheduler()
-    console.info("[sync] Background CARE synchronization started (internal).")
+    const started = startSyncScheduler()
+    if (started) {
+      console.info("[sync] Background CARE synchronization started (internal).")
+    }
   }
 }

@@ -4,15 +4,14 @@ import type {
   CareTicketComment,
   CareTicketHistoryEvent,
 } from "./types"
-import {
-  mapCareTicketToCpAgentPriority,
-  mapCareTicketToCpAgentStatus,
-  type CareTicketOperational,
-} from "./cp-agent-status"
+import { resolveTtrTargetHours } from "@/lib/care-operational/sla-exposure"
+import { mapCareTicketToCpAgentPriority, mapCareTicketToCpAgentStatus, type CareTicketOperational } from "./cp-agent-status"
+import { normalizePerimeterForStorage } from "@/lib/care-operational/perimeter-codes"
 
 /** Map normalized CARE ticket into cp_agent upsert fields. */
 export function ticketToSyncRow(t: CareTicket) {
   const op = t as CareTicketOperational
+  const priority = mapCareTicketToCpAgentPriority(op)
   return {
     externalId: t.id,
     careId: t.reference,
@@ -20,8 +19,8 @@ export function ticketToSyncRow(t: CareTicket) {
     title: t.title,
     description: t.description,
     status: mapCareTicketToCpAgentStatus(op),
-    priority: mapCareTicketToCpAgentPriority(op),
-    perimeter: t.perimeter,
+    priority,
+    perimeter: normalizePerimeterForStorage(t.perimeter) ?? t.perimeter,
     category: t.category ?? "GENERAL",
     subCategory: t.subCategory,
     storeId: t.careStoreId,
@@ -33,6 +32,7 @@ export function ticketToSyncRow(t: CareTicket) {
     assignedGroup: t.assignedGroup,
     assignedAgent: t.assignedAgent,
     slaDueAt: t.slaDeadline ? new Date(t.slaDeadline) : null,
+    ttrTargetHours: resolveTtrTargetHours(priority),
     resolutionDate: t.resolutionDate ? new Date(t.resolutionDate) : null,
     externalCreatedAt: new Date(t.createdAt),
     externalUpdatedAt: new Date(t.updatedAt),
@@ -83,7 +83,7 @@ export function kmToSyncRow(k: CareKmReference) {
     externalId: k.id,
     code: k.code,
     title: k.title,
-    perimeter: k.perimeter,
+    perimeter: normalizePerimeterForStorage(k.perimeter) ?? k.perimeter,
     category: k.category,
     keywords: k.keywords.join(", "),
     summary: k.summary,

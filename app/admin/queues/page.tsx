@@ -1,4 +1,4 @@
-import { AdminHeader, AdminPageBody } from "@/components/admin/layout/admin-header"
+import { AdminPageBody } from "@/components/admin/layout/admin-header"
 import { AdminQueuesView } from "@/components/admin/views/admin-queues-view"
 import { AdminUnavailable } from "@/components/admin/ui/admin-unavailable"
 import { CarepilotAutoRefresh } from "@/components/carepilot/carepilot-auto-refresh"
@@ -13,7 +13,6 @@ export default async function AdminQueuesPage() {
   return (
     <>
       {workspace.ok ? <CarepilotAutoRefresh intervalMs={60_000} /> : null}
-      <AdminHeader title="Queues" />
       <AdminPageBody>
         {!workspace.ok ? (
           <AdminUnavailable reason={workspace.reason} />

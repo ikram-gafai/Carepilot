@@ -1,0 +1,252 @@
+[
+  {
+    "case_id": "EVAL-001",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-100\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-002",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-101\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-003",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-102\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-004",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-103\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-005",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-104\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-006",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-105\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-007",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-106\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-008",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-107\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-009",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-108\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-010",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-109\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-011",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-110\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-012",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-111\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-013",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-112\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-014",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-113\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-015",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-114\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-016",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-115\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-017",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-116\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-018",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-117\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-019",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-118\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-020",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-119\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-021",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-120\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-022",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-121\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-023",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-122\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-024",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-123\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-025",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-124\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-026",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-125\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-027",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-126\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-028",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-127\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-029",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-128\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-030",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-129\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-031",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-130\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-032",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-131\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-033",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-132\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-034",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-133\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-035",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-134\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-036",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-135\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-037",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-136\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-038",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-137\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-039",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-138\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-040",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-139\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-041",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-140\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-042",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-141\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-043",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-142\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-044",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-143\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-045",
+    "scenario_type": "sla",
+    "context_block": "=== TICKET ===\nTitle: Critical SLA breach risk checkout\nDescription: Lane 3 down, customers waiting.\nStore: FR-PAR-144\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nSLA prediction: Breach risk \u2014 HIGH\nAction recommendation: MONITOR\nMissing information: POOR quality (38% complete)\nTransfer prediction: Not required\nSLA prediction: Breach risk \u2014 HIGH\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-046",
+    "scenario_type": "km",
+    "context_block": "=== TICKET ===\nTitle: EMV contactless decline pattern\nDescription: Same error as last week on lane 7.\nStore: FR-PAR-145\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nKM recommendations: EMV Contactless Recovery (88% match)\nAction recommendation: APPLY_KM\nMissing information: COMPLETE quality (91% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: EMV Contactless Recovery (88% match)"
+  },
+  {
+    "case_id": "EVAL-047",
+    "scenario_type": "missing",
+    "context_block": "=== TICKET ===\nTitle: checkout not working\nDescription: please fix urgent\nStore: FR-PAR-146\nPerimeter: CHECKOUT\nPriority: P3\n\n=== AI SIGNALS ===\nMissing information: POOR quality (25% complete) \u2014 Description too vague; Missing lane\nAction recommendation: REQUEST_INFO\nEscalation prediction: Not required\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-048",
+    "scenario_type": "local",
+    "context_block": "=== TICKET ===\nTitle: Register 4 receipt printer OK\nDescription: Restart cleared queue. Lane 4 FR-LYO-042 operational.\nStore: FR-PAR-147\nPerimeter: PAYMENT\nPriority: P4\n\n=== AI SIGNALS ===\nEscalation prediction: Not required\nTransfer prediction: Not required\nAction recommendation: CLOSE\nEscalation prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-049",
+    "scenario_type": "escalation",
+    "context_block": "=== TICKET ===\nTitle: SCO lane 12 auth timeout\nDescription: Payment validation fails at checkout. ERR-AUTH-042 after reboot.\nStore: FR-PAR-148\nPerimeter: CHECKOUT\nPriority: P1\n\n=== AI SIGNALS ===\nEscalation prediction: Required (HIGH, confidence 82%)\nAction recommendation: ESCALATE_N3\nMissing information: INCOMPLETE quality (52% complete)\nTransfer prediction: Not required\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  },
+  {
+    "case_id": "EVAL-050",
+    "scenario_type": "transfer",
+    "context_block": "=== TICKET ===\nTitle: Network VLAN issue hyper market\nDescription: POS cannot sync to back-office since 08:00.\nStore: FR-PAR-149\nPerimeter: PAYMENT\nPriority: P2\n\n=== AI SIGNALS ===\nTransfer prediction: Required to NETWORK\nAction recommendation: TRANSFER_TEAM\nMissing information: ADEQUATE quality (71% complete)\nTransfer prediction: Required to NETWORK\nSLA prediction: Within SLA \u2014 LOW\nPriority prediction: P2 (confidence 74%)\nKM recommendations: None"
+  }
+]

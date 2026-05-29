@@ -4,8 +4,11 @@ import { CARE_SYNC_INTERVAL_MS } from "@/lib/sync/constants"
 let timer: ReturnType<typeof setInterval> | null = null
 let started = false
 
-export function startSyncScheduler() {
-  if (started || process.env.DISABLE_SYNC_SCHEDULER !== "0") return
+export function startSyncScheduler(): boolean {
+  if (started) return false
+  if (process.env.DISABLE_SYNC_SCHEDULER === "1") return false
+  if (process.env.NODE_ENV === "development" && process.env.SYNC_SCHEDULER_ENABLED !== "1") return false
+  if (process.env.DISABLE_SYNC_SCHEDULER !== "0" && process.env.SYNC_SCHEDULER_ENABLED !== "1") return false
   started = true
 
   const safeInterval =
@@ -24,6 +27,7 @@ export function startSyncScheduler() {
   timer = setInterval(tick, safeInterval)
 
   console.info(`[sync-scheduler] CARE synchronization every ${safeInterval}ms`)
+  return true
 }
 
 export function stopSyncScheduler() {

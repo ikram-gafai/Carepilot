@@ -1,0 +1,69 @@
+{
+  "scenariosSeeded": 8,
+  "manifest": [
+    {
+      "careId": "CARE-DEMO-00001",
+      "slug": "escalation",
+      "title": "SCO basket sync failures after local recovery",
+      "ticketId": 1,
+      "agentUrl": "/agent/tickets/1",
+      "objective": "Demonstrate high escalation probability, elevated SLA risk, and N3 routing after failed local SCO troubleshooting."
+    },
+    {
+      "careId": "CARE-DEMO-00002",
+      "slug": "transfer",
+      "title": "Loyalty balance mismatch after back-office sync delay",
+      "ticketId": 2,
+      "agentUrl": "/agent/tickets/2",
+      "objective": "Demonstrate transfer to back-office perimeter when loyalty symptoms originate from BO synchronization."
+    },
+    {
+      "careId": "CARE-DEMO-00003",
+      "slug": "local-resolution",
+      "title": "Receipt printer communication failure on checkout lane 7",
+      "ticketId": 3,
+      "agentUrl": "/agent/tickets/3",
+      "objective": "Demonstrate local resolution with strong KM match and low escalation risk."
+    },
+    {
+      "careId": "CARE-DEMO-00004",
+      "slug": "incomplete-ticket",
+      "title": "checkout not working",
+      "ticketId": 4,
+      "agentUrl": "/agent/tickets/4",
+      "objective": "Demonstrate missing information detection and request-for-information workflow."
+    },
+    {
+      "careId": "CARE-DEMO-00005",
+      "slug": "sla-critical",
+      "title": "Payment authorization outage on six SCO lanes",
+      "ticketId": 5,
+      "agentUrl": "/agent/tickets/5",
+      "objective": "Demonstrate SLA-critical payment outage with high urgency and escalation path."
+    },
+    {
+      "careId": "CARE-DEMO-00006",
+      "slug": "false-escalation-risk",
+      "title": "Card reader timeout with known payment KM available",
+      "ticketId": 6,
+      "agentUrl": "/agent/tickets/6",
+      "objective": "Show moderate escalation signal overridden by strong KM-led local resolution."
+    },
+    {
+      "careId": "CARE-DEMO-00007",
+      "slug": "network-payment-ambiguity",
+      "title": "Payment timeout linked to store connectivity instability",
+      "ticketId": 7,
+      "agentUrl": "/agent/tickets/7",
+      "objective": "Demonstrate operational ambiguity between payment and network perimeters."
+    },
+    {
+      "careId": "CARE-DEMO-00008",
+      "slug": "monitoring",
+      "title": "Intermittent SCO screen freeze without current reproduction",
+      "ticketId": 8,
+      "agentUrl": "/agent/tickets/8",
+      "objective": "Demonstrate monitor recommendation with low confidence and limited urgency."
+    }
+  ]
+}

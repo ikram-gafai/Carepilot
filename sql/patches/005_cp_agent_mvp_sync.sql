@@ -29,6 +29,7 @@ ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS external_created_at
 ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS external_updated_at TIMESTAMPTZ;
 ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS last_synced_at TIMESTAMPTZ;
 ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'CARE';
+ALTER TABLE cp_agent.ticket_history ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
 
 CREATE UNIQUE INDEX IF NOT EXISTS cp_agent_hist_external_id ON cp_agent.ticket_history (external_id);
 

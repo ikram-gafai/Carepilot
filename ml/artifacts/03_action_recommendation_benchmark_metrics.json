@@ -1,0 +1,395 @@
+{
+  "dataset": {
+    "total_tickets": 14000,
+    "table_counts": {
+      "historical_tickets": 14000,
+      "historical_actions": 34791,
+      "historical_resolutions": 10293,
+      "km_articles": 92,
+      "dataset_exports": 42000
+    },
+    "class_distribution_pct": {
+      "APPLY_KM": 20.61,
+      "ESCALATE_N3": 16.69,
+      "MONITOR": 10.64,
+      "REQUEST_INFORMATION": 12.96,
+      "RESOLVE_LOCALLY": 21.84,
+      "TRANSFER_PERIMETER": 17.27
+    },
+    "split_sizes": {
+      "train": 9800,
+      "validation": 2100,
+      "test": 2100
+    },
+    "missing_description_pct": 7.69,
+    "missing_resolution_time_pct": 26.48
+  },
+  "results": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.6648,
+      "Macro Precision": 0.7236,
+      "Macro Recall": 0.63,
+      "Macro F1": 0.6397,
+      "Weighted F1": 0.6512,
+      "Training Time (s)": 1.233,
+      "Inference Time (ms/row)": 0.0625
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.6805,
+      "Macro Precision": 0.7866,
+      "Macro Recall": 0.648,
+      "Macro F1": 0.6518,
+      "Weighted F1": 0.6618,
+      "Training Time (s)": 0.9667,
+      "Inference Time (ms/row)": 0.1036
+    },
+    {
+      "Model": "XGBoost",
+      "Accuracy": 0.681,
+      "Macro Precision": 0.7282,
+      "Macro Recall": 0.6507,
+      "Macro F1": 0.6584,
+      "Weighted F1": 0.6691,
+      "Training Time (s)": 39.2691,
+      "Inference Time (ms/row)": 0.1065
+    }
+  ],
+  "best_model": "XGBoost",
+  "confusion_matrices": {
+    "Logistic Regression": [
+      [
+        437,
+        11,
+        3,
+        7,
+        0,
+        0
+      ],
+      [
+        68,
+        226,
+        54,
+        81,
+        4,
+        0
+      ],
+      [
+        7,
+        22,
+        296,
+        26,
+        0,
+        0
+      ],
+      [
+        34,
+        47,
+        37,
+        231,
+        12,
+        1
+      ],
+      [
+        105,
+        11,
+        17,
+        3,
+        123,
+        13
+      ],
+      [
+        119,
+        2,
+        4,
+        9,
+        7,
+        83
+      ]
+    ],
+    "Random Forest": [
+      [
+        443,
+        1,
+        4,
+        10,
+        0,
+        0
+      ],
+      [
+        73,
+        181,
+        70,
+        100,
+        9,
+        0
+      ],
+      [
+        6,
+        2,
+        323,
+        20,
+        0,
+        0
+      ],
+      [
+        40,
+        1,
+        37,
+        277,
+        7,
+        0
+      ],
+      [
+        115,
+        1,
+        17,
+        15,
+        124,
+        0
+      ],
+      [
+        119,
+        0,
+        4,
+        13,
+        7,
+        81
+      ]
+    ],
+    "XGBoost": [
+      [
+        416,
+        14,
+        3,
+        16,
+        5,
+        4
+      ],
+      [
+        54,
+        228,
+        56,
+        92,
+        3,
+        0
+      ],
+      [
+        6,
+        14,
+        313,
+        17,
+        1,
+        0
+      ],
+      [
+        31,
+        32,
+        33,
+        256,
+        10,
+        0
+      ],
+      [
+        101,
+        7,
+        17,
+        8,
+        125,
+        14
+      ],
+      [
+        108,
+        2,
+        2,
+        8,
+        12,
+        92
+      ]
+    ]
+  },
+  "classification_reports": {
+    "Logistic Regression": {
+      "RESOLVE_LOCALLY": {
+        "precision": 0.5675324675324676,
+        "recall": 0.9541484716157205,
+        "f1-score": 0.7117263843648208,
+        "support": 458.0
+      },
+      "APPLY_KM": {
+        "precision": 0.7084639498432602,
+        "recall": 0.5219399538106235,
+        "f1-score": 0.601063829787234,
+        "support": 433.0
+      },
+      "ESCALATE_N3": {
+        "precision": 0.7201946472019465,
+        "recall": 0.8433048433048433,
+        "f1-score": 0.7769028871391076,
+        "support": 351.0
+      },
+      "TRANSFER_PERIMETER": {
+        "precision": 0.6470588235294118,
+        "recall": 0.638121546961326,
+        "f1-score": 0.6425591098748261,
+        "support": 362.0
+      },
+      "REQUEST_INFORMATION": {
+        "precision": 0.8424657534246576,
+        "recall": 0.4522058823529412,
+        "f1-score": 0.5885167464114832,
+        "support": 272.0
+      },
+      "MONITOR": {
+        "precision": 0.8556701030927835,
+        "recall": 0.3705357142857143,
+        "f1-score": 0.5171339563862928,
+        "support": 224.0
+      },
+      "accuracy": 0.6647619047619048,
+      "macro avg": {
+        "precision": 0.7235642907707546,
+        "recall": 0.6300427353885282,
+        "f1-score": 0.6396504856606274,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.7021615065342013,
+        "recall": 0.6647619047619048,
+        "f1-score": 0.6511643784532987,
+        "support": 2100.0
+      }
+    },
+    "Random Forest": {
+      "RESOLVE_LOCALLY": {
+        "precision": 0.5565326633165829,
+        "recall": 0.9672489082969432,
+        "f1-score": 0.7065390749601276,
+        "support": 458.0
+      },
+      "APPLY_KM": {
+        "precision": 0.9731182795698925,
+        "recall": 0.418013856812933,
+        "f1-score": 0.5848142164781907,
+        "support": 433.0
+      },
+      "ESCALATE_N3": {
+        "precision": 0.7098901098901099,
+        "recall": 0.9202279202279202,
+        "f1-score": 0.8014888337468983,
+        "support": 351.0
+      },
+      "TRANSFER_PERIMETER": {
+        "precision": 0.6367816091954023,
+        "recall": 0.7651933701657458,
+        "f1-score": 0.6951066499372648,
+        "support": 362.0
+      },
+      "REQUEST_INFORMATION": {
+        "precision": 0.8435374149659864,
+        "recall": 0.45588235294117646,
+        "f1-score": 0.5918854415274463,
+        "support": 272.0
+      },
+      "MONITOR": {
+        "precision": 1.0,
+        "recall": 0.36160714285714285,
+        "f1-score": 0.5311475409836065,
+        "support": 224.0
+      },
+      "accuracy": 0.6804761904761905,
+      "macro avg": {
+        "precision": 0.786643346156329,
+        "recall": 0.648028925216977,
+        "f1-score": 0.6518302929389224,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.7663717727731767,
+        "recall": 0.6804761904761905,
+        "f1-score": 0.6617812044119236,
+        "support": 2100.0
+      }
+    },
+    "XGBoost": {
+      "RESOLVE_LOCALLY": {
+        "precision": 0.5810055865921788,
+        "recall": 0.9082969432314411,
+        "f1-score": 0.7086882453151618,
+        "support": 458.0
+      },
+      "APPLY_KM": {
+        "precision": 0.7676767676767676,
+        "recall": 0.5265588914549654,
+        "f1-score": 0.6246575342465753,
+        "support": 433.0
+      },
+      "ESCALATE_N3": {
+        "precision": 0.7382075471698113,
+        "recall": 0.8917378917378918,
+        "f1-score": 0.807741935483871,
+        "support": 351.0
+      },
+      "TRANSFER_PERIMETER": {
+        "precision": 0.6448362720403022,
+        "recall": 0.7071823204419889,
+        "f1-score": 0.6745718050065876,
+        "support": 362.0
+      },
+      "REQUEST_INFORMATION": {
+        "precision": 0.8012820512820513,
+        "recall": 0.45955882352941174,
+        "f1-score": 0.5841121495327103,
+        "support": 272.0
+      },
+      "MONITOR": {
+        "precision": 0.8363636363636363,
+        "recall": 0.4107142857142857,
+        "f1-score": 0.5508982035928144,
+        "support": 224.0
+      },
+      "accuracy": 0.680952380952381,
+      "macro avg": {
+        "precision": 0.7282286435207911,
+        "recall": 0.6506748593516641,
+        "f1-score": 0.6584449788629535,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.7125430243298208,
+        "recall": 0.680952380952381,
+        "f1-score": 0.669070497013344,
+        "support": 2100.0
+      }
+    }
+  },
+  "cross_validation": [
+    {
+      "Model": "Logistic Regression",
+      "Mean Macro F1": 0.654,
+      "Std Deviation": 0.0114
+    },
+    {
+      "Model": "Random Forest",
+      "Mean Macro F1": 0.6645,
+      "Std Deviation": 0.0161
+    },
+    {
+      "Model": "XGBoost",
+      "Mean Macro F1": 0.6756,
+      "Std Deviation": 0.0116
+    }
+  ],
+  "plots": {
+    "action_distribution": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_action_distribution.png",
+    "model_comparison": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_action_model_comparison.png",
+    "macro_f1": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_action_macro_f1.png",
+    "per_class_metrics": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_action_per_class_metrics.png",
+    "benchmark_results_table": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_action_recommendation_benchmark_results_table.png"
+  },
+  "feature_importance_plots": {
+    "Random Forest": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_feature_importance_random_forest.png",
+    "XGBoost": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_feature_importance_xgboost.png"
+  }
+}

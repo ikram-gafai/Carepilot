@@ -18,11 +18,22 @@ import {
 import type { InferSelectModel } from "drizzle-orm"
 
 import { CLOSED_TICKET_STATUSES, CLOSED_STATUS_SQL_LIST } from "@/lib/care-operational-actions"
+import {
+  isDemoCareTicketId,
+  operationalCareTicketScope,
+} from "@/lib/care-operational/operational-ticket-scope"
+import {
+  classifySlaExposure,
+  type SlaExposureInput,
+  type SlaExposureResult,
+} from "@/lib/care-operational/sla-exposure"
+import { isOrchestratedSlaAttention } from "@/lib/ai/orchestration/resolve-operational-decision"
 import { englishLegacyCopy } from "@/lib/cp-agent-legacy-copy-en"
 import { getDb } from "@/lib/db"
 import {
   cpAgentAiAnalyses,
   cpAgentAiFeedback,
+  cpAgentAiSlaPredictions,
   cpAgentKmSuggestions,
   cpAgentSyncLogs,
   cpAgentTicketHistory,
@@ -49,7 +60,7 @@ export async function cpAgentTicketCountsByStatus() {
       c: count(),
     })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.source, "CARE"))
+    .where(operationalCareTicketScope())
     .groupBy(cpAgentTickets.status)
   return rows.map((r) => ({ status: r.status, count: Number(r.c) }))
 }
@@ -62,72 +73,60 @@ export async function cpAgentTicketCountsByPriority() {
       c: count(),
     })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.source, "CARE"))
+    .where(operationalCareTicketScope())
     .groupBy(cpAgentTickets.priority)
   return rows.map((r) => ({ priority: r.priority, count: Number(r.c) }))
 }
 
-/** SLA/TTR buckets for dashboard chart */
+/** SLA/TTR buckets for dashboard chart — uses stored timestamps + ttr_target_hours when present. */
 export async function cpAgentSlaRiskBuckets() {
   const db = getDb()
   const now = new Date()
-  const soon = new Date(now.getTime() + 8 * 3600 * 1000)
 
   const [closed] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
     .where(inArray(cpAgentTickets.status, [...CLOSED_STATUSES]))
 
-  const [unknown] = await db
-    .select({ c: count() })
+  const openRows = await db
+    .select({
+      status: cpAgentTickets.status,
+      priority: cpAgentTickets.priority,
+      slaDueAt: cpAgentTickets.slaDueAt,
+      createdAt: cpAgentTickets.createdAt,
+      externalCreatedAt: cpAgentTickets.externalCreatedAt,
+      ttrTargetHours: cpAgentTickets.ttrTargetHours,
+    })
     .from(cpAgentTickets)
-    .where(
-      and(
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        sql`${cpAgentTickets.slaDueAt} IS NULL`,
-      )!,
-    )
+    .where(operationalCareTicketScope(sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`!))
 
-  const [breached] = await db
-    .select({ c: count() })
-    .from(cpAgentTickets)
-    .where(
-      and(
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        isNotNull(cpAgentTickets.slaDueAt),
-        lt(cpAgentTickets.slaDueAt, now),
-      )!,
-    )
+  let unknown = 0
+  let breached = 0
+  let atRisk = 0
+  let onTrack = 0
 
-  const [atRisk] = await db
-    .select({ c: count() })
-    .from(cpAgentTickets)
-    .where(
-      and(
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        isNotNull(cpAgentTickets.slaDueAt),
-        gte(cpAgentTickets.slaDueAt, now),
-        lte(cpAgentTickets.slaDueAt, soon),
-      )!,
-    )
-
-  const [onTrack] = await db
-    .select({ c: count() })
-    .from(cpAgentTickets)
-    .where(
-      and(
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        isNotNull(cpAgentTickets.slaDueAt),
-        gt(cpAgentTickets.slaDueAt, soon),
-      )!,
-    )
+  for (const row of openRows) {
+    const exposure = classifySlaExposure({
+      status: row.status,
+      priority: row.priority,
+      slaDueAt: row.slaDueAt,
+      createdAt: row.createdAt,
+      externalCreatedAt: row.externalCreatedAt,
+      ttrTargetHours: row.ttrTargetHours,
+      now,
+    })
+    if (exposure.label === "Not set") unknown++
+    else if (exposure.bucket === "breached") breached++
+    else if (exposure.bucket === "at_risk") atRisk++
+    else onTrack++
+  }
 
   return [
     { bucket: "closed", count: Number(closed?.c ?? 0) },
-    { bucket: "unknown", count: Number(unknown?.c ?? 0) },
-    { bucket: "breached", count: Number(breached?.c ?? 0) },
-    { bucket: "at_risk", count: Number(atRisk?.c ?? 0) },
-    { bucket: "on_track", count: Number(onTrack?.c ?? 0) },
+    { bucket: "unknown", count: unknown },
+    { bucket: "breached", count: breached },
+    { bucket: "at_risk", count: atRisk },
+    { bucket: "on_track", count: onTrack },
   ]
 }
 
@@ -158,54 +157,65 @@ export async function cpAgentRecommendationOutcomes() {
 // TODO: move dashboard metrics to CarePilot API layer in next backend hardening phase.
 export async function cpAgentDashboardTopMetrics() {
   const db = getDb()
-  const soon = new Date(Date.now() + 8 * 3600 * 1000)
 
-  const careOnly = eq(cpAgentTickets.source, "CARE")
+  const openScope = operationalCareTicketScope(
+    sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
+  )
 
-  const [openRow] = await db
-    .select({ c: count() })
+  const openRows = await db
+    .select({
+      id: cpAgentTickets.id,
+      priority: cpAgentTickets.priority,
+      status: cpAgentTickets.status,
+      slaDueAt: cpAgentTickets.slaDueAt,
+      createdAt: cpAgentTickets.createdAt,
+      externalCreatedAt: cpAgentTickets.externalCreatedAt,
+      ttrTargetHours: cpAgentTickets.ttrTargetHours,
+    })
     .from(cpAgentTickets)
-    .where(
-      and(
-        careOnly,
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-      )!,
-    )
+    .where(openScope)
 
-  const [slaRiskRow] = await db
-    .select({ c: count() })
-    .from(cpAgentTickets)
-    .where(
-      and(
-        careOnly,
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        isNotNull(cpAgentTickets.slaDueAt),
-        sql`${cpAgentTickets.slaDueAt} > NOW()`,
-        lt(cpAgentTickets.slaDueAt, soon),
-      )!,
-    )
+  const slaPredRows = await db
+    .select({
+      ticketId: cpAgentAiSlaPredictions.ticketId,
+      riskLevel: cpAgentAiSlaPredictions.riskLevel,
+    })
+    .from(cpAgentAiSlaPredictions)
+    .orderBy(desc(cpAgentAiSlaPredictions.createdAt))
 
-  const [actionRequiredRow] = await db
-    .select({ c: count() })
-    .from(cpAgentTickets)
-    .where(
-      and(
-        careOnly,
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        or(
-          eq(cpAgentTickets.priority, "P1"),
-          inArray(cpAgentTickets.status, [
-            "IN_PROGRESS",
-            "WAITING_STORE",
-            "SUSPENDED",
-            "ESCALATED",
-            "MONITORING",
-            "ESCALATED_N3",
-          ]),
-          and(isNotNull(cpAgentTickets.slaDueAt), lt(cpAgentTickets.slaDueAt, soon))!,
-        )!,
-      )!,
-    )
+  const slaRiskByTicket = new Map<number, string>()
+  for (const row of slaPredRows) {
+    if (!slaRiskByTicket.has(row.ticketId)) slaRiskByTicket.set(row.ticketId, row.riskLevel)
+  }
+
+  let slaAtRisk = 0
+  let actionRequired = 0
+  for (const row of openRows) {
+    const exposure = classifySlaExposure({
+      status: row.status,
+      priority: row.priority,
+      slaDueAt: row.slaDueAt,
+      createdAt: row.createdAt,
+      externalCreatedAt: row.externalCreatedAt,
+      ttrTargetHours: row.ttrTargetHours,
+    })
+
+    if (isOrchestratedSlaAttention(exposure.label, slaRiskByTicket.get(row.id))) {
+      slaAtRisk++
+    }
+
+    const priority = row.priority.toUpperCase()
+    const waitingStatus = ["IN_PROGRESS", "WAITING_STORE", "SUSPENDED", "MONITORING"].includes(row.status)
+    if (
+      priority === "P1" ||
+      priority === "P2" ||
+      waitingStatus ||
+      exposure.bucket === "breached" ||
+      exposure.bucket === "at_risk"
+    ) {
+      actionRequired++
+    }
+  }
 
   const [fbTotal] = await db
     .select({ c: count() })
@@ -223,24 +233,19 @@ export async function cpAgentDashboardTopMetrics() {
       : null
 
   return {
-    openTickets: Number(openRow?.c ?? 0),
-    slaAtRisk: Number(slaRiskRow?.c ?? 0),
-    actionRequired: Number(actionRequiredRow?.c ?? 0),
+    openTickets: openRows.length,
+    slaAtRisk,
+    actionRequired,
     aiAccuracyPct,
   }
 }
 
-export type CpAgentTicketListRow = CpAgentTicketRow & {
-  assigneeName: string | null
-}
+export type CpAgentTicketListRow = import("@/lib/carepilot-api/tickets").AgentTicketListItem
 
 export type CpAgentTicketFilters = {
   q?: string
-  status?: string
-  priority?: string
-  category?: string
   assignedUserId?: string
-  slaState?: "at_risk" | "breached" | "ok" | "all"
+  quickFilter?: import("@/lib/agent/ticket-queue-display").TicketQueueQuickFilter
 }
 
 export async function cpAgentListTickets(filters: CpAgentTicketFilters) {
@@ -257,8 +262,6 @@ export async function cpAgentFilterOptions() {
 
 export async function cpAgentHighRiskTickets(limit = 8) {
   const db = getDb()
-  const nowDate = new Date()
-  const soonDate = new Date(nowDate.getTime() + 8 * 3600 * 1000)
   const rows = await db
     .select({
       ticket: cpAgentTickets,
@@ -267,22 +270,30 @@ export async function cpAgentHighRiskTickets(limit = 8) {
     .from(cpAgentTickets)
     .leftJoin(cpAgentUsers, eq(cpAgentTickets.assignedUserId, cpAgentUsers.id))
     .where(
-      and(
-        sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`,
-        or(
-          eq(cpAgentTickets.priority, "P1"),
-          eq(cpAgentTickets.status, "ESCALATED_N3"),
-          and(
-            isNotNull(cpAgentTickets.slaDueAt),
-            lt(cpAgentTickets.slaDueAt, soonDate),
-          )!,
-        ),
-      ),
+      operationalCareTicketScope(sql`${cpAgentTickets.status} NOT IN (${sql.raw(CLOSED_SQL)})`),
     )
-    .orderBy(asc(cpAgentTickets.slaDueAt))
-    .limit(limit)
 
-  return rows.map((r) => ({
+  const ranked = rows
+    .map((r) => {
+      const exposure = classifySlaExposure({
+        status: r.ticket.status,
+        priority: r.ticket.priority,
+        slaDueAt: r.ticket.slaDueAt,
+        createdAt: r.ticket.createdAt,
+        externalCreatedAt: r.ticket.externalCreatedAt,
+        ttrTargetHours: r.ticket.ttrTargetHours,
+      })
+      const priorityScore =
+        r.ticket.priority === "P1" ? 40 : r.ticket.priority === "P2" ? 30 : r.ticket.status === "ESCALATED_N3" ? 25 : 0
+      const slaScore =
+        exposure.bucket === "breached" ? 30 : exposure.bucket === "at_risk" ? 20 : 0
+      return { ...r, score: priorityScore + slaScore, exposure }
+    })
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score || (a.exposure.remainingMs ?? 0) - (b.exposure.remainingMs ?? 0))
+    .slice(0, limit)
+
+  return ranked.map((r) => ({
     ...r.ticket,
     title: englishLegacyCopy(r.ticket.title),
     description: englishLegacyCopy(r.ticket.description),
@@ -304,6 +315,7 @@ export async function cpAgentRecentActivity(limit = 12) {
     })
     .from(cpAgentTicketHistory)
     .innerJoin(cpAgentTickets, eq(cpAgentTicketHistory.ticketId, cpAgentTickets.id))
+    .where(operationalCareTicketScope())
     .orderBy(desc(cpAgentTicketHistory.occurredAt))
     .limit(limit)
 
@@ -401,32 +413,32 @@ export async function cpAgentGetTicketAiEnrichment(ticketId: number, ticketCateg
         }
       : null)
 
-  const km = await db
-    .select()
-    .from(cpAgentKmSuggestions)
-    .where(eq(cpAgentKmSuggestions.ticketId, ticketId))
-    .orderBy(asc(cpAgentKmSuggestions.rank))
-
-  const feedback = await db
-    .select()
-    .from(cpAgentAiFeedback)
-    .where(eq(cpAgentAiFeedback.ticketId, ticketId))
-    .orderBy(desc(cpAgentAiFeedback.createdAt))
-
-  const related = category
-    ? await db
-        .select({
-          id: cpAgentTickets.id,
-          careId: cpAgentTickets.careId,
-          title: cpAgentTickets.title,
-          status: cpAgentTickets.status,
-          priority: cpAgentTickets.priority,
-        })
-        .from(cpAgentTickets)
-        .where(and(ne(cpAgentTickets.id, ticketId), eq(cpAgentTickets.category, category)))
-        .orderBy(desc(cpAgentTickets.updatedAt))
-        .limit(6)
-    : []
+  const [km, feedback, related] = await Promise.all([
+    db
+      .select()
+      .from(cpAgentKmSuggestions)
+      .where(eq(cpAgentKmSuggestions.ticketId, ticketId))
+      .orderBy(asc(cpAgentKmSuggestions.rank)),
+    db
+      .select()
+      .from(cpAgentAiFeedback)
+      .where(eq(cpAgentAiFeedback.ticketId, ticketId))
+      .orderBy(desc(cpAgentAiFeedback.createdAt)),
+    category
+      ? db
+          .select({
+            id: cpAgentTickets.id,
+            careId: cpAgentTickets.careId,
+            title: cpAgentTickets.title,
+            status: cpAgentTickets.status,
+            priority: cpAgentTickets.priority,
+          })
+          .from(cpAgentTickets)
+          .where(and(ne(cpAgentTickets.id, ticketId), eq(cpAgentTickets.category, category)))
+          .orderBy(desc(cpAgentTickets.updatedAt))
+          .limit(6)
+      : Promise.resolve([]),
+  ])
 
   const analysisNorm = analysis
     ? {
@@ -479,7 +491,7 @@ export async function cpAgentGetTicketDetail(ticketId: number) {
     .where(eq(cpAgentTickets.id, ticketId))
     .limit(1)
 
-  if (!row) return null
+  if (!row || isDemoCareTicketId(row.ticket.careId)) return null
 
   const ticket = {
     ...row.ticket,
@@ -523,23 +535,23 @@ export async function cpAgentLatestSyncLog() {
   return row ?? null
 }
 
+export function cpAgentSlaExposure(input: SlaExposureInput): SlaExposureResult {
+  return classifySlaExposure(input)
+}
+
 export function cpAgentSlaLabel(
   slaDueAt: Date | null,
   status: string,
+  context?: Omit<SlaExposureInput, "slaDueAt" | "status">,
 ): { label: string; tone: "critical" | "warning" | "success" | "neutral" } {
-  if (!isOpenStatus(status)) {
-    return { label: "—", tone: "neutral" }
-  }
-  if (!slaDueAt) {
-    return { label: "Not set", tone: "neutral" }
-  }
-  const now = Date.now()
-  const due = slaDueAt.getTime()
-  if (due < now) {
-    return { label: "Breached", tone: "critical" }
-  }
-  if (due < now + 8 * 3600 * 1000) {
-    return { label: "At risk", tone: "warning" }
-  }
-  return { label: "On track", tone: "success" }
+  const result = classifySlaExposure({
+    slaDueAt,
+    status,
+    priority: context?.priority,
+    createdAt: context?.createdAt,
+    externalCreatedAt: context?.externalCreatedAt,
+    ttrTargetHours: context?.ttrTargetHours,
+    now: context?.now,
+  })
+  return { label: result.label, tone: result.tone }
 }

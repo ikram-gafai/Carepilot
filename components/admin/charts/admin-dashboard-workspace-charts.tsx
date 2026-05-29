@@ -35,12 +35,12 @@ type EscalationTrendRow = { label: string; escalations: number }
 type DonutRow = { name: string; value: number }
 
 const slaEscalationTrendConfig = {
-  slaRisk: { label: "SLA at risk", color: ADMIN_CHART_BLUE.mid },
-  escalations: { label: "Escalate N3", color: ADMIN_CHART_SEMANTIC.critical },
+  slaRisk: { label: "SLA à risque", color: ADMIN_CHART_BLUE.mid },
+  escalations: { label: "Escalade N3", color: ADMIN_CHART_SEMANTIC.critical },
 } satisfies ChartConfig
 
 const escalationTrendConfig = {
-  escalations: { label: "Escalate N3", color: ADMIN_CHART_SEMANTIC.critical },
+  escalations: { label: "Escalade N3", color: ADMIN_CHART_SEMANTIC.critical },
 } satisfies ChartConfig
 
 export function AdminSlaEscalationTrendChart({ data }: { data: SlaEscalationTrendRow[] }) {
@@ -118,7 +118,7 @@ export function AdminTransferDonutChart({ data }: { data: DonutRow[] }) {
   if (sum <= 0) {
     return (
       <div className="flex h-[140px] items-center justify-center text-center text-xs text-muted-foreground">
-        No transfer volume recorded.
+        Aucun volume de transfert enregistré.
       </div>
     )
   }

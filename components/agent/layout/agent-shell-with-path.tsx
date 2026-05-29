@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation"
 
+import { AgentHeaderProvider } from "@/components/agent/layout/agent-header-context"
 import { AgentPreferencesProvider } from "@/components/agent/layout/agent-preferences-context"
 import { AgentAppShell } from "@/components/agent/layout/agent-app-shell"
 import { Toaster } from "@/components/ui/sonner"
@@ -20,9 +21,11 @@ export function AgentShellWithPath({
   const pathname = usePathname()
   return (
     <AgentPreferencesProvider>
-      <AgentAppShell pathname={pathname} sidebar={sidebar} sessionUser={sessionUser}>
-        {children}
-      </AgentAppShell>
+      <AgentHeaderProvider>
+        <AgentAppShell pathname={pathname} sidebar={sidebar} sessionUser={sessionUser}>
+          {children}
+        </AgentAppShell>
+      </AgentHeaderProvider>
       <Toaster />
     </AgentPreferencesProvider>
   )

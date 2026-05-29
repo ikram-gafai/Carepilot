@@ -7,7 +7,7 @@ import { cpAgentTickets } from "@/lib/db/schema/cp-agent"
 
 import { fillDailySeries, type SeriesPoint } from "./chart-data"
 import { OPERATIONAL_QUEUE_PERIMETERS } from "./operational-perimeters"
-import { hoursAgo, OPEN_FILTER } from "./shared"
+import { hoursAgo, OPERATIONAL_TICKET_SCOPE } from "./shared"
 
 export type QueuePressureRow = {
   category: string
@@ -20,7 +20,7 @@ export type QueuePressureRow = {
 
 export type QueueDisplayHealth = "healthy" | "stable" | "degraded" | "critical"
 
-export type QueueTrendLabel = "↑ Increasing" | "↓ Stable" | "↗ SLA rise" | "↘ Recovery" | "—"
+export type QueueTrendLabel = "↑ En hausse" | "↓ Stable" | "↗ Hausse SLA" | "↘ Reprise" | "—"
 
 export type QueueSupervisionRow = QueuePressureRow & {
   health: QueueDisplayHealth
@@ -41,7 +41,7 @@ async function loadPressureByCategory() {
   return new Map(pressure.map((r) => [r.category, r]))
 }
 
-async function workloadTrendSeries(category: string): Promise<number[]> {
+export async function workloadTrendSeries(category: string): Promise<number[]> {
   const db = getDb()
   const since = hoursAgo(7 * 24)
   const rows = await db
@@ -52,7 +52,7 @@ async function workloadTrendSeries(category: string): Promise<number[]> {
     .from(cpAgentTickets)
     .where(
       and(
-        eq(cpAgentTickets.source, "CARE"),
+        OPERATIONAL_TICKET_SCOPE,
         eq(cpAgentTickets.category, category),
         gte(cpAgentTickets.createdAt, since),
       )!,
@@ -77,13 +77,13 @@ export function queueDisplayHealth(
   return "healthy"
 }
 
-function queueTrendLabel(row: QueuePressureRow, trendPoints: number[]): QueueTrendLabel {
+export function queueTrendLabel(row: QueuePressureRow, trendPoints: number[]): QueueTrendLabel {
   if (trendPoints.length < 2) return "—"
   const recent = trendPoints.slice(-2).reduce((a, b) => a + b, 0)
   const prior = trendPoints.slice(0, 2).reduce((a, b) => a + b, 0)
-  if (row.slaRisk >= 2 && recent >= prior) return "↗ SLA rise"
-  if (recent > prior + 1) return "↑ Increasing"
-  if (recent < prior) return "↘ Recovery"
+  if (row.slaRisk >= 2 && recent >= prior) return "↗ Hausse SLA"
+  if (recent > prior + 1) return "↑ En hausse"
+  if (recent < prior) return "↘ Reprise"
   return "↓ Stable"
 }
 
@@ -96,7 +96,7 @@ export async function adminTransferDistribution(): Promise<TransferDistributionR
     const [row] = await db
       .select({ c: count() })
       .from(cpAgentTickets)
-      .where(eq(cpAgentTickets.status, dest.status))
+      .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, dest.status))!)
     const n = Number(row?.c ?? 0)
     if (n > 0) rows.push({ name: dest.label, value: n })
   }
@@ -175,7 +175,7 @@ export function buildQueuePressureSummary(rows: QueueSupervisionRow[]): QueuePre
   const unstable = [...rows].sort((a, b) => healthRank(b.health) - healthRank(a.health))[0]!
 
   const totalOpen = rows.reduce((s, r) => s + r.open, 0)
-  const rising = rows.filter((r) => r.trend === "↑ Increasing" || r.trend === "↗ SLA rise").length
+  const rising = rows.filter((r) => r.trend === "↑ En hausse" || r.trend === "↗ Hausse SLA").length
 
   return {
     highestSlaExposure: topSla.slaRisk > 0 ? `${topSla.name} · ${topSla.slaRisk}` : "—",
@@ -186,7 +186,7 @@ export function buildQueuePressureSummary(rows: QueueSupervisionRow[]): QueuePre
         ? `${unstable.name} · ${capitalize(unstable.health)}`
         : "—",
     backlogTrend:
-      rising >= 2 ? "↑ Rising" : totalOpen > 12 ? "↑ Elevated" : "↓ Stable",
+      rising >= 2 ? "↑ En hausse" : totalOpen > 12 ? "↑ Élevée" : "↓ Stable",
   }
 }
 

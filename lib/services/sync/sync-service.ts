@@ -10,6 +10,7 @@ import { isSyncRunning, releaseSyncLock, tryAcquireSyncLock } from "./sync-state
 import { linkAllTicketAssignees } from "@/lib/cp-agent/assignee-link"
 import { refreshCpAgentStoreFieldsFromCare } from "./refresh-store-fields"
 import { syncTicketsFromCare } from "./sync-tickets"
+import { refreshOperationalSlaTimestamps } from "@/lib/care-operational/refresh-sla-timestamps"
 
 export type SyncRunResult = {
   ok: boolean
@@ -63,6 +64,7 @@ export async function runMvpCareSync(opts?: {
     const { careSourceTotal } = ticketSync
     await refreshCpAgentStoreFieldsFromCare(db)
     await linkAllTicketAssignees(db)
+    await refreshOperationalSlaTimestamps(db)
 
     const status =
       errors.length === 0

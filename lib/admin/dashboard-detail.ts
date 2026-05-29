@@ -1,28 +1,83 @@
 import { and, count, desc, eq, sql } from "drizzle-orm"
 
+import { ESCALATION_PREDICTION_ENABLED, AI_PHASE_DISABLED, PENDING_AI_TRAINING, TRANSFER_PREDICTION_ENABLED } from "@/lib/ai-phase"
+import { getEscalationPredictionStats } from "@/lib/ai/run-escalation-predictions"
+import { getTransferPredictionStats, listTransferPredictions } from "@/lib/ai/run-transfer-predictions"
 import { cpAgentCategoryLabel } from "@/lib/cp-agent-legacy-copy-en"
 import { N3_TICKET_STATUS, TRANSFER_DESTINATIONS } from "@/lib/care-operational-actions"
 import { getDb } from "@/lib/db"
-import { OPEN_FILTER } from "@/lib/admin/shared"
+import { OPERATIONAL_OPEN_SCOPE, OPERATIONAL_TICKET_SCOPE } from "@/lib/admin/shared"
 import { cpAdminSourceHealth } from "@/lib/db/schema/cp-admin"
 import {
   cpAgentAiAnalyses,
+  cpAgentAiEscalationPredictions,
   cpAgentAiFeedback,
+  cpAgentAiTransferPredictions,
   cpAgentTicketHistory,
   cpAgentTickets,
 } from "@/lib/db/schema/cp-agent"
 
 export async function adminEscalationMonitoringBlock() {
+  if (ESCALATION_PREDICTION_ENABLED) {
+    const db = getDb()
+    const stats = await getEscalationPredictionStats()
+
+    const topCat = await db
+      .select({ category: cpAgentTickets.category, c: count() })
+      .from(cpAgentAiEscalationPredictions)
+      .innerJoin(cpAgentTickets, eq(cpAgentTickets.id, cpAgentAiEscalationPredictions.ticketId))
+      .where(
+        and(
+          OPERATIONAL_TICKET_SCOPE,
+          eq(cpAgentAiEscalationPredictions.predictedEscalationRequired, true),
+        )!,
+      )
+      .groupBy(cpAgentTickets.category)
+      .orderBy(desc(count()))
+      .limit(1)
+
+    const [highConfidence] = await db
+      .select({ c: count() })
+      .from(cpAgentAiEscalationPredictions)
+      .where(
+        and(
+          eq(cpAgentAiEscalationPredictions.predictedEscalationRequired, true),
+          sql`${cpAgentAiEscalationPredictions.confidenceScore} >= 0.75`,
+        )!,
+      )
+
+    const [critical] = await db
+      .select({ c: count() })
+      .from(cpAgentAiEscalationPredictions)
+      .innerJoin(cpAgentTickets, eq(cpAgentTickets.id, cpAgentAiEscalationPredictions.ticketId))
+      .where(
+        and(
+          eq(cpAgentAiEscalationPredictions.predictedEscalationRequired, true),
+          OPERATIONAL_TICKET_SCOPE,
+          eq(cpAgentTickets.priority, "P1"),
+        )!,
+      )
+
+    return {
+      n3Volume: stats.escalationCount,
+      open: stats.escalationCount,
+      topCategory: topCat[0] ? cpAgentCategoryLabel(topCat[0].category) : "—",
+      avgAgingHours: 0,
+      agingOver4h: Number(highConfidence?.c ?? 0),
+      criticalUnresolved: Number(critical?.c ?? 0),
+    }
+  }
+
   const db = getDb()
   const [n3Vol] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.status, N3_TICKET_STATUS))
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS))!)
 
   const topCat = await db
     .select({ category: cpAgentTickets.category, c: count() })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.status, N3_TICKET_STATUS))
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS))!)
     .groupBy(cpAgentTickets.category)
     .orderBy(desc(count()))
     .limit(1)
@@ -32,20 +87,21 @@ export async function adminEscalationMonitoringBlock() {
       avgH: sql<number>`coalesce(avg(extract(epoch from (now() - ${cpAgentTickets.updatedAt})) / 3600.0), 0)`,
     })
     .from(cpAgentTickets)
-    .where(eq(cpAgentTickets.status, N3_TICKET_STATUS))
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS))!)
 
   const [critical] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
-    .where(and(eq(cpAgentTickets.status, N3_TICKET_STATUS), eq(cpAgentTickets.priority, "P1"))!)
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS), eq(cpAgentTickets.priority, "P1"))!)
 
   const [agingOver4h] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
     .where(
       and(
+        OPERATIONAL_TICKET_SCOPE,
         eq(cpAgentTickets.status, N3_TICKET_STATUS),
-        OPEN_FILTER,
+        OPERATIONAL_OPEN_SCOPE,
         sql`${cpAgentTickets.updatedAt} <= now() - interval '4 hours'`,
       )!,
     )
@@ -53,7 +109,7 @@ export async function adminEscalationMonitoringBlock() {
   const [openEscalated] = await db
     .select({ c: count() })
     .from(cpAgentTickets)
-    .where(and(eq(cpAgentTickets.status, N3_TICKET_STATUS), OPEN_FILTER)!)
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS), OPERATIONAL_OPEN_SCOPE)!)
 
   return {
     n3Volume: Number(n3Vol?.c ?? 0),
@@ -66,6 +122,43 @@ export async function adminEscalationMonitoringBlock() {
 }
 
 export async function adminTransferMonitoringBlock() {
+  if (TRANSFER_PREDICTION_ENABLED) {
+    const stats = await getTransferPredictionStats()
+    const predictions = await listTransferPredictions()
+    const transferRows = predictions.filter((p) => p.predictedTransferRequired)
+
+    const volumes: Record<string, number> = {}
+    for (const row of transferRows) {
+      volumes[row.targetPerimeter] = (volumes[row.targetPerimeter] ?? 0) + 1
+    }
+
+    const topEntry = Object.entries(volumes).sort((a, b) => b[1] - a[1])[0]
+    const topDestination = topEntry && topEntry[1] > 0 ? topEntry[0] : "—"
+    const total = stats.transferCount
+    const imbalance =
+      total === 0 || !topEntry
+        ? "—"
+        : `${Math.round((topEntry[1] / total) * 100)}% via ${topDestination}`
+
+    return {
+      volumes,
+      total,
+      topDestination,
+      routingImbalance: imbalance,
+      repeatedWrongPerimeter: 0,
+    }
+  }
+
+  if (AI_PHASE_DISABLED) {
+    return {
+      volumes: {} as Record<string, number>,
+      total: 0,
+      topDestination: PENDING_AI_TRAINING,
+      routingImbalance: PENDING_AI_TRAINING,
+      repeatedWrongPerimeter: 0,
+    }
+  }
+
   const db = getDb()
   const volumes: Record<string, number> = {}
   let total = 0
@@ -73,7 +166,7 @@ export async function adminTransferMonitoringBlock() {
     const [row] = await db
       .select({ c: count() })
       .from(cpAgentTickets)
-      .where(eq(cpAgentTickets.status, dest.status))
+      .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, dest.status))!)
     const n = Number(row?.c ?? 0)
     volumes[dest.label] = n
     total += n
@@ -206,10 +299,10 @@ export function buildSyncSupervisionRows(
       ? Math.max(0, Math.round((Date.now() - lastIngestionAt.getTime()) / 60_000))
       : null
 
-  const ingestion = running ? "Synchronizing" : syncLabel
+  const ingestion = running ? "Synchronisation en cours" : syncLabel
   const ingestionHealth: AdminSyncSupervisionRow["health"] = running
     ? "degraded"
-    : syncLabel === "Healthy"
+    : syncLabel === "Sain"
       ? "healthy"
       : "degraded"
 
@@ -222,7 +315,7 @@ export function buildSyncSupervisionRows(
           health: (s.state.toLowerCase().includes("health") ? "healthy" : "degraded") as AdminSyncSupervisionRow["health"],
         })),
         {
-          label: "Latency",
+          label: "Latence",
           value: latencyMin != null ? `${latencyMin}m` : "—",
           health: latencyMin != null && latencyMin > 30 ? "degraded" : "healthy",
         },
@@ -232,12 +325,12 @@ export function buildSyncSupervisionRows(
   }
 
   const careHealth: AdminSyncSupervisionRow["health"] =
-    syncLabel === "Healthy" ? "healthy" : running || syncLabel === "Synchronizing" ? "degraded" : "degraded"
+    syncLabel === "Sain" ? "healthy" : running || syncLabel === "Synchronisation en cours" ? "degraded" : "degraded"
 
   return {
     rows: [
-      { label: "CARE source", value: syncLabel, health: careHealth },
-      { label: "Parser", value: "Healthy", health: "healthy" },
+      { label: "Source CARE", value: syncLabel, health: careHealth },
+      { label: "Parseur", value: "Sain", health: "healthy" },
       { label: "Ingestion", value: ingestion, health: ingestionHealth },
       {
         label: "Latency",
@@ -248,7 +341,7 @@ export function buildSyncSupervisionRows(
     tone:
       careHealth === "healthy" && ingestionHealth === "healthy"
         ? "success"
-        : running || syncLabel !== "Healthy"
+        : running || syncLabel !== "Sain"
           ? "primary"
           : "success",
   }
@@ -271,6 +364,9 @@ export async function adminSyncStatusCompact() {
 
 export async function adminOpenN3Count() {
   const db = getDb()
-  const [r] = await db.select({ c: count() }).from(cpAgentTickets).where(eq(cpAgentTickets.status, N3_TICKET_STATUS))
+  const [r] = await db
+    .select({ c: count() })
+    .from(cpAgentTickets)
+    .where(and(OPERATIONAL_TICKET_SCOPE, eq(cpAgentTickets.status, N3_TICKET_STATUS))!)
   return Number(r?.c ?? 0)
 }

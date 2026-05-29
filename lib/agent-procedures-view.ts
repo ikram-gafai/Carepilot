@@ -14,6 +14,14 @@ export type AgentProcedureRow = {
   relevanceScore: number
   usageCount: number
   lastUsedAt: string | null
+  beforeApplying?: string[]
+  ifFailed?: string[]
+  successRatePct?: number
+  estimatedMinutes?: number
+  /** Tickets where this KM was the primary AI match. */
+  successfulCount?: number
+  escalatedAfterCount?: number
+  waitingCount?: number
 }
 
 export function distinctScopes(procedures: AgentProcedureRow[]): string[] {

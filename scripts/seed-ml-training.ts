@@ -82,8 +82,13 @@ async function main() {
         resolvedAt: t.resolvedAt,
         resolutionTimeMinutes: t.resolutionTimeMinutes,
         slaBreached: t.slaBreached,
+        ticketAgeMinutes: t.ticketAgeMinutes,
+        queueLoad: t.queueLoad,
+        storeSize: t.storeSize,
+        operationalComplexity: t.operationalComplexity,
         escalationRequired: t.escalationRequired,
         transferRequired: t.transferRequired,
+        recommendedAction: t.recommendedAction,
         incidentCategory: t.incidentCategory,
         environmentType: t.environmentType,
         ticketSource: t.ticketSource,
@@ -94,6 +99,14 @@ async function main() {
         rawText: t.rawText,
         cleanedText: t.cleanedText,
         vectorizationText: t.vectorizationText,
+        expectedKmId: t.expectedKmId,
+        relevantKmIds: t.relevantKmIds,
+        similarCaseGroupId: t.similarCaseGroupId,
+        incidentCluster: t.incidentCluster,
+        semanticGroup: t.semanticGroup,
+        incidentFamily: t.incidentFamily,
+        rootCauseFamily: t.rootCauseFamily,
+        resolutionPattern: t.resolutionPattern,
       })),
     ),
   )
@@ -128,6 +141,7 @@ async function main() {
 
   await db.insert(mlTrainingKmArticles).values(
     dataset.kmArticles.map((km) => ({
+      kmCode: km.kmId,
       title: km.title,
       procedureSteps: km.procedureSteps,
       perimeter: km.perimeter,

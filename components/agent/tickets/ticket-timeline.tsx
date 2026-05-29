@@ -6,19 +6,20 @@ import { cn } from "@/lib/utils"
 type HistoryRow = InferSelectModel<typeof cpAgentTicketHistory>
 
 const eventLabel: Record<string, string> = {
-  created: "Created",
-  assignment: "Assignment",
-  ai_recommendation: "AI recommendation",
-  escalation: "Escalation",
+  created: "Créé",
+  assignment: "Assignation",
+  ai_recommendation: "Analyse IA générée",
+  ai_analysis: "Analyse IA générée",
+  escalation: "Escalade",
   suspension: "Suspension",
-  transfer: "Transfer",
-  resolution: "Resolution",
-  resolve: "Resolution",
+  transfer: "Transfert",
+  resolution: "Résolution",
+  resolve: "Résolution",
   suspend: "Suspension",
-  transfer_mat: "Transfer",
-  transfer_bur: "Transfer",
-  escalate: "Escalation",
-  comment: "Comment",
+  transfer_mat: "Transfert",
+  transfer_bur: "Transfert",
+  escalate: "Escalade",
+  comment: "Commentaire",
 }
 
 function eventPillClass(type: string) {
@@ -52,7 +53,7 @@ function formatDt(d: Date) {
 
 export function TicketTimeline({ events }: { events: HistoryRow[] }) {
   if (!events.length) {
-    return <p className="text-xs text-muted-foreground">No timeline events.</p>
+    return <p className="text-xs text-muted-foreground">Aucun événement dans la chronologie.</p>
   }
 
   return (

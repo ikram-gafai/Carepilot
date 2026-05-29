@@ -1,26 +1,21 @@
-import { PENDING_AI_TRAINING } from "@/lib/ai-phase"
-import { Card, CardContent } from "@/components/ui/card"
-import type { CpAgentTicketRow } from "@/lib/queries/cp-agent"
+import { OperationalIntelligenceWorkflowPanel } from "@/components/agent/ai/operational-intelligence-workflow-panel"
+import type { OperationalIntelligencePayload } from "@/lib/ai/orchestration/types"
 
-/** AI recommendations disabled until training phase — operational ticket data only. */
+/** Unified operational intelligence sidebar for ticket investigation. */
 export function OperationalIntelligencePanel({
-  ticket: _ticket,
+  ticketId,
+  intelligence,
+  canRunPrediction = false,
 }: {
-  ticket: CpAgentTicketRow
-  assigneeName?: string | null
-  analysis?: unknown
-  relatedIncidents?: unknown[]
-  km?: unknown[]
+  ticketId: number
+  intelligence: OperationalIntelligencePayload
+  canRunPrediction?: boolean
 }) {
   return (
-    <Card className="overflow-hidden border-border/90 shadow-sm">
-      <CardContent className="flex min-h-[12rem] flex-col items-center justify-center gap-2 px-6 py-10 text-center">
-        <p className="text-sm font-semibold text-foreground">{PENDING_AI_TRAINING}</p>
-        <p className="max-w-sm text-xs text-muted-foreground">
-          Recommendations, transfers, escalations, and procedure suggestions will appear here after the AI
-          training phase. Ticket data below is synchronized from CARE.
-        </p>
-      </CardContent>
-    </Card>
+    <OperationalIntelligenceWorkflowPanel
+      ticketId={ticketId}
+      intelligence={intelligence}
+      canRunAi={canRunPrediction}
+    />
   )
 }

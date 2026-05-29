@@ -1,11 +1,13 @@
-# CARE → CAREPILOT operational architecture (MVP)
+# CAREPILOT operational architecture (MVP)
+
+> **Updated:** See the full architecture pack in [`docs/architecture/`](./architecture/README.md) and report assets in [`docs/report/`](./report/README.md).
 
 ## Active schemas
 
 | Schema | Purpose |
 |--------|---------|
 | `care_source` | CARE system of record (70 tickets + stores, registers, actions, comments) |
-| `cp_agent` | Synchronized operational store for Agent/Admin UI |
+| `cp_agent` | Synchronized operational store for Agent/Admin UI + AI outputs |
 | `carepilot` | **Auth only** (`users`, `sessions`) |
 
 ## Sync flow (internal — no frontend sync page)
@@ -22,22 +24,18 @@ care_source.tickets (70)
 - Scheduler starts from `instrumentation.ts` unless `DISABLE_SYNC_SCHEDULER=1`.
 - APIs kept: `/api/sync/run`, `/api/sync/status`, `/api/sync/logs` (not linked in UI).
 
-## Dashboard (only operational UI)
+## Operational intelligence (orchestrated)
 
-KPIs from `cp_agent.tickets` (`source = 'CARE'`):
+Nine AI modules write to `cp_agent.ai_*` tables. The orchestrator (`lib/ai/orchestration/`) aggregates signals into one payload for the ticket investigation UI.
 
-| KPI | Value |
-|-----|--------|
-| Open Tickets | Live count |
-| SLA Risk | Due within 4h |
-| Transfers | 0 |
-| Escalate N3 | 0 |
-| Sync Health | Healthy when fully synchronized |
-| AI Status | Pending AI Training |
+```
+GET /api/ai/orchestration/{ticketId}
+→ { ticketQuality, operationalRisk, recommendedAction, kmRecommendation, operationalExplanation }
+```
 
-Operational Pressure: Open + SLA Risk by perimeter (Checkout, SCO, Payment, Network, Hardware).
+## Demo scenarios
 
-Top Risks: SLA breach, queue overload, critical priority tickets.
+Eight PFE demo tickets: `bun run db:seed:demo-scenarios` → [`docs/demo-scenarios/demo-manifest.json`](./demo-scenarios/demo-manifest.json)
 
 ## Reset commands
 
@@ -46,4 +44,5 @@ bun run db:reset:operational-mvp
 bun run db:seed:care-operational
 bun run db:seed:cp-agent
 bun run db:sync
+bun run db:seed:demo-scenarios
 ```

@@ -12,6 +12,7 @@ import { syncHistoryFromCare } from "@/lib/services/sync/sync-history"
 import { syncKmFromCare } from "@/lib/services/sync/sync-km"
 import { finishSyncLog, startSyncLog, type SyncCounters } from "@/lib/services/sync/sync-logger"
 import { syncTicketsFromCare } from "@/lib/services/sync/sync-tickets"
+import { refreshOperationalSlaTimestamps } from "@/lib/care-operational/refresh-sla-timestamps"
 
 async function main() {
   const db = getDb()
@@ -50,6 +51,7 @@ async function main() {
     await syncHistoryFromCare(db, client, ticketSync.ticketIdByExternal, ticketSync.changedExternalIds, counters, errors)
     await syncCommentsFromCare(db, client, ticketSync.ticketIdByExternal, ticketSync.changedExternalIds, counters, errors)
     await syncKmFromCare(db, client, counters, errors)
+    await refreshOperationalSlaTimestamps(db)
 
     const status = errors.length === 0 ? "success" : counters.inserted + counters.updated > 0 ? "partial_success" : "failed"
     await finishSyncLog(db, logId, started, status, counters, {

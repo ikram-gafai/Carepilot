@@ -2,6 +2,10 @@
 
 import { usePathname } from "next/navigation"
 
+import {
+  AdminHeaderProvider,
+  AdminShellHeader,
+} from "@/components/admin/layout/admin-header-context"
 import { AdminPreferencesProvider } from "@/components/admin/layout/admin-preferences-context"
 import { AdminSidebar } from "@/components/admin/layout/admin-sidebar"
 import { Toaster } from "@/components/ui/sonner"
@@ -18,10 +22,15 @@ export function AdminShellWithPath({
   const pathname = usePathname()
   return (
     <AdminPreferencesProvider>
-      <div className={`flex min-h-dvh ${adminSurfaces.page}`}>
-        <AdminSidebar pathname={pathname} sessionUser={sessionUser} />
-        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
-      </div>
+      <AdminHeaderProvider>
+        <div className={`flex h-dvh overflow-hidden ${adminSurfaces.page}`}>
+          <AdminSidebar pathname={pathname} sessionUser={sessionUser} />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            <AdminShellHeader />
+            <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
+          </div>
+        </div>
+      </AdminHeaderProvider>
       <Toaster />
     </AdminPreferencesProvider>
   )

@@ -7,19 +7,19 @@ export type OperationalPerimeter = {
 
 /** CARE operational perimeters — dashboard pressure chart (MVP). */
 export const DASHBOARD_OPERATIONAL_PERIMETERS: OperationalPerimeter[] = [
-  { category: "CHECKOUT", label: "Checkout", sortOrder: 1 },
+  { category: "CHECKOUT", label: "FO", sortOrder: 1 },
   { category: "SCO", label: "SCO", sortOrder: 2 },
-  { category: "PAYMENT", label: "Payment", sortOrder: 3 },
-  { category: "NETWORK", label: "Network", sortOrder: 4 },
-  { category: "HARDWARE", label: "Hardware", sortOrder: 5 },
+  { category: "PAYMENT", label: "Monétique", sortOrder: 3 },
+  { category: "NETWORK", label: "Réseau", sortOrder: 4 },
+  { category: "HARDWARE", label: "Matériel", sortOrder: 5 },
 ]
 
 /** Extended list for queues / routing views. */
 export const OPERATIONAL_QUEUE_PERIMETERS: OperationalPerimeter[] = [
   ...DASHBOARD_OPERATIONAL_PERIMETERS,
-  { category: "IT_DESK", label: "Back office", sortOrder: 6 },
-  { category: "LOGISTICS", label: "Logistics", sortOrder: 7 },
-  { category: "SYNC", label: "Synchronization", sortOrder: 8 },
+  { category: "IT_DESK", label: "Back-office", sortOrder: 6 },
+  { category: "LOGISTICS", label: "Logistique", sortOrder: 7 },
+  { category: "SYNC", label: "Synchronisation", sortOrder: 8 },
 ]
 
 const PERIMETER_CATEGORIES = new Set(OPERATIONAL_QUEUE_PERIMETERS.map((p) => p.category))

@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 import { AdminQueueHealthBadge } from "@/components/admin/ui/admin-queue-health-badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { adminQueueSupervision } from "@/lib/queries/admin"
 import type { QueueSupervisionRow } from "@/lib/admin/queue-metrics"
@@ -27,17 +27,14 @@ export function AdminQueuesView({ data }: { data: Data }) {
   return (
     <div className="mx-auto max-w-[1600px] p-4 pb-6">
       <Card className={cardClass}>
-        <CardHeader className="border-b border-zinc-200/90 px-4 py-2.5">
-          <CardTitle className="text-sm font-semibold">Operational Queues</CardTitle>
-        </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow className="border-zinc-100 hover:bg-transparent">
-                {["Queue", "Open", "SLA Risk", "Escalate N3", "Transfers", "Trend", "Health"].map((h) => (
+                {["File", "Ouverts", "Risque SLA", "Escalade N3", "Transferts", "Tendance", "État"].map((h) => (
                   <TableHead
                     key={h}
-                    className="h-9 px-4 text-[11px] font-semibold uppercase tracking-wide text-zinc-500"
+                    className="h-9 px-4 text-xs font-medium text-muted-foreground"
                   >
                     {h}
                   </TableHead>

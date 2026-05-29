@@ -1,0 +1,250 @@
+{
+  "dataset": {
+    "total_tickets": 14000,
+    "table_counts": {
+      "historical_tickets": 14000,
+      "historical_actions": 34779,
+      "historical_resolutions": 10281,
+      "km_articles": 92,
+      "dataset_exports": 42000
+    },
+    "class_distribution_pct": {
+      "0": 65.01,
+      "1": 34.99
+    },
+    "priority_distribution_pct": {
+      "critical": 18.0,
+      "high": 28.0,
+      "low": 15.0,
+      "medium": 39.0
+    },
+    "perimeter_distribution_pct": {
+      "back_office": 9.0,
+      "checkout": 17.31,
+      "front office": 0.69,
+      "hardware": 13.0,
+      "loyalty": 10.0,
+      "network": 13.0,
+      "payment": 13.0,
+      "sco": 15.5,
+      "store_infrastructure": 8.5
+    },
+    "split_sizes": {
+      "train": 9800,
+      "validation": 2100,
+      "test": 2100
+    },
+    "missing_description_pct": 7.76,
+    "missing_resolution_time_pct": 26.56
+  },
+  "results": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.7476,
+      "Precision": 0.7008,
+      "Recall": 0.485,
+      "F1": 0.5733,
+      "ROC-AUC": 0.7603,
+      "Training Time (s)": 0.3529,
+      "Inference Time (ms/row)": 0.0573
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.8086,
+      "Precision": 0.7627,
+      "Recall": 0.6567,
+      "F1": 0.7057,
+      "ROC-AUC": 0.8711,
+      "Training Time (s)": 0.6415,
+      "Inference Time (ms/row)": 0.1054
+    },
+    {
+      "Model": "XGBoost",
+      "Accuracy": 0.8405,
+      "Precision": 0.7548,
+      "Recall": 0.8052,
+      "F1": 0.7792,
+      "ROC-AUC": 0.9153,
+      "Training Time (s)": 4.3304,
+      "Inference Time (ms/row)": 0.105
+    }
+  ],
+  "confusion_matrices": {
+    "Logistic Regression": [
+      [
+        1214,
+        152
+      ],
+      [
+        378,
+        356
+      ]
+    ],
+    "Random Forest": [
+      [
+        1216,
+        150
+      ],
+      [
+        252,
+        482
+      ]
+    ],
+    "XGBoost": [
+      [
+        1174,
+        192
+      ],
+      [
+        143,
+        591
+      ]
+    ]
+  },
+  "normalized_confusion_matrices": {
+    "Logistic Regression": [
+      [
+        0.8887262079062958,
+        0.11127379209370425
+      ],
+      [
+        0.5149863760217984,
+        0.48501362397820164
+      ]
+    ],
+    "Random Forest": [
+      [
+        0.890190336749634,
+        0.10980966325036604
+      ],
+      [
+        0.34332425068119893,
+        0.6566757493188011
+      ]
+    ],
+    "XGBoost": [
+      [
+        0.8594436310395315,
+        0.14055636896046853
+      ],
+      [
+        0.19482288828337874,
+        0.8051771117166212
+      ]
+    ]
+  },
+  "classification_reports": {
+    "Logistic Regression": {
+      "No transfer": {
+        "precision": 0.7625628140703518,
+        "recall": 0.8887262079062958,
+        "f1-score": 0.8208248816768087,
+        "support": 1366.0
+      },
+      "Transfer": {
+        "precision": 0.7007874015748031,
+        "recall": 0.48501362397820164,
+        "f1-score": 0.573268921095008,
+        "support": 734.0
+      },
+      "accuracy": 0.7476190476190476,
+      "macro avg": {
+        "precision": 0.7316751078225774,
+        "recall": 0.6868699159422487,
+        "f1-score": 0.6970469013859084,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.740970836560003,
+        "recall": 0.7476190476190476,
+        "f1-score": 0.7342981792639317,
+        "support": 2100.0
+      }
+    },
+    "Random Forest": {
+      "No transfer": {
+        "precision": 0.8283378746594006,
+        "recall": 0.890190336749634,
+        "f1-score": 0.858151023288638,
+        "support": 1366.0
+      },
+      "Transfer": {
+        "precision": 0.7626582278481012,
+        "recall": 0.6566757493188011,
+        "f1-score": 0.705710102489019,
+        "support": 734.0
+      },
+      "accuracy": 0.8085714285714286,
+      "macro avg": {
+        "precision": 0.7954980512537508,
+        "recall": 0.7734330430342176,
+        "f1-score": 0.7819305628888285,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.8053812742977369,
+        "recall": 0.8085714285714286,
+        "f1-score": 0.8048692919234379,
+        "support": 2100.0
+      }
+    },
+    "XGBoost": {
+      "No transfer": {
+        "precision": 0.8914198936977981,
+        "recall": 0.8594436310395315,
+        "f1-score": 0.8751397689153932,
+        "support": 1366.0
+      },
+      "Transfer": {
+        "precision": 0.7547892720306514,
+        "recall": 0.8051771117166212,
+        "f1-score": 0.7791694133157547,
+        "support": 734.0
+      },
+      "accuracy": 0.8404761904761905,
+      "macro avg": {
+        "precision": 0.8231045828642247,
+        "recall": 0.8323103713780764,
+        "f1-score": 0.827154591115574,
+        "support": 2100.0
+      },
+      "weighted avg": {
+        "precision": 0.8436642383150906,
+        "recall": 0.8404761904761905,
+        "f1-score": 0.8415958446248528,
+        "support": 2100.0
+      }
+    }
+  },
+  "cross_validation": [
+    {
+      "Model": "Logistic Regression",
+      "Mean Accuracy": 0.7398,
+      "Std Deviation": 0.0101
+    },
+    {
+      "Model": "Random Forest",
+      "Mean Accuracy": 0.8083,
+      "Std Deviation": 0.0059
+    },
+    {
+      "Model": "XGBoost",
+      "Mean Accuracy": 0.8426,
+      "Std Deviation": 0.0058
+    }
+  ],
+  "plots": {
+    "class_distribution": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_transfer_distribution.png",
+    "priority_vs_transfer": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_priority_vs_transfer.png",
+    "perimeter_vs_transfer": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_perimeter_vs_transfer.png",
+    "roc_curve": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_transfer_roc_curves.png",
+    "model_comparison": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_transfer_model_comparison.png",
+    "precision_recall": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_transfer_precision_recall.png",
+    "f1": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_transfer_f1_score.png",
+    "benchmark_results_table": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_transfer_benchmark_results_table.png"
+  },
+  "feature_importance_plots": {
+    "Random Forest": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_feature_importance_random_forest.png",
+    "XGBoost": "C:\\Users\\ar202\\carepilot\\ml\\plots\\03_feature_importance_xgboost.png"
+  }
+}

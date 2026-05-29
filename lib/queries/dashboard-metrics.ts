@@ -1,10 +1,8 @@
-import { count, desc, sql } from "drizzle-orm"
+import { desc, sql } from "drizzle-orm"
 
-import { getCarePilotOperationalMetrics } from "@/lib/carepilot-api/metrics"
+import { getCarePilotOperationalMetrics, getSynchronizedTicketListTotal } from "@/lib/carepilot-api/metrics"
 import { getDb } from "@/lib/db"
-import { cpAgentSyncLogs, cpAgentTickets } from "@/lib/db/schema/cp-agent"
-
-const CARE_FILTER = sql`${cpAgentTickets.source} = 'CARE'`
+import { cpAgentSyncLogs } from "@/lib/db/schema/cp-agent"
 
 export type DashboardMetrics = {
   openTickets: number
@@ -34,14 +32,14 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     .orderBy(desc(cpAgentSyncLogs.syncStartedAt))
     .limit(1)
 
-  const [total] = await db.select({ c: count() }).from(cpAgentTickets).where(CARE_FILTER)
+  const synchronizedTotal = await getSynchronizedTicketListTotal()
 
   return {
     openTickets: kpis.openTickets,
     slaAtRisk: kpis.slaRisk,
     transfers: kpis.transfers,
     escalations: kpis.escalations,
-    synchronizedTotal: Number(total?.c ?? kpis.totalSynchronized),
+    synchronizedTotal: synchronizedTotal || kpis.totalSynchronized,
     syncHealth: sync.label,
     lastSync: latest
       ? {

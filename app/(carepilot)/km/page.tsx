@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatPerimeterLabel } from "@/lib/care-operational/perimeter-codes"
 import { getDb } from "@/lib/db"
 import { kmProcedures } from "@/lib/db/schema/care-source"
 
@@ -54,7 +55,7 @@ export default async function KmPage() {
                   <TableRow key={r.id} className="text-xs">
                     <TableCell className="py-2 text-[11px]">{r.kmCode}</TableCell>
                     <TableCell className="py-2">{r.title}</TableCell>
-                    <TableCell className="py-2">{r.perimeter}</TableCell>
+                    <TableCell className="py-2">{formatPerimeterLabel(r.perimeter)}</TableCell>
                     <TableCell className="py-2">{r.category}</TableCell>
                   </TableRow>
                 ))}

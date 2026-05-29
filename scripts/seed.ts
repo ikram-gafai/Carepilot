@@ -28,7 +28,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-001",
     title: "Controlled VLP lane restart",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "CHECKOUT",
     content:
       "Standard procedure: isolate lane, verify session, restart application, review error logs.",
@@ -38,7 +38,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-002",
     title: "Handheld scanner error",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "PERIPH",
     content:
       "Check USB attachment, hub ports, scanner driver, test degraded barcode reads.",
@@ -58,7 +58,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-004",
     title: "Customer receipt print blocked",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "PRINT",
     content:
       "Print spooler, Windows test page, thermal printer driver, roller alignment.",
@@ -68,7 +68,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-005",
     title: "Payment terminal incident",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "TPE",
     content:
       "TPE checklist: reboot, line test, acquirer contract, hardware swap from stock.",
@@ -78,7 +78,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-006",
     title: "Slow article catalog sync",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "DATA",
     content:
       "Check sync window, regional server load, restart sync job, middleware logs.",
@@ -88,7 +88,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-007",
     title: "Cashier session locked",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "IAM",
     content:
       "Supervisor unlock, local AD session reset, password policy check.",
@@ -98,7 +98,7 @@ const KM_SEED = [
   {
     kmCode: "KM-VLP-008",
     title: "Inventory anomaly report",
-    perimeter: "FO_VLP",
+    perimeter: "FO",
     category: "INV",
     content:
       "Pull inventory logs, reconcile theoretical vs physical stock, clear caches.",
@@ -181,7 +181,7 @@ async function main() {
 
   const rnd = mulberry32(42)
 
-  console.log(`Seed: ${TICKET_COUNT} anonymized FO VLP operational tickets`)
+  console.log(`Seed: ${TICKET_COUNT} anonymized FO operational tickets`)
 
   const cityPairs = [
     ["101", "North Alpha Store", "Lille"],
@@ -252,7 +252,7 @@ async function main() {
       networkHeavy = true
     }
 
-    let description = `FO VLP operational incident — ${title}. `
+    let description = `FO operational incident — ${title}. `
     description += hardwareHeavy
       ? "Hardware symptoms (USB/scanner/roller). "
       : ""
@@ -322,7 +322,7 @@ async function main() {
       : description
     const seedPerimeter = demoSlot
       ? demoSlot.perimeter.replace(/\s*\/\s*/g, "_").replace(/\s+/g, "")
-      : "FO_VLP"
+      : "FO"
 
     const [ticketRow] = await db
       .insert(careSourceTickets)

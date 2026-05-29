@@ -1,0 +1,4 @@
+Model,Accuracy,Macro Precision,Macro Recall,Macro F1,Weighted F1,Training Time (s),Inference Time (ms/row)
+Logistic Regression,0.6648,0.7236,0.63,0.6397,0.6512,1.233,0.0625
+Random Forest,0.6805,0.7866,0.648,0.6518,0.6618,0.9667,0.1036
+XGBoost,0.681,0.7282,0.6507,0.6584,0.6691,39.2691,0.1065

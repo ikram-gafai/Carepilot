@@ -6,14 +6,14 @@ export function TicketMetadata({ ticket }: { ticket: CpAgentTicketRow }) {
   const statusLabel = ticketStatusUiLabel(ticket.status)
   const items: { label: string; value: string }[] = [
     {
-      label: "Store",
+      label: "Magasin",
       value: ticket.storeName
         ? `${ticket.storeName}${ticket.storeCity ? ` · ${ticket.storeCity}` : ""}`
         : (ticket.storeCode ?? "—"),
     },
-    { label: "Category", value: cpAgentCategoryLabel(ticket.category) },
-    { label: "Status", value: statusLabel },
-    { label: "Priority", value: ticket.priority },
+    { label: "Catégorie", value: cpAgentCategoryLabel(ticket.category) },
+    { label: "Statut", value: statusLabel },
+    { label: "Priorité", value: ticket.priority },
   ]
 
   return (

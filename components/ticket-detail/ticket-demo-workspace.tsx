@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatPerimeterLabel } from "@/lib/care-operational/perimeter-codes"
 import { cn } from "@/lib/utils"
 import {
   DEMO_DIAGNOSTIC_ITEMS,
@@ -47,7 +48,7 @@ export function TicketDemoWorkspace({ row }: { row: DemoTicketQueueRow }) {
   const meta = demoMetadataBar(row)
   const category = demoCategoryLabel(row.subject)
   const priority = demoPriorityLabel(row.slaState)
-  const perimeterDisplay = row.perimeter
+  const perimeterDisplay = formatPerimeterLabel(row.perimeter)
 
   return (
     <div className="space-y-4">

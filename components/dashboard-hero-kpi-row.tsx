@@ -7,7 +7,7 @@ const SCREENSHOT = {
   sla: "6",
   slaHint: "near breach or overdue",
   escalations: "12",
-  escalationsHint: "N3 pressure",
+  escalationsHint: "AI escalation prediction",
   transfers: "11",
   transfersHint: "cross-perimeter suggestions",
 } as const

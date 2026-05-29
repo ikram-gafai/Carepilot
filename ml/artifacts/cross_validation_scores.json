@@ -1,17 +1,17 @@
 [
   {
     "Model": "Logistic Regression",
-    "Mean Accuracy": 0.8278,
-    "Std Deviation": 0.0057
+    "Mean Accuracy": 0.8179,
+    "Std Deviation": 0.0064
   },
   {
     "Model": "Random Forest",
-    "Mean Accuracy": 0.8503,
-    "Std Deviation": 0.0045
+    "Mean Accuracy": 0.8334,
+    "Std Deviation": 0.0059
   },
   {
     "Model": "XGBoost",
-    "Mean Accuracy": 0.886,
-    "Std Deviation": 0.0047
+    "Mean Accuracy": 0.8712,
+    "Std Deviation": 0.0055
   }
 ]

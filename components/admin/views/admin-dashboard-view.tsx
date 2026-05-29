@@ -1,43 +1,73 @@
 "use client"
 
+import Link from "next/link"
+
+import { AdminDecisionFeedbackPanel } from "@/components/admin/dashboard/admin-decision-feedback-panel"
+import { AdminAiPipelineHealthPanel } from "@/components/admin/dashboard/admin-ai-pipeline-health-panel"
+import { AdminOrchestrationCharts } from "@/components/admin/charts/admin-orchestration-charts"
 import { AdminSupervisionSignalCard } from "@/components/admin/dashboard/admin-supervision-signal-card"
-import { AdminOperationalPressureChart } from "@/components/admin/charts/admin-operational-pressure-chart"
 import { AdminSlaEscalationTrendChart } from "@/components/admin/charts/admin-dashboard-workspace-charts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { AdminDashboardKpi, AdminKpiStatus } from "@/lib/admin/dashboard"
 import type { adminDashboardBundle } from "@/lib/queries/admin"
 import { adminSurfaces } from "@/lib/admin-surface"
+import { ADMIN_SECTION_SUBTITLES } from "@/lib/operational-ui-copy"
 import { cn } from "@/lib/utils"
 
 type Data = Awaited<ReturnType<typeof adminDashboardBundle>>
 
 const cardClass = cn(adminSurfaces.card, "overflow-hidden border-primary/12 shadow-sm")
-const sectionTitle = "text-sm font-semibold tracking-tight text-foreground"
-const sectionSub = "text-[11px] text-muted-foreground"
+const sectionTitle = "text-sm font-medium text-foreground"
 
-const KPI_STATUS_ACCENT: Record<AdminKpiStatus, string> = {
-  healthy: "border-l-primary/80 bg-gradient-to-br from-primary/[0.06] to-card",
-  watch: "border-l-amber-500/80 bg-gradient-to-br from-amber-500/[0.06] to-card",
-  critical: "border-l-destructive/80 bg-gradient-to-br from-destructive/[0.05] to-card",
+const KPI_STATUS_STYLES: Record<AdminKpiStatus, string> = {
+  healthy: "border-border/70 bg-card",
+  watch: "border-amber-500/30 bg-amber-500/[0.03]",
+  critical: "border-destructive/35 bg-destructive/[0.03]",
 }
 
-function ExecutiveKpiCard({ title, kpi }: { title: string; kpi: AdminDashboardKpi }) {
+const KPI_STATUS_DOT: Record<AdminKpiStatus, string> = {
+  healthy: "bg-primary/70",
+  watch: "bg-amber-500",
+  critical: "bg-destructive",
+}
+
+const ADMIN_KPI_ITEMS: { key: keyof Data["kpiStrip"]; label: string }[] = [
+  { key: "openTickets", label: "Actifs" },
+  { key: "slaRisk", label: "SLA" },
+  { key: "transfers", label: "Transferts" },
+  { key: "escalateN3", label: "Escalade" },
+  { key: "suspend", label: "Suspendus" },
+  { key: "aiStatus", label: "Décisions" },
+]
+
+function AdminKpiTile({ label, kpi }: { label: string; kpi: AdminDashboardKpi }) {
   return (
-    <Card className={cn(cardClass, "border-l-[3px]", KPI_STATUS_ACCENT[kpi.status])}>
-      <CardHeader className="space-y-0 px-4 pt-3.5 pb-1">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{title}</div>
-      </CardHeader>
-      <CardContent className="px-4 pb-3.5 pt-0">
-        <p className="text-2xl font-semibold tracking-tight tabular-nums text-foreground">{kpi.value}</p>
-        {kpi.subtitle ? <p className="mt-1 truncate text-[11px] text-muted-foreground">{kpi.subtitle}</p> : null}
-      </CardContent>
-    </Card>
+    <div
+      className={cn(
+        "flex min-h-[4.5rem] flex-col justify-between rounded-xl border px-3.5 py-3 shadow-sm",
+        KPI_STATUS_STYLES[kpi.status],
+      )}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{label}</p>
+        {kpi.status !== "healthy" ? (
+          <span className={cn("size-1.5 shrink-0 rounded-full", KPI_STATUS_DOT[kpi.status])} aria-hidden />
+        ) : null}
+      </div>
+      <p className="text-3xl leading-none font-semibold tabular-nums tracking-tight text-foreground">
+        {kpi.value}
+      </p>
+    </div>
   )
 }
 
+function SectionSubtitle({ children }: { children: string }) {
+  return <p className="mt-0.5 text-[11px] text-muted-foreground">{children}</p>
+}
+
 function fmtTime(d: Date) {
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "short", timeStyle: "short" }).format(d)
+  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeStyle: "short" }).format(d)
 }
 
 function priorityTone(priority: string) {
@@ -48,75 +78,87 @@ function priorityTone(priority: string) {
 }
 
 export function AdminDashboardView({ data }: { data: Data }) {
-  const { kpiStrip, supervision, slaEscalationTrend, operationalPressure, topMagasins, recentTickets } =
-    data
+  const {
+    kpiStrip,
+    decisionFeedback,
+    supervision,
+    decisionDistribution,
+    slaExposure,
+    transferByTarget,
+    slaEscalationTrend,
+    topMagasins,
+    recentTickets,
+    aiPipelineHealth,
+    systemHealth,
+  } = data
+
+  const transferByTargetChart = transferByTarget ?? []
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-5 p-4 pb-8">
-      <section aria-label="Executive KPIs" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        <ExecutiveKpiCard title="Open Tickets" kpi={kpiStrip.openTickets} />
-        <ExecutiveKpiCard title="SLA Risk" kpi={kpiStrip.slaRisk} />
-        <ExecutiveKpiCard title="Transfers" kpi={kpiStrip.transfers} />
-        <ExecutiveKpiCard title="Escalate N3" kpi={kpiStrip.escalateN3} />
-        <ExecutiveKpiCard title="Sync Health" kpi={kpiStrip.syncHealth} />
-        <ExecutiveKpiCard title="AI Status" kpi={kpiStrip.aiStatus} />
+      <section aria-label="KPI opérationnels" className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {ADMIN_KPI_ITEMS.map(({ key, label }) => (
+          <AdminKpiTile key={key} label={label} kpi={kpiStrip[key]} />
+        ))}
       </section>
+
+      <AdminOrchestrationCharts
+        decisionDistribution={decisionDistribution}
+        slaExposure={slaExposure}
+        transferByTarget={transferByTargetChart}
+      />
 
       <section
         aria-label="Supervision"
         className="grid gap-3 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"
       >
         <Card className={cn(cardClass, "border-primary/15")}>
-          <CardHeader className="border-b border-primary/10 px-4 py-3">
-            <CardTitle className={sectionTitle}>SLA &amp; Escalate N3</CardTitle>
-            <p className={sectionSub}>7-day supervision trend</p>
+          <CardHeader className="px-4 py-3">
+            <CardTitle className={sectionTitle}>Tendance SLA et escalade N3</CardTitle>
+            <SectionSubtitle>{ADMIN_SECTION_SUBTITLES.slaTrend}</SectionSubtitle>
           </CardHeader>
           <CardContent className="px-3 pb-3 pt-2">
             <AdminSlaEscalationTrendChart data={slaEscalationTrend} />
           </CardContent>
         </Card>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <AdminSupervisionSignalCard
-            title="Escalate N3"
-            rows={supervision.escalation.rows}
-            tone={supervision.escalation.tone}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <AdminDecisionFeedbackPanel
+            summary={decisionFeedback}
+            tone={supervision.decisionAlignment.tone}
           />
           <AdminSupervisionSignalCard
-            title="Transfers"
+            title="Transferts par cible"
+            subtitle={ADMIN_SECTION_SUBTITLES.transfersByTarget}
             rows={supervision.transfers.rows}
             tone={supervision.transfers.tone}
           />
           <AdminSupervisionSignalCard
-            title="AI Reliability"
-            rows={supervision.aiReliability.rows}
-            tone={supervision.aiReliability.tone}
-          />
-          <AdminSupervisionSignalCard
-            title="Sync Health"
-            rows={supervision.syncHealth.rows}
-            tone={supervision.syncHealth.tone}
+            title="Efficacité KM"
+            subtitle={ADMIN_SECTION_SUBTITLES.kmEffectiveness}
+            rows={supervision.kmEffectiveness.rows}
+            tone={supervision.kmEffectiveness.tone}
           />
         </div>
       </section>
 
-      <section className="grid gap-3 lg:grid-cols-2" aria-label="Stores and recent activity">
+      <section className="grid gap-3 lg:grid-cols-2" aria-label="Magasins et activité récente">
         <Card className={cardClass}>
-          <CardHeader className="border-b border-primary/10 px-4 py-3">
-            <CardTitle className={sectionTitle}>Top Magasins</CardTitle>
-            <p className={sectionSub}>Synchronized ticket volume by store</p>
+          <CardHeader className="px-4 py-3">
+            <CardTitle className={sectionTitle}>Top magasins</CardTitle>
+            <SectionSubtitle>{ADMIN_SECTION_SUBTITLES.topStores}</SectionSubtitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow className="border-border/60 hover:bg-transparent">
-                  {["Store", "City", "Tickets", "Open", "SLA risk"].map((h) => (
+                  {["Magasin", "Ville", "Tickets", "Ouverts", "Risque SLA"].map((h) => (
                     <TableHead
                       key={h}
                       className={cn(
-                        "h-9 bg-muted/30 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground",
-                        h !== "Store" && h !== "City" && "text-right",
-                        h === "Store" && "pl-4",
+                        "h-9 px-3 text-xs font-medium text-muted-foreground",
+                        h !== "Magasin" && h !== "Ville" && "text-right",
+                        h === "Magasin" && "pl-4",
                       )}
                     >
                       {h}
@@ -128,7 +170,7 @@ export function AdminDashboardView({ data }: { data: Data }) {
                 {topMagasins.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="py-8 text-center text-xs text-muted-foreground">
-                      No synchronized store data yet.
+                      Aucune donnée magasin synchronisée pour le moment.
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -156,17 +198,18 @@ export function AdminDashboardView({ data }: { data: Data }) {
         </Card>
 
         <Card className={cardClass}>
-          <CardHeader className="border-b border-primary/10 px-4 py-3">
-            <CardTitle className={sectionTitle}>Recent Tickets</CardTitle>
-            <p className={sectionSub}>Enterprise operations queue</p>
+          <CardHeader className="px-4 py-3">
+            <CardTitle className={sectionTitle}>Tickets récents</CardTitle>
+            <SectionSubtitle>{ADMIN_SECTION_SUBTITLES.recentTickets}</SectionSubtitle>
           </CardHeader>
           <CardContent className="divide-y divide-border/50 p-0">
             {recentTickets.length === 0 ? (
-              <p className="px-4 py-8 text-center text-xs text-muted-foreground">No recent tickets.</p>
+              <p className="px-4 py-8 text-center text-xs text-muted-foreground">Aucun ticket récent.</p>
             ) : (
               recentTickets.map((t) => (
-                <div
+                <Link
                   key={t.careId}
+                  href={`/agent/tickets/${t.id}`}
                   className="group flex items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-primary/[0.03]"
                 >
                   <div className="min-w-0 flex-1">
@@ -174,33 +217,38 @@ export function AdminDashboardView({ data }: { data: Data }) {
                       {t.title}
                     </p>
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      {t.storeName}
+                      {t.careId}
+                      {t.storeName ? ` · ${t.storeName}` : ""}
                       {t.storeCity ? ` · ${t.storeCity}` : ""}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className={cn("text-[10px] font-semibold uppercase", priorityTone(t.priority))}>
+                    <p className={cn("text-xs font-medium", priorityTone(t.priority))}>
                       {t.priority}
                     </p>
                     <p className="text-[10px] text-muted-foreground/80">{fmtTime(t.updatedAt)}</p>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </CardContent>
         </Card>
       </section>
 
-      <section aria-label="Operational pressure">
-        <Card className={cardClass}>
-          <CardHeader className="border-b border-primary/10 px-4 py-3">
-            <CardTitle className={sectionTitle}>Operational Pressure</CardTitle>
-            <p className={sectionSub}>Open workload and SLA risk by perimeter</p>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 pt-3">
-            <AdminOperationalPressureChart data={operationalPressure} />
-          </CardContent>
-        </Card>
+      <section aria-label="Surveillance IA et synchronisation" className="grid gap-3 lg:grid-cols-2">
+        <AdminAiPipelineHealthPanel rows={aiPipelineHealth.rows} />
+        <AdminSupervisionSignalCard
+          title="Synchronisation CARE"
+          subtitle={ADMIN_SECTION_SUBTITLES.careSync}
+          rows={systemHealth.sync.rows}
+          tone={
+            systemHealth.sync.tone === "success"
+              ? "success"
+              : systemHealth.sync.tone === "critical"
+                ? "critical"
+                : "primary"
+          }
+        />
       </section>
     </div>
   )

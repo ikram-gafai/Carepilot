@@ -1,4 +1,8 @@
-import { buildStoreSlotCodes, CARREFOUR_OPERATIONAL_STORES } from "@/lib/data/carrefour-stores"
+import { plannedOperationalOutcomeForCareId } from "@/lib/care-operational/catalog-operational-outcome"
+import {
+  buildStoreSlotCodes,
+  CARREFOUR_OPERATIONAL_STORES,
+} from "@/lib/data/carrefour-stores"
 import { SUPPORT_AGENTS } from "@/lib/data/support-agents"
 
 import {
@@ -8,7 +12,13 @@ import {
   type OperationalTicketCatalogEntry,
 } from "@/lib/care-operational/ticket-catalog"
 
-/** Stable 70-ticket CARE source catalog for operational synchronization windows. */
+import {
+  buildSlaTimingForBucket,
+  resolveTtrTargetHours,
+  slaExposureBucketForIndex,
+} from "@/lib/care-operational/sla-exposure"
+
+export { buildSlaTimingForBucket, slaExposureBucketForIndex, resolveTtrTargetHours }
 
 export type OperationalTicketSeed = {
   careTicketId: string
@@ -31,6 +41,7 @@ export type OperationalTicketSeed = {
   aiRecommendedAction: string | null
   aiConfidence: number | null
   aiReason: string | null
+  /** @deprecated Use buildSlaTimingForBucket at seed time */
   slaHoursFromNow: number
 }
 
@@ -41,24 +52,28 @@ const STORE_SLOT_CODES: string[] = buildStoreSlotCodes()
 
 const STORE_BY_CODE = new Map(CARREFOUR_OPERATIONAL_STORES.map((s) => [s.storeCode, s]))
 
-function slaHoursForPriority(priority: OperationalTicketCatalogEntry["priority"]): number {
+function mapCatalogPriorityToP(priority: OperationalTicketCatalogEntry["priority"]): string {
   switch (priority) {
     case "critical":
-      return 2
+      return "P1"
     case "high":
-      return 6
+      return "P2"
     case "medium":
-      return 24
+      return "P3"
     case "low":
     default:
-      return 48
+      return "P4"
   }
+}
+
+function slaHoursForPriority(priority: OperationalTicketCatalogEntry["priority"]): number {
+  return resolveTtrTargetHours(mapCatalogPriorityToP(priority))
 }
 
 function enrichDescription(entry: OperationalTicketCatalogEntry, storeCode: string): string {
   const store = STORE_BY_CODE.get(storeCode)
   if (!store) return entry.description
-  return `${entry.description} Store: ${store.storeName}, ${store.city}.`
+  return `${entry.description} Magasin : ${store.storeName}, ${store.city}.`
 }
 
 export function buildOperationalTicketSeeds(): OperationalTicketSeed[] {
@@ -71,6 +86,7 @@ export function buildOperationalTicketSeeds(): OperationalTicketSeed[] {
     const i = index + 1
     const careTicketId = `CARE-OP-${String(i).padStart(5, "0")}`
     const storeCode = STORE_SLOT_CODES[index]!
+    const plan = plannedOperationalOutcomeForCareId(careTicketId)
     return {
       careTicketId,
       reference: careTicketId,
@@ -85,10 +101,10 @@ export function buildOperationalTicketSeeds(): OperationalTicketSeed[] {
       assignedGroup: "Carrefour Support",
       assignedAgent: SUPPORT_AGENTS[index % SUPPORT_AGENTS.length]!.email,
       syncBatch: 1 as const,
-      escalationRequired: false,
-      transferRequired: false,
-      targetPerimeter: null,
-      kmApplicable: null,
+      escalationRequired: plan?.outcome === "ESCALATE_N3",
+      transferRequired: plan?.outcome === "TRANSFER",
+      targetPerimeter: plan?.outcome === "TRANSFER" ? perimeterCodeForCategory(entry.category) : null,
+      kmApplicable: plan?.kmCode ?? null,
       aiRecommendedAction: null,
       aiConfidence: null,
       aiReason: null,
@@ -100,42 +116,42 @@ export function buildOperationalTicketSeeds(): OperationalTicketSeed[] {
 export const OPERATIONAL_KM_SEED = [
   {
     kmCode: "KM-OP-001",
-    title: "VLP lane recovery procedure",
-    perimeter: "FO_VLP",
+    title: "Procédure reprise caisse VLP",
+    perimeter: "FO",
     category: "CHECKOUT",
-    content: "Isolate lane, verify session state, restart VLP services, validate basket flow.",
+    content: "Isoler la caisse, vérifier l'état de session, redémarrer les services VLP, valider le flux panier.",
     tags: "vlp,checkout,lane",
   },
   {
     kmCode: "KM-OP-002",
-    title: "Payment terminal diagnostic",
+    title: "Diagnostic terminal de paiement",
     perimeter: "MONETIQUE",
     category: "PAYMENT",
-    content: "Verify acquirer link, reboot terminal, capture error trace, escalate if persistent.",
+    content: "Vérifier la liaison acquéreur, redémarrer le terminal, capturer la trace erreur, escalader si persistant.",
     tags: "payment,terminal",
   },
   {
     kmCode: "KM-OP-003",
-    title: "Store network path verification",
+    title: "Vérification chemin réseau magasin",
     perimeter: "RESEAU",
     category: "NETWORK",
-    content: "Check gateway, VLAN, DNS resolution, and physical link at lane rack.",
+    content: "Contrôler passerelle, VLAN, résolution DNS et lien physique sur le rack caisse.",
     tags: "network,vlan",
   },
   {
     kmCode: "KM-OP-004",
-    title: "Peripheral hardware swap",
+    title: "Remplacement périphérique matériel",
     perimeter: "MATERIEL",
     category: "HARDWARE",
-    content: "Validate cable and hub, replace scanner or printer module, run acceptance test.",
+    content: "Valider câble et hub, remplacer module scanner ou imprimante, exécuter test de recette.",
     tags: "hardware,peripheral",
   },
   {
     kmCode: "KM-OP-005",
-    title: "Loyalty entitlement sync",
+    title: "Synchronisation avantages fidélité",
     perimeter: "FIDELITE",
     category: "LOYALTY",
-    content: "Review loyalty batch window, re-run entitlement sync, confirm customer balance.",
+    content: "Revoir la fenêtre batch fidélité, relancer la synchro avantages, confirmer le solde client.",
     tags: "loyalty,sync",
   },
 ] as const

@@ -17,7 +17,7 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
   {
     ticketId: "INC-2025-0148",
     subject: "Printer not printing on lane 25",
-    perimeter: "FO / VLP",
+    perimeter: "FO",
     slaState: "breached",
     predictedOutcome: "Continue N2 with KM",
     confidence: 82,
@@ -41,7 +41,7 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
   {
     ticketId: "INC-2025-0146",
     subject: "Cash drawer not opening",
-    perimeter: "FO / VLP",
+    perimeter: "FO",
     slaState: "at-risk",
     predictedOutcome: "Transfer Hardware",
     confidence: 77,
@@ -64,7 +64,7 @@ export const DEMO_TICKETS_QUEUE: DemoTicketQueueRow[] = [
   {
     ticketId: "INC-2025-0144",
     subject: "Receipt not printing",
-    perimeter: "FO / VLP",
+    perimeter: "FO",
     slaState: "on-track",
     predictedOutcome: "Escalate N3",
     confidence: 85,

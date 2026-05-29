@@ -1,86 +1,85 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-import { StatusBadge } from "@/components/agent/ui/status-badge"
 import { PriorityBadge } from "@/components/agent/ui/priority-badge"
+import { QueueSlaBadge } from "@/components/agent/ui/queue-sla-badge"
+import { StatusBadge } from "@/components/agent/ui/status-badge"
+import { SuggestedDecisionBadge } from "@/components/agent/ui/suggested-decision-badge"
 import { EmptyState } from "@/components/agent/ui/empty-state"
-import { SlaIndicator } from "@/components/agent/ui/sla-indicator"
+import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { cpAgentSlaLabel } from "@/lib/queries/cp-agent"
-import type { CpAgentTicketListRow } from "@/lib/queries/cp-agent"
 import { agentTicketDisplayTitle } from "@/lib/agent-ticket-display-title"
-import { cpAgentCategoryLabel } from "@/lib/cp-agent-legacy-copy-en"
+import type { AgentTicketListItem } from "@/lib/carepilot-api/tickets"
 
-function formatDt(d: Date | null) {
-  if (!d) return "—"
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(d)
-}
+export function TicketTable({ rows }: { rows: AgentTicketListItem[] }) {
+  const router = useRouter()
 
-export function TicketTable({ rows }: { rows: CpAgentTicketListRow[] }) {
   if (!rows.length) {
-    return <EmptyState title="No tickets" />
+    return <EmptyState title="Aucun ticket en file" />
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-zinc-200 shadow-sm dark:border-zinc-800">
+    <div className="overflow-hidden rounded-lg border border-border/80 bg-card">
       <Table>
-        <TableHeader className="sticky top-0 z-20 bg-zinc-50/95 backdrop-blur dark:bg-zinc-900/95">
-          <TableRow className="border-zinc-100 hover:bg-transparent dark:border-zinc-800">
-            <TableHead className="h-10 w-[112px] text-[11px] font-semibold uppercase tracking-wide text-zinc-500">ID</TableHead>
-            <TableHead className="h-10 min-w-[240px] text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Title</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Store</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Category</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Status</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Priority</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">SLA / TTR</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Assigned</TableHead>
-            <TableHead className="h-10 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Updated</TableHead>
+        <TableHeader className="sticky top-0 z-20 bg-muted/40 backdrop-blur">
+          <TableRow className="border-border/70 hover:bg-transparent">
+            <TableHead className="h-9 w-[120px] text-xs font-medium text-muted-foreground">
+              CARE ID
+            </TableHead>
+            <TableHead className="h-9 min-w-[240px] text-xs font-medium text-muted-foreground">
+              Titre
+            </TableHead>
+            <TableHead className="h-9 w-[72px] text-xs font-medium text-muted-foreground">
+              Priorité
+            </TableHead>
+            <TableHead className="h-9 w-[96px] text-xs font-medium text-muted-foreground">
+              SLA
+            </TableHead>
+            <TableHead className="h-9 w-[108px] text-xs font-medium text-muted-foreground">
+              Action
+            </TableHead>
+            <TableHead className="h-9 w-[96px] text-xs font-medium text-muted-foreground">
+              Statut
+            </TableHead>
+            <TableHead className="h-9 w-[104px] text-right text-xs font-medium text-muted-foreground">
+              Ouvrir
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((t) => {
-            const sla = cpAgentSlaLabel(t.slaDueAt, t.status)
-            const problemStatement = t.description.replace(/\s+/g, " ").trim()
-            return (
-              <TableRow
-                key={t.id}
-                className="cursor-pointer border-zinc-100 transition-colors hover:bg-primary/[0.05] dark:border-zinc-800/80 dark:hover:bg-primary/[0.08]"
-              >
-                <TableCell className="align-top py-2.5 font-mono text-xs">
-                  <Link href={`/agent/tickets/${t.id}`} className="text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100">
-                    {t.careId}
-                  </Link>
-                </TableCell>
-                <TableCell className="max-w-[min(420px,44vw)] align-top py-2.5">
-                  <Link href={`/agent/tickets/${t.id}`} className="block text-sm font-medium leading-snug text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-50">
-                    {agentTicketDisplayTitle(t.title)}
-                  </Link>
-                  {problemStatement ? (
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-zinc-500 dark:text-zinc-400">{problemStatement}</p>
-                  ) : null}
-                </TableCell>
-                <TableCell className="align-top py-2.5 text-xs text-zinc-600 dark:text-zinc-300">
-                      {t.storeName ?? t.storeCode ?? "—"}
-                    </TableCell>
-                <TableCell className="align-top py-2.5 text-xs text-zinc-600 dark:text-zinc-300">
-                  {cpAgentCategoryLabel(t.category)}
-                </TableCell>
-                <TableCell className="align-top py-2.5">
-                  <StatusBadge status={t.status} />
-                </TableCell>
-                <TableCell className="align-top py-2.5">
-                  <PriorityBadge priority={t.priority} />
-                </TableCell>
-                <TableCell className="align-top py-2.5">
-                  <SlaIndicator label={sla.label} tone={sla.tone} />
-                </TableCell>
-                <TableCell className="align-top py-2.5 text-xs text-zinc-600 dark:text-zinc-300">{t.assigneeName ?? "—"}</TableCell>
-                <TableCell className="align-top py-2.5 text-xs tabular-nums text-zinc-600 dark:text-zinc-300">{formatDt(t.updatedAt)}</TableCell>
-              </TableRow>
-            )
-          })}
+          {rows.map((t) => (
+            <TableRow
+              key={t.id}
+              className="cursor-pointer border-border/60 transition-colors hover:bg-primary/[0.04] dark:hover:bg-primary/[0.06]"
+              onClick={() => router.push(`/agent/tickets/${t.id}`)}
+            >
+              <TableCell className="py-2 font-mono text-xs text-foreground">{t.careId}</TableCell>
+              <TableCell className="max-w-[min(420px,40vw)] py-2">
+                <span className="line-clamp-1 text-sm font-medium text-foreground">
+                  {agentTicketDisplayTitle(t.title)}
+                </span>
+              </TableCell>
+              <TableCell className="py-2">
+                <PriorityBadge priority={t.predictedPriority ?? t.priority} />
+              </TableCell>
+              <TableCell className="py-2">
+                <QueueSlaBadge slaLabel={t.slaLabel} />
+              </TableCell>
+              <TableCell className="py-2">
+                <SuggestedDecisionBadge label={t.suggestedActionLabel} />
+              </TableCell>
+              <TableCell className="py-2">
+                <StatusBadge status={t.status} />
+              </TableCell>
+              <TableCell className="py-2 text-right" onClick={(e) => e.stopPropagation()}>
+                <Button variant="outline" size="sm" className="h-7 px-2.5 text-xs" asChild>
+                  <Link href={`/agent/tickets/${t.id}`}>Investiguer</Link>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>

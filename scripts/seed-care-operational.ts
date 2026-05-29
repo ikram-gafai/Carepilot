@@ -5,8 +5,10 @@ import "./load-env"
 
 import {
   buildOperationalTicketSeeds,
+  buildSlaTimingForBucket,
   CARREFOUR_OPERATIONAL_STORES,
   OPERATIONAL_KM_SEED,
+  slaExposureBucketForIndex,
 } from "@/lib/care-operational/seed-data"
 import { getDb, getSql } from "@/lib/db"
 import {
@@ -70,9 +72,12 @@ async function main() {
       throw new Error(`Store not found for ticket seed: ${t.storeCode}`)
     }
 
-    const created = new Date(now - (70 - Number(t.careTicketId.slice(-5))) * 3600_000)
-    const updated = new Date(created.getTime() + 1800_000)
-    const slaDue = new Date(now + t.slaHoursFromNow * 3600_000)
+    const pPriority = t.priority === "critical" ? "P1" : t.priority === "high" ? "P2" : t.priority === "medium" ? "P3" : "P4"
+    const bucket = slaExposureBucketForIndex(idx, seeds.length)
+    const timing = buildSlaTimingForBucket(pPriority, bucket, idx, now)
+    const created = timing.createdAt
+    const updated = timing.updatedAt
+    const slaDue = timing.slaDueAt
 
     const [row] = await db
       .insert(careSourceTickets)

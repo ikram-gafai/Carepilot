@@ -8,13 +8,13 @@ The benchmark uses the isolated `ml_training.historical_tickets` dataset. It is 
 
 ## 3. Dataset Statistics
 - Total tickets: 14000
-- Historical actions: 34856
-- Historical resolutions: 10356
+- Historical actions: 34787
+- Historical resolutions: 10332
 - KM articles: 92
 - Train / validation / test: 9800 / 2100 / 2100
 - Positive class rate: 40.0%
-- Missing description rate: 8.1%
-- Missing resolution time rate: 26.03%
+- Missing description rate: 8.16%
+- Missing resolution time rate: 26.2%
 
 ### Class Distribution
 ![Class Distribution](../../../plots/class_distribution.png)
@@ -62,27 +62,27 @@ Cross-validation is computed on the training split using accuracy as the scoring
 
 | Model | Mean Accuracy | Std Deviation |
 | --- | --- | --- |
-| Logistic Regression | 0.828 | 0.006 |
-| Random Forest | 0.850 | 0.004 |
-| XGBoost | 0.886 | 0.005 |
+| Logistic Regression | 0.818 | 0.006 |
+| Random Forest | 0.833 | 0.006 |
+| XGBoost | 0.871 | 0.005 |
 
 ## 9. Benchmark Results
 ![Escalation Benchmark Results](../../../plots/03_escalation_benchmark_results_table.png)
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 | --- | --- | --- | --- | --- | --- |
-| Logistic Regression | 0.817 | 0.875 | 0.633 | 0.735 | 0.927 |
-| Random Forest | 0.852 | 0.859 | 0.755 | 0.803 | 0.931 |
-| XGBoost | 0.873 | 0.806 | 0.899 | 0.850 | 0.954 |
+| Logistic Regression | 0.821 | 0.860 | 0.658 | 0.746 | 0.906 |
+| Random Forest | 0.841 | 0.854 | 0.725 | 0.784 | 0.927 |
+| XGBoost | 0.880 | 0.831 | 0.880 | 0.855 | 0.957 |
 
 ![Model Comparison](../../../plots/model_comparison.png)
 
 ### Runtime Metrics
 | Model | Training Time (s) | Inference Time (ms/row) |
 | --- | --- | --- |
-| Logistic Regression | 0.2219 | 0.0325 |
-| Random Forest | 0.3634 | 0.0658 |
-| XGBoost | 2.2218 | 0.0739 |
+| Logistic Regression | 0.2448 | 0.0356 |
+| Random Forest | 0.3701 | 0.0688 |
+| XGBoost | 3.0174 | 0.0794 |
 
 ## 10. Confusion Matrix Interpretation
 The confusion matrices show how each model trades off false escalations and missed escalations. For enterprise support, false negatives are operationally important because missed escalations can increase SLA risk. False positives also matter because unnecessary N3 escalation increases support cost.
@@ -110,20 +110,20 @@ The per-class classification report shows the precision, recall, and F1-score fo
 ### Logistic Regression
 | Class | Precision | Recall | F1-score | Support |
 | --- | --- | --- | --- | --- |
-| No escalation | 0.794 | 0.940 | 0.860 | 1260 |
-| Escalation | 0.875 | 0.633 | 0.735 | 840 |
+| No escalation | 0.803 | 0.929 | 0.861 | 1260 |
+| Escalation | 0.860 | 0.658 | 0.746 | 840 |
 
 ### Random Forest
 | Class | Precision | Recall | F1-score | Support |
 | --- | --- | --- | --- | --- |
-| No escalation | 0.849 | 0.917 | 0.882 | 1260 |
-| Escalation | 0.859 | 0.755 | 0.804 | 840 |
+| No escalation | 0.833 | 0.917 | 0.873 | 1260 |
+| Escalation | 0.854 | 0.725 | 0.784 | 840 |
 
 ### XGBoost
 | Class | Precision | Recall | F1-score | Support |
 | --- | --- | --- | --- | --- |
-| No escalation | 0.927 | 0.856 | 0.890 | 1260 |
-| Escalation | 0.806 | 0.899 | 0.850 | 840 |
+| No escalation | 0.917 | 0.881 | 0.898 | 1260 |
+| Escalation | 0.831 | 0.880 | 0.855 | 840 |
 
 
 ## 12. ROC Curve Interpretation

@@ -1,7 +1,7 @@
-/** Short, shared UI copy — avoid repeating long setup text on every page. */
+/** Messages UI partagés — français. */
 
-export const DB_UNAVAILABLE_TITLE = "Database unavailable"
+export const DB_UNAVAILABLE_TITLE = "Base de données indisponible"
 
 export function dbUnavailableDescription(reason: "offline" | "unavailable"): string {
-  return reason === "offline" ? "Configure DATABASE_URL." : "Run database setup and seed."
+  return reason === "offline" ? "Configurez DATABASE_URL." : "Exécutez la configuration et le seed de la base."
 }

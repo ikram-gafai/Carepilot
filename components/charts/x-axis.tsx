@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useChart } from "./chart-context";
@@ -127,8 +128,6 @@ export function XAxis({
     return null;
   }
 
-  // Dynamic import to avoid SSR issues
-  const { createPortal } = require("react-dom") as typeof import("react-dom");
 
   return createPortal(
     <div className="pointer-events-none absolute inset-0">

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
 import type { AdminRecommendationsData } from "@/lib/admin/recommendation-audit-types"
 import {
@@ -163,15 +163,16 @@ export function AdminRecommendationsView({ data }: { data: Data }) {
     })
   }, [rows, decisionFilter, alignmentFilter])
 
-  useEffect(() => {
+  // When the filtered rows change, keep the selection inside them (adjusted during render).
+  const [selectionSyncedRows, setSelectionSyncedRows] = useState<typeof filteredRows | null>(null)
+  if (selectionSyncedRows !== filteredRows) {
+    setSelectionSyncedRows(filteredRows)
     if (filteredRows.length === 0) {
-      setSelectedId(null)
-      return
-    }
-    if (selectedId == null || !filteredRows.some((r) => r.ticketId === selectedId)) {
+      if (selectedId !== null) setSelectedId(null)
+    } else if (selectedId == null || !filteredRows.some((r) => r.ticketId === selectedId)) {
       setSelectedId(filteredRows[0]!.ticketId)
     }
-  }, [filteredRows])
+  }
 
   const visibleRows = filteredRows.slice(0, TABLE_ROW_LIMIT)
   const truncated = filteredRows.length > TABLE_ROW_LIMIT
@@ -204,7 +205,7 @@ export function AdminRecommendationsView({ data }: { data: Data }) {
                   <SelectItem value="suspend">Suspendus</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={alignmentFilter} onValueChange={setAlignmentFilter}>
+              <Select value={alignmentFilter} onValueChange={(v) => setAlignmentFilter(v as typeof alignmentFilter)}>
                 <SelectTrigger size="sm" className="h-8 w-[10rem] border-border/60 text-xs shadow-none">
                   <SelectValue placeholder="Validation" />
                 </SelectTrigger>

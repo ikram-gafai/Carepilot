@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import { useLocalStorageFlag } from "@/hooks/use-local-storage-flag"
+
 const COMPACT_KEY = "carepilot-agent-compact"
 const NOTIFY_KEY = "carepilot-agent-notify-pref"
 
@@ -14,24 +16,13 @@ type AgentPreferencesContextValue = {
 
 const AgentPreferencesContext = React.createContext<AgentPreferencesContextValue | null>(null)
 
+const parseCompact = (raw: string | null) => raw === "1"
+const parseNotify = (raw: string | null) => raw !== "0"
+
 export function AgentPreferencesProvider({ children }: { children: React.ReactNode }) {
-  const [compact, setCompactState] = React.useState(false)
-  const [notifyEnabled, setNotifyEnabledState] = React.useState(true)
-
-  React.useEffect(() => {
-    setCompactState(localStorage.getItem(COMPACT_KEY) === "1")
-    setNotifyEnabledState(localStorage.getItem(NOTIFY_KEY) !== "0")
-  }, [])
-
-  const setCompact = React.useCallback((value: boolean) => {
-    setCompactState(value)
-    localStorage.setItem(COMPACT_KEY, value ? "1" : "0")
-  }, [])
-
-  const setNotifyEnabled = React.useCallback((value: boolean) => {
-    setNotifyEnabledState(value)
-    localStorage.setItem(NOTIFY_KEY, value ? "1" : "0")
-  }, [])
+  // Server render and hydration use the defaults; stored values apply right after hydration.
+  const [compact, setCompact] = useLocalStorageFlag(COMPACT_KEY, parseCompact, false)
+  const [notifyEnabled, setNotifyEnabled] = useLocalStorageFlag(NOTIFY_KEY, parseNotify, true)
 
   const value = React.useMemo(
     () => ({ compact, setCompact, notifyEnabled, setNotifyEnabled }),

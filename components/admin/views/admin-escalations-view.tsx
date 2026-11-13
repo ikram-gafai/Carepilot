@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Search } from "lucide-react"
 
 import type { adminEscalations } from "@/lib/queries/admin"
@@ -153,15 +153,16 @@ export function AdminEscalationsView({ data }: { data: Data }) {
     })
   }, [rows, reasonFilter, categoryFilter, search])
 
-  useEffect(() => {
+  // When the filtered rows change, keep the selection inside them (adjusted during render).
+  const [selectionSyncedRows, setSelectionSyncedRows] = useState<typeof filteredRows | null>(null)
+  if (selectionSyncedRows !== filteredRows) {
+    setSelectionSyncedRows(filteredRows)
     if (filteredRows.length === 0) {
-      setSelectedId(null)
-      return
-    }
-    if (selectedId == null || !filteredRows.some((r) => r.ticketId === selectedId)) {
+      if (selectedId !== null) setSelectedId(null)
+    } else if (selectedId == null || !filteredRows.some((r) => r.ticketId === selectedId)) {
       setSelectedId(filteredRows[0]!.ticketId)
     }
-  }, [filteredRows])
+  }
 
   const visibleRows = filteredRows.slice(0, TABLE_ROW_LIMIT)
   const truncated = filteredRows.length > TABLE_ROW_LIMIT

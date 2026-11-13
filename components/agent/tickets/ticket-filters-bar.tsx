@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useState, useTransition } from "react"
+import { useMemo, useState, useTransition } from "react"
 import { Search } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
@@ -46,9 +46,12 @@ export function TicketFiltersBar() {
   const fromUrl = useMemo(() => readFilters(sp), [sp])
   const [q, setQ] = useState(fromUrl.q)
 
-  useEffect(() => {
+  // Follow the URL when it changes (e.g. back/forward), adjusted during render.
+  const [syncedUrlQ, setSyncedUrlQ] = useState(fromUrl.q)
+  if (syncedUrlQ !== fromUrl.q) {
+    setSyncedUrlQ(fromUrl.q)
     setQ(fromUrl.q)
-  }, [fromUrl.q])
+  }
 
   function navigate(next: Partial<ReturnType<typeof readFilters>>) {
     const merged = { ...fromUrl, ...next }

@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { motion, useSpring } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { chartCssVars, useChart } from "../chart-context";
@@ -142,8 +143,6 @@ export function ChartTooltip({
     return null;
   }
 
-  // Dynamic import to avoid SSR issues
-  const { createPortal } = require("react-dom") as typeof import("react-dom");
 
   const tooltipContent = (
     <>

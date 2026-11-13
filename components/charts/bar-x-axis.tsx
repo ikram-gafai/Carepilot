@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -133,8 +134,6 @@ export function BarXAxis({
     return null;
   }
 
-  // Dynamic import to avoid SSR issues
-  const { createPortal } = require("react-dom") as typeof import("react-dom");
 
   return createPortal(
     <div className="pointer-events-none absolute inset-0">

@@ -3,9 +3,8 @@
 import { curveMonotoneX } from "@visx/curve";
 import { AreaClosed, LinePath } from "@visx/shape";
 
-// CurveFactory type - simplified version compatible with visx
-// biome-ignore lint/suspicious/noExplicitAny: d3 curve factory type
-type CurveFactory = any;
+// d3 CurveFactory (every @visx/curve export has this type)
+type CurveFactory = typeof curveMonotoneX;
 
 import { motion, useMotionTemplate, useSpring } from "motion/react";
 import {
@@ -74,15 +73,8 @@ export function Area({
 
   // Unique IDs for this area
   const uniqueId = useId();
-  const gradientId = useMemo(
-    () => `area-gradient-${dataKey}-${Math.random().toString(36).slice(2, 9)}`,
-    [dataKey]
-  );
-  const strokeGradientId = useMemo(
-    () =>
-      `area-stroke-gradient-${dataKey}-${Math.random().toString(36).slice(2, 9)}`,
-    [dataKey]
-  );
+  const gradientId = `area-gradient-${dataKey}-${uniqueId}`;
+  const strokeGradientId = `area-stroke-gradient-${dataKey}-${uniqueId}`;
   const edgeMaskId = `area-edge-mask-${dataKey}-${uniqueId}`;
   const edgeGradientId = `${edgeMaskId}-gradient`;
 

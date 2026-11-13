@@ -78,7 +78,7 @@ export function resolveApplicableKm(input: {
     CATEGORY_KM[input.category as OperationalTicketCategory] ??
     CATEGORY_KM[(input.category ?? "").toUpperCase()]
   if (code) {
-    const seed = KM_BY_CODE.get(code)
+    const seed = KM_BY_CODE.get(code as Parameters<typeof KM_BY_CODE.get>[0])
     if (seed) {
       return {
         hasKm: true,

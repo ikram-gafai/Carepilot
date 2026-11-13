@@ -254,9 +254,9 @@ export function buildAlignedDecisionSignals(input: {
   predictedPriority?: string | null
   priorityConfidence?: number | null
 }): OperationalRiskSignal[] {
-  let escScore = SIGNAL_SCORE.LOW
-  let trfScore = SIGNAL_SCORE.LOW
-  let missingScore = SIGNAL_SCORE.LOW
+  let escScore: number = SIGNAL_SCORE.LOW
+  let trfScore: number = SIGNAL_SCORE.LOW
+  let missingScore: number = SIGNAL_SCORE.LOW
 
   switch (input.decision) {
     case "RESOLVE":

@@ -106,6 +106,7 @@ export function plannedOperationalOutcomeForCareId(
 
 export function summarizePlannedDistribution(): Record<OperationalDecision, number> {
   const counts: Record<OperationalDecision, number> = {
+    REQUEST_INFORMATION: 0,
     RESOLVE: 0,
     ESCALATE_N3: 0,
     TRANSFER: 0,

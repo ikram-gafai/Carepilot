@@ -3,12 +3,11 @@
 import { curveNatural } from "@visx/curve";
 import { LinePath } from "@visx/shape";
 
-// CurveFactory type - simplified version compatible with visx
-// biome-ignore lint/suspicious/noExplicitAny: d3 curve factory type
-type CurveFactory = any;
+// d3 CurveFactory (every @visx/curve export has this type)
+type CurveFactory = typeof curveNatural;
 
 import { motion, useMotionTemplate, useSpring } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { chartCssVars, useChart } from "./chart-context";
 
 export interface LineProps {
@@ -55,10 +54,8 @@ export function Line({
   const [clipWidth, setClipWidth] = useState(0);
 
   // Unique gradient ID for this line
-  const gradientId = useMemo(
-    () => `line-gradient-${dataKey}-${Math.random().toString(36).slice(2, 9)}`,
-    [dataKey]
-  );
+  const uniqueId = useId();
+  const gradientId = `line-gradient-${dataKey}-${uniqueId}`;
 
   // Measure path length and trigger animation
   useEffect(() => {

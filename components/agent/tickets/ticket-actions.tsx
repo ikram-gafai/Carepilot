@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useState, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
 import { submitCpAgentAiFeedback, submitCpAgentTicketAction } from "@/app/agent/tickets/[id]/actions"
@@ -237,11 +237,14 @@ export function AIFeedbackPanel({
   const [pending, start] = useTransition()
   const router = useRouter()
 
-  useEffect(() => {
+  // Reset the feedback form when another ticket is shown (adjusted during render).
+  const [formTicketId, setFormTicketId] = useState(ticketId)
+  if (formTicketId !== ticketId) {
+    setFormTicketId(ticketId)
     setHelpful("unset")
     setRating("")
     setComment("")
-  }, [ticketId])
+  }
 
   function submit() {
     start(async () => {

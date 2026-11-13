@@ -78,23 +78,31 @@ export function RunbooksWorkspace({
     [runbooks, q],
   )
 
-  React.useEffect(() => {
-    if (!initialKm?.trim() || runbooks.length === 0) return
-    const match = findRunbookByKmCode(runbooks, initialKm)
-    if (!match) return
-    setSelectedId(match.id)
-  }, [initialKm, runbooks])
-
-  React.useEffect(() => {
-    if (filtered.length === 0) {
-      setSelectedId(null)
-      return
+  // Selection sync, adjusted during render when its inputs change (previously two effects, same order):
+  // 1) an initial KM code selects its runbook; 2) the selection is kept inside the filtered list.
+  const [syncedInputs, setSyncedInputs] = React.useState<{
+    initialKm: string | null | undefined
+    runbooks: EnrichedRunbook[]
+    filtered: EnrichedRunbook[]
+  } | null>(null)
+  if (
+    syncedInputs === null ||
+    syncedInputs.initialKm !== initialKm ||
+    syncedInputs.runbooks !== runbooks ||
+    syncedInputs.filtered !== filtered
+  ) {
+    let next = selectedId
+    if (syncedInputs === null || syncedInputs.initialKm !== initialKm || syncedInputs.runbooks !== runbooks) {
+      const match = initialKm?.trim() && runbooks.length > 0 ? findRunbookByKmCode(runbooks, initialKm) : null
+      if (match) next = match.id
     }
-    setSelectedId((prev) => {
-      if (prev != null && filtered.some((r) => r.id === prev)) return prev
-      return filtered[0]!.id
-    })
-  }, [filtered])
+    if (syncedInputs === null || syncedInputs.filtered !== filtered) {
+      if (filtered.length === 0) next = null
+      else if (next == null || !filtered.some((r) => r.id === next)) next = filtered[0]!.id
+    }
+    setSyncedInputs({ initialKm, runbooks, filtered })
+    if (next !== selectedId) setSelectedId(next)
+  }
 
   const selected = selectedId != null ? runbooks.find((r) => r.id === selectedId) ?? null : null
 

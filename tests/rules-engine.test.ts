@@ -32,7 +32,7 @@ describe("suggestEscalationTransfer", () => {
     expect(out.blockingRules.some((b) => b.includes("KM"))).toBe(true)
   })
 
-  test("KM applied + similar tickets often N3 → review", () => {
+  test("KM applied + similar tickets often N3 → escalate to N3", () => {
     const out = suggestEscalationTransfer({
       appliedKmCode: "KM-X",
       kmApplicable: null,
@@ -42,7 +42,10 @@ describe("suggestEscalationTransfer", () => {
       networkHints: false,
       missingFieldsCount: 0,
     })
-    expect(out.suggestedAction.toLowerCase()).toMatch(/review|failure/)
+    // Since 5303ff8 the engine returns the app-wide decision label (see lib/agent/investigation-timeline.ts).
+    expect(out.suggestedAction).toBe("Escalate N3")
+    expect(out.whyFactors).toContain("KM already applied")
+    expect(out.whyFactors).toContain("Similar historical tickets often escalated to N3")
   })
 
   test("no KM and no obvious N2 resolution → stronger qualification", () => {

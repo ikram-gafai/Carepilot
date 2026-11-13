@@ -70,6 +70,8 @@ function resolveFromCatalog(input: FoWorkflowInput, plan: CatalogOperationalPlan
   const inFo = isFoTreatableScope(input.category, input.perimeter)
 
   switch (plan.outcome) {
+    case "REQUEST_INFORMATION":
+      return { decision: "REQUEST_INFORMATION", workflowStep: 2, stepLabel: "Ticket incomplet — demander détails magasin" }
     case "SUSPEND":
       return { decision: "SUSPEND", workflowStep: 2, stepLabel: "En attente magasin ou dépendance externe" }
     case "TRANSFER":

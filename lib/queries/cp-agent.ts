@@ -380,7 +380,7 @@ export async function cpAgentGetTicketAiEnrichment(ticketId: number, ticketCateg
     .where(eq(cpAgentTickets.id, ticketId))
     .limit(1)
 
-  let category = ticketCategory ?? ticketRow?.category
+  const category = ticketCategory ?? ticketRow?.category
 
   const [analysisRow] = await db
     .select()

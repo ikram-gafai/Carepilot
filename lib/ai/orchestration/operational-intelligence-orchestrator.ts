@@ -55,6 +55,9 @@ function resolveMissingInformation(
     id: ticket.id,
     title: ticket.title ?? "",
     description: ticket.description ?? "",
+    storeCode: null,
+    storeName: null,
+    perimeter: null,
     category: ticket.category ?? null,
   })
 }

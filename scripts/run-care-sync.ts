@@ -4,7 +4,7 @@
  */
 import "./load-env"
 
-import { careListTickets } from "@/lib/care-api/store"
+import { careGetKmById, careGetTicketById, careListTickets } from "@/lib/care-api/store"
 import { getOperationalSyncSummary } from "@/lib/care-operational/sync-stats"
 import { getDb } from "@/lib/db"
 import { syncCommentsFromCare } from "@/lib/services/sync/sync-comments"
@@ -20,6 +20,19 @@ async function main() {
   const errors: { entity: string; id: string; message: string }[] = []
 
   const client = {
+    async getTickets(opts?: { limit?: number; offset?: number }) {
+      return careListTickets(opts)
+    },
+    async getTicketById(id: string) {
+      const ticket = await careGetTicketById(id)
+      if (!ticket) throw new Error(`CARE ticket not found: ${id}`)
+      return ticket
+    },
+    async getKmById(id: string) {
+      const km = await careGetKmById(id)
+      if (!km) throw new Error(`CARE KM procedure not found: ${id}`)
+      return km
+    },
     async getAllTickets() {
       const pageSize = 100
       const items = []

@@ -770,13 +770,29 @@ Each finding states what was **observed**. Explanations that are not directly me
 - **Authentication gaps:** only the AI run endpoints, `POST /api/sync/run` and a few reads check the session; most `GET /api/*` routes, including `/api/admin/*`, are unauthenticated. The admin role list contains `"Superviseur"` but the seeded role is `"Supervisor"`. The seeded demo password has a default value.
 - **Stale documentation:** `POST /api/sync/care` now returns HTTP 410, and `bun run db:sync` is referenced in scripts and docs but is not defined in `package.json`.
 
-### Code health at the audited commit
+### Code health
 
-- **Unit tests:** `bun test tests` gives 14 pass and 1 fail. `tests/rules-engine.test.ts` expects "review" where `lib/rules/engine.ts` returns "Escalate N3", and both files changed in the same commits, so the intended behaviour is ambiguous. The Postgres smoke test passes vacuously unless `RUN_INTEGRATION=1`.
-- **Type checking:** `bun run typecheck` reports 21 errors. The count is unchanged by this revision.
-- **Lint:** `bun run lint` reports 113 problems (61 errors, 52 warnings).
-- **CI:** CI runs lint, typecheck and test, so it fails at this commit.
+At the audited commit (`3c02b61`), CI (lint → typecheck → test) failed:
+
+| Check | Before | Now |
+| --- | --- | --- |
+| `bun test tests` | 14 pass / 1 fail | 15 pass |
+| `bun run typecheck` | 21 errors | 0 errors |
+| `bun run lint` | 61 errors, 52 warnings | 0 errors, 88 warnings |
+
+What changed:
+- **The failing test.** `tests/rules-engine.test.ts` was stale. Commit `5303ff8` replaced the engine's French action strings with the app-wide decision labels ("Escalate N3"), while the test's regex was only translated word for word.
+- **Type errors.** They were fixed without behaviour changes: missing union cases, literal-type widening, unused excess properties, an incomplete CLI client, and stale script types. One was a genuine bug: the legacy `scripts/seed.ts` never set the NOT NULL `store_id`.
+- **Lint errors in application components.** These came from the React 19 hook rules:
+  - setState-in-effect patterns now use `useSyncExternalStore` (`hooks/use-local-storage-flag.ts`, `hooks/use-mobile.ts`) or state adjustment during render;
+  - `Math.random()` ids now use `useId()`;
+  - `require()` calls now use static imports.
+- **Scoped warnings in `components/charts/**`.** Only there are `react-hooks/refs` and `react-hooks/set-state-in-effect` reported as warnings (`eslint.config.mjs` explains why). These visx/motion primitives read refs during render for path measurement, springs and portal containers. React Compiler is not enabled, and changing that logic needs visual regression tests.
+- **Verification limits.** `next build` compiles successfully. Static prerendering needs a database, because some pages query it at build time; CI does not build.
+
+Other issues:
 - **Seed scripts hang:** `scripts/seed-care-operational.ts` and `scripts/seed-carepilot-auth.ts` finish their work but do not exit, because the connection pool is left open.
+- **Vacuous smoke test:** the Postgres smoke test passes vacuously unless `RUN_INTEGRATION=1`.
 
 ### What this project does not claim
 
@@ -880,10 +896,12 @@ echo '{"tickets":[{"ticket_id":"T1","title":"Payment terminal offline","descript
 ### 11.6 Tests
 
 ```bash
-bun test tests          # 15 tests: 14 pass, 1 fail (see §10)
-bun run typecheck       # 21 errors at the audited commit
-bun run lint            # 61 errors, 52 warnings at the audited commit
+bun test tests          # 15 pass
+bun run typecheck       # 0 errors
+bun run lint            # 0 errors (88 warnings; see §10)
 ```
+
+The same three steps run in GitHub Actions on every push (`.github/workflows/ci.yml`).
 
 ### 11.7 Changes made in this revision
 
@@ -895,7 +913,8 @@ bun run lint            # 61 errors, 52 warnings at the audited commit
 - `bun.lock`: re-synced with `package.json` (removed the stale `server-only` entry).
 - `.gitignore`: Python caches, virtual environments, local databases, ML caches, Ollama pull logs, coding-agent folders, and `.env.*` except `.env.example`.
 - Untracked, but kept on disk: compiled `__pycache__/*.pyc`, `ml/artifacts/cache/*.npy` (21 MB embedding cache), `ml/artifacts/ollama_pull_*.log`, and local coding-agent configuration.
-- Added `experiments/` (E1–E8, results, figures) and this README. Application code is unchanged.
+- Added `experiments/` (E0–E8, results, figures) and this README.
+- CI fixes (§10, "Code health"): the stale unit test, 21 type errors, and 61 lint errors. These are behaviour-preserving apart from the legacy-seed `store_id` bug fix. ML code, models and decision logic are unchanged.
 
 ---
 
@@ -974,7 +993,7 @@ None of the items below has been implemented. They follow from the findings in �
 **System**
 9. Replace the per-chunk subprocess with a long-lived inference worker (or ONNX export) to remove the ~1.6 s start-up per call, and validate payloads with a schema before prediction.
 10. Either feed calibrated model probabilities into the workflow decision with explicit rules, or stop presenting banded values as "confidence".
-11. Add authentication to the unauthenticated API routes, fix the `Supervisor`/`Superviseur` role mismatch, close the database pools in seed scripts, and bring lint, typecheck and tests back to green.
+11. Add authentication to the unauthenticated API routes, fix the `Supervisor`/`Superviseur` role mismatch, close the database pools in seed scripts, and make the chart primitives compliant with the React Compiler rules (with visual regression tests) so the scoped lint override can be removed.
 
 ---
 

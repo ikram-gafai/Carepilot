@@ -334,6 +334,7 @@ async function main() {
         status,
         priority: priorities[Math.floor(rnd() * priorities.length)]!,
         channel: rnd() < 0.8 ? "PORTAL" : "PHONE",
+        storeId,
         storeCode: missingFieldsScenario ? "" : storeCode,
         cashRegisterCode: missingFieldsScenario && rnd() < 0.5 ? "" : registerCode,
         category: categories[Math.floor(rnd() * categories.length)]!,

@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { motion, useSpring } from "motion/react";
 import type { RefObject } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -137,7 +138,6 @@ export function TooltipBox({
     return null;
   }
 
-  const { createPortal } = require("react-dom") as typeof import("react-dom");
 
   if (!visible) {
     return null;

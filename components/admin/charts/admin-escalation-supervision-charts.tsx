@@ -13,13 +13,14 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import type {
-  AdminEscalationEvolutionPoint,
-  AdminEscalationReasonBar,
-} from "@/lib/admin/escalations"
+import type { EscalationTrendPoint } from "@/lib/admin/escalations"
 import { adminSurfaces } from "@/lib/admin-surface"
 import { cn } from "@/lib/utils"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+
+// Prop types for these charts (never exported by lib/admin/escalations; shapes follow the usage below).
+type AdminEscalationReasonBar = { label: string; count: number }
+type AdminEscalationEvolutionPoint = EscalationTrendPoint
 
 const cardClass = cn(adminSurfaces.card, "overflow-hidden border-primary/12 shadow-sm")
 const sectionTitle = "text-sm font-medium text-foreground"

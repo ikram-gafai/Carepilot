@@ -71,9 +71,12 @@ export function AgentSidebarProfile({ sessionUser }: { sessionUser?: CarePilotSe
   const [displayName, setDisplayName] = React.useState(() => profileName(sessionUser))
   const teamLine = profileSubtitle(sessionUser)
 
-  React.useEffect(() => {
+  // Re-derive the display name when the session user changes (during render, not in an effect).
+  const [prevSessionUser, setPrevSessionUser] = React.useState(sessionUser)
+  if (sessionUser !== prevSessionUser) {
+    setPrevSessionUser(sessionUser)
     setDisplayName(profileName(sessionUser))
-  }, [sessionUser])
+  }
   const [avatarObjectUrl, setAvatarObjectUrl] = React.useState<string | null>(null)
   const [editOpen, setEditOpen] = React.useState(false)
   const [editDraft, setEditDraft] = React.useState(displayName)

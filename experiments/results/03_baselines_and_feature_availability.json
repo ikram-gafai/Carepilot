@@ -1,0 +1,1559 @@
+{
+  "meta": {
+    "experiment": "03_baselines_and_feature_availability",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525,
+    "dataset": {
+      "rows": 14000,
+      "fingerprint_sha256": "245b401a533e3667fe69ebbaf029796e68196b3c7255ee82546e65a85f37e2ef"
+    }
+  },
+  "tasks": {
+    "escalation": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "n_test": 2100,
+      "feature_sets": {
+        "original": {
+          "categorical": [
+            "perimeter",
+            "priority",
+            "incident_category"
+          ],
+          "numeric": [
+            "sla_breached",
+            "resolution_time_minutes"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.6,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "roc_auc": 0.5,
+                "pr_auc": 0.4,
+                "brier": 0.24,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 0.4912,
+              "f1_ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.799,
+                "precision": 0.7359,
+                "recall": 0.7762,
+                "f1": 0.7555,
+                "roc_auc": 0.8894,
+                "pr_auc": 0.8556,
+                "brier": 0.1362,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 0.7037,
+              "f1_ci95": [
+                0.7332128578505592,
+                0.779546442410646
+              ],
+              "roc_auc_ci95": [
+                0.8757975505827286,
+                0.90242053611845
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.7867,
+                "precision": 0.7586,
+                "recall": 0.6845,
+                "f1": 0.7196,
+                "roc_auc": 0.8636,
+                "pr_auc": 0.8272,
+                "brier": 0.1458,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 2.898,
+              "f1_ci95": [
+                0.6954769212581964,
+                0.7445457666256217
+              ],
+              "roc_auc_ci95": [
+                0.848295052947616,
+                0.878977435351973
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7919,
+                "precision": 0.7272,
+                "recall": 0.7679,
+                "f1": 0.747,
+                "roc_auc": 0.8839,
+                "pr_auc": 0.8532,
+                "brier": 0.1382,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 7.4946,
+              "f1_ci95": [
+                0.7229178866130855,
+                0.7704042410483953
+              ],
+              "roc_auc_ci95": [
+                0.8707493800570952,
+                0.8975782012610515
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_roc_auc": 0.8862
+        },
+        "creation_time": {
+          "categorical": [
+            "perimeter",
+            "incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.6,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "roc_auc": 0.5,
+                "pr_auc": 0.4,
+                "brier": 0.24,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 0.5455,
+              "f1_ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.799,
+                "precision": 0.737,
+                "recall": 0.7738,
+                "f1": 0.7549,
+                "roc_auc": 0.8877,
+                "pr_auc": 0.8531,
+                "brier": 0.1374,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 0.8309,
+              "f1_ci95": [
+                0.7328683379665153,
+                0.7784234733112927
+              ],
+              "roc_auc_ci95": [
+                0.8743450752641521,
+                0.9010334045994829
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.7829,
+                "precision": 0.752,
+                "recall": 0.6821,
+                "f1": 0.7154,
+                "roc_auc": 0.8609,
+                "pr_auc": 0.8244,
+                "brier": 0.1472,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 3.0901,
+              "f1_ci95": [
+                0.6909977810811397,
+                0.7401673972113687
+              ],
+              "roc_auc_ci95": [
+                0.8455559456905364,
+                0.8772378844330545
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7914,
+                "precision": 0.7274,
+                "recall": 0.7655,
+                "f1": 0.7459,
+                "roc_auc": 0.8833,
+                "pr_auc": 0.8528,
+                "brier": 0.1388,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 9.0321,
+              "f1_ci95": [
+                0.7239709443099274,
+                0.7699339433807854
+              ],
+              "roc_auc_ci95": [
+                0.8699468484066862,
+                0.896715394923244
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_roc_auc": 0.8838
+        },
+        "creation_time_base_category": {
+          "categorical": [
+            "perimeter",
+            "base_incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.789,
+                "precision": 0.73,
+                "recall": 0.75,
+                "f1": 0.7399,
+                "roc_auc": 0.8771,
+                "pr_auc": 0.8475,
+                "brier": 0.1415,
+                "positive_rate": 0.4
+              },
+              "training_time_s": 8.0428,
+              "f1_ci95": [
+                0.716645733753147,
+                0.764510424471362
+              ],
+              "roc_auc_ci95": [
+                0.8630059417739743,
+                0.8915531153875307
+              ]
+            }
+          }
+        }
+      },
+      "paired_bootstrap": {
+        "XGBoost vs Logistic Regression (original features)": {
+          "f1": {
+            "observed_diff": -0.0085,
+            "ci95": [
+              -0.0211,
+              0.0036
+            ],
+            "bootstrap_p_two_sided": 0.194,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": -0.0055,
+            "ci95": [
+              -0.0112,
+              -0.0001
+            ],
+            "bootstrap_p_two_sided": 0.046,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Random Forest (original features)": {
+          "f1": {
+            "observed_diff": 0.0273,
+            "ci95": [
+              0.009,
+              0.0445
+            ],
+            "bootstrap_p_two_sided": 0.006,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0203,
+            "ci95": [
+              0.0139,
+              0.0276
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Logistic Regression (creation-time features)": {
+          "f1": {
+            "observed_diff": -0.009,
+            "ci95": [
+              -0.0202,
+              0.0023
+            ],
+            "bootstrap_p_two_sided": 0.122,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": -0.0045,
+            "ci95": [
+              -0.0105,
+              0.0009
+            ],
+            "bootstrap_p_two_sided": 0.106,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost original minus creation-time features": {
+          "f1": {
+            "observed_diff": 0.001,
+            "ci95": [
+              -0.0049,
+              0.007
+            ],
+            "bootstrap_p_two_sided": 0.816,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0006,
+            "ci95": [
+              -0.0008,
+              0.0021
+            ],
+            "bootstrap_p_two_sided": 0.39,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost creation-time minus base-category-only": {
+          "f1": {
+            "observed_diff": 0.0061,
+            "ci95": [
+              -0.0033,
+              0.016
+            ],
+            "bootstrap_p_two_sided": 0.194,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0061,
+            "ci95": [
+              0.0022,
+              0.0102
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        }
+      }
+    },
+    "transfer": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "n_test": 2100,
+      "feature_sets": {
+        "original": {
+          "categorical": [
+            "perimeter",
+            "priority",
+            "incident_category"
+          ],
+          "numeric": [
+            "sla_breached",
+            "resolution_time_minutes"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.65,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "roc_auc": 0.5,
+                "pr_auc": 0.35,
+                "brier": 0.2275,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 0.4779,
+              "f1_ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.7857,
+                "precision": 0.6617,
+                "recall": 0.7932,
+                "f1": 0.7215,
+                "roc_auc": 0.8853,
+                "pr_auc": 0.8233,
+                "brier": 0.1386,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 0.7537,
+              "f1_ci95": [
+                0.6946558999015781,
+                0.7453165367780505
+              ],
+              "roc_auc_ci95": [
+                0.8712775109956205,
+                0.8994623504911645
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.7971,
+                "precision": 0.7249,
+                "recall": 0.6776,
+                "f1": 0.7004,
+                "roc_auc": 0.8692,
+                "pr_auc": 0.8115,
+                "brier": 0.1372,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 2.9623,
+              "f1_ci95": [
+                0.6735655131617865,
+                0.7294620899881424
+              ],
+              "roc_auc_ci95": [
+                0.853562079643854,
+                0.8848621205598874
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7952,
+                "precision": 0.6805,
+                "recall": 0.7823,
+                "f1": 0.7278,
+                "roc_auc": 0.8838,
+                "pr_auc": 0.832,
+                "brier": 0.138,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 7.1264,
+              "f1_ci95": [
+                0.7015494112822916,
+                0.7523478738746306
+              ],
+              "roc_auc_ci95": [
+                0.8686649677457038,
+                0.8976137967192024
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_roc_auc": 0.8864
+        },
+        "creation_time": {
+          "categorical": [
+            "perimeter",
+            "incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.65,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "roc_auc": 0.5,
+                "pr_auc": 0.35,
+                "brier": 0.2275,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 0.4974,
+              "f1_ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.7881,
+                "precision": 0.6651,
+                "recall": 0.7946,
+                "f1": 0.7241,
+                "roc_auc": 0.883,
+                "pr_auc": 0.8193,
+                "brier": 0.1399,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 0.7981,
+              "f1_ci95": [
+                0.6976003667718295,
+                0.7480489375897046
+              ],
+              "roc_auc_ci95": [
+                0.8685215546814526,
+                0.8965300070374127
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.7986,
+                "precision": 0.7294,
+                "recall": 0.6748,
+                "f1": 0.7011,
+                "roc_auc": 0.8691,
+                "pr_auc": 0.812,
+                "brier": 0.1371,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 2.9763,
+              "f1_ci95": [
+                0.673293707675845,
+                0.7271572744121394
+              ],
+              "roc_auc_ci95": [
+                0.8532974554957103,
+                0.8845684649423384
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7929,
+                "precision": 0.6761,
+                "recall": 0.7837,
+                "f1": 0.7259,
+                "roc_auc": 0.8819,
+                "pr_auc": 0.8277,
+                "brier": 0.139,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 6.7474,
+              "f1_ci95": [
+                0.6999126171292518,
+                0.7506214575257896
+              ],
+              "roc_auc_ci95": [
+                0.8676134793522687,
+                0.8956875362652206
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_roc_auc": 0.8837
+        },
+        "creation_time_base_category": {
+          "categorical": [
+            "perimeter",
+            "base_incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7881,
+                "precision": 0.6803,
+                "recall": 0.7442,
+                "f1": 0.7109,
+                "roc_auc": 0.8692,
+                "pr_auc": 0.8192,
+                "brier": 0.1438,
+                "positive_rate": 0.35
+              },
+              "training_time_s": 6.9777,
+              "f1_ci95": [
+                0.684692557734679,
+                0.7361871078742306
+              ],
+              "roc_auc_ci95": [
+                0.8545406671292806,
+                0.8842278783741296
+              ]
+            }
+          }
+        }
+      },
+      "paired_bootstrap": {
+        "XGBoost vs Logistic Regression (original features)": {
+          "f1": {
+            "observed_diff": 0.0063,
+            "ci95": [
+              -0.01,
+              0.0234
+            ],
+            "bootstrap_p_two_sided": 0.424,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": -0.0015,
+            "ci95": [
+              -0.0083,
+              0.0058
+            ],
+            "bootstrap_p_two_sided": 0.71,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Random Forest (original features)": {
+          "f1": {
+            "observed_diff": 0.0274,
+            "ci95": [
+              0.007,
+              0.047
+            ],
+            "bootstrap_p_two_sided": 0.006,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0147,
+            "ci95": [
+              0.0079,
+              0.0214
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Logistic Regression (creation-time features)": {
+          "f1": {
+            "observed_diff": 0.0018,
+            "ci95": [
+              -0.0138,
+              0.0174
+            ],
+            "bootstrap_p_two_sided": 0.784,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": -0.0012,
+            "ci95": [
+              -0.0081,
+              0.0061
+            ],
+            "bootstrap_p_two_sided": 0.77,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost original minus creation-time features": {
+          "f1": {
+            "observed_diff": 0.002,
+            "ci95": [
+              -0.0072,
+              0.0117
+            ],
+            "bootstrap_p_two_sided": 0.702,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0019,
+            "ci95": [
+              -0.0005,
+              0.0045
+            ],
+            "bootstrap_p_two_sided": 0.128,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost creation-time minus base-category-only": {
+          "f1": {
+            "observed_diff": 0.015,
+            "ci95": [
+              0.0023,
+              0.0277
+            ],
+            "bootstrap_p_two_sided": 0.022,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0126,
+            "ci95": [
+              0.0074,
+              0.0174
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        }
+      }
+    },
+    "sla": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "n_test": 2100,
+      "feature_sets": {
+        "original": {
+          "categorical": [
+            "perimeter",
+            "priority",
+            "recommended_action",
+            "store_size",
+            "incident_category",
+            "environment_type"
+          ],
+          "numeric": [
+            "escalation_required",
+            "transfer_required",
+            "ticket_age_minutes",
+            "resolution_time_minutes",
+            "queue_load",
+            "operational_complexity",
+            "description_missing",
+            "resolution_time_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.6857,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "roc_auc": 0.5,
+                "pr_auc": 0.3143,
+                "brier": 0.2155,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 0.5447,
+              "f1_ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.7724,
+                "precision": 0.6104,
+                "recall": 0.7621,
+                "f1": 0.6779,
+                "roc_auc": 0.8567,
+                "pr_auc": 0.7253,
+                "brier": 0.1536,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 0.7586,
+              "f1_ci95": [
+                0.6492213521467354,
+                0.7042267883302534
+              ],
+              "roc_auc_ci95": [
+                0.8394476115323579,
+                0.8721036642679693
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.759,
+                "precision": 0.6954,
+                "recall": 0.4152,
+                "f1": 0.5199,
+                "roc_auc": 0.8197,
+                "pr_auc": 0.6507,
+                "brier": 0.1659,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 3.3618,
+              "f1_ci95": [
+                0.4815524777987392,
+                0.5554554253848804
+              ],
+              "roc_auc_ci95": [
+                0.7997396924841853,
+                0.8373772287462183
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.8671,
+                "precision": 0.7537,
+                "recall": 0.8576,
+                "f1": 0.8023,
+                "roc_auc": 0.9453,
+                "pr_auc": 0.903,
+                "brier": 0.0988,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 7.1999,
+              "f1_ci95": [
+                0.7785114140263485,
+                0.8268097677137348
+              ],
+              "roc_auc_ci95": [
+                0.9358676353289177,
+                0.9547407719694248
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 0.1,
+          "logistic_regression_validation_roc_auc": 0.8578
+        },
+        "creation_time": {
+          "categorical": [
+            "perimeter",
+            "incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.6857,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "roc_auc": 0.5,
+                "pr_auc": 0.3143,
+                "brier": 0.2155,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 0.5057,
+              "f1_ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.7276,
+                "precision": 0.5505,
+                "recall": 0.7273,
+                "f1": 0.6266,
+                "roc_auc": 0.7896,
+                "pr_auc": 0.5853,
+                "brier": 0.1883,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 0.6291,
+              "f1_ci95": [
+                0.5969242727070841,
+                0.6559530012836318
+              ],
+              "roc_auc_ci95": [
+                0.7694903853611907,
+                0.8093996019322931
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.7052,
+                "precision": 0.555,
+                "recall": 0.3136,
+                "f1": 0.4008,
+                "roc_auc": 0.7283,
+                "pr_auc": 0.5215,
+                "brier": 0.1887,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 3.7575,
+              "f1_ci95": [
+                0.36269696140831825,
+                0.4350353577919987
+              ],
+              "roc_auc_ci95": [
+                0.7055317090407943,
+                0.7523522284828014
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.711,
+                "precision": 0.531,
+                "recall": 0.6879,
+                "f1": 0.5993,
+                "roc_auc": 0.7638,
+                "pr_auc": 0.5627,
+                "brier": 0.1953,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 6.1083,
+              "f1_ci95": [
+                0.569912951058911,
+                0.6309694659659764
+              ],
+              "roc_auc_ci95": [
+                0.7426274481863965,
+                0.7860282851447071
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 0.1,
+          "logistic_regression_validation_roc_auc": 0.7666
+        },
+        "creation_time_base_category": {
+          "categorical": [
+            "perimeter",
+            "base_incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7067,
+                "precision": 0.5259,
+                "recall": 0.6758,
+                "f1": 0.5915,
+                "roc_auc": 0.7545,
+                "pr_auc": 0.5507,
+                "brier": 0.1986,
+                "positive_rate": 0.3143
+              },
+              "training_time_s": 6.2618,
+              "f1_ci95": [
+                0.5606004070556309,
+                0.6218457847173658
+              ],
+              "roc_auc_ci95": [
+                0.7333339116740171,
+                0.7772167744109261
+              ]
+            }
+          }
+        }
+      },
+      "paired_bootstrap": {
+        "XGBoost vs Logistic Regression (original features)": {
+          "f1": {
+            "observed_diff": 0.1244,
+            "ci95": [
+              0.0983,
+              0.1495
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0886,
+            "ci95": [
+              0.0762,
+              0.1018
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Random Forest (original features)": {
+          "f1": {
+            "observed_diff": 0.2823,
+            "ci95": [
+              0.2451,
+              0.3226
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.1256,
+            "ci95": [
+              0.1115,
+              0.1419
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Logistic Regression (creation-time features)": {
+          "f1": {
+            "observed_diff": -0.0273,
+            "ci95": [
+              -0.0454,
+              -0.0066
+            ],
+            "bootstrap_p_two_sided": 0.01,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": -0.0258,
+            "ci95": [
+              -0.0366,
+              -0.015
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost original minus creation-time features": {
+          "f1": {
+            "observed_diff": 0.2029,
+            "ci95": [
+              0.1778,
+              0.2303
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.1815,
+            "ci95": [
+              0.1631,
+              0.1985
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost creation-time minus base-category-only": {
+          "f1": {
+            "observed_diff": 0.0078,
+            "ci95": [
+              -0.0045,
+              0.0206
+            ],
+            "bootstrap_p_two_sided": 0.196,
+            "n_resamples": 1000
+          },
+          "roc_auc": {
+            "observed_diff": 0.0093,
+            "ci95": [
+              0.0047,
+              0.0141
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        }
+      }
+    },
+    "priority": {
+      "classes": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "n_test": 2100,
+      "feature_sets": {
+        "original": {
+          "categorical": [
+            "perimeter",
+            "incident_category",
+            "store_size",
+            "recommended_action",
+            "environment_type"
+          ],
+          "numeric": [
+            "queue_load",
+            "escalation_required",
+            "transfer_required",
+            "sla_breached",
+            "ticket_age_minutes",
+            "operational_complexity",
+            "description_missing",
+            "resolution_time_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.4214,
+                "macro_f1": 0.1482,
+                "weighted_f1": 0.2499,
+                "macro_precision": 0.1054,
+                "macro_recall": 0.25
+              },
+              "training_time_s": 0.4914,
+              "macro_f1_ci95": [
+                0.1426109810444105,
+                0.15323645970937913
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.781,
+                "macro_f1": 0.7876,
+                "weighted_f1": 0.7814,
+                "macro_precision": 0.7768,
+                "macro_recall": 0.8029
+              },
+              "training_time_s": 3.6556,
+              "macro_f1_ci95": [
+                0.770565475785785,
+                0.8044333529892117
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.7805,
+                "macro_f1": 0.7695,
+                "weighted_f1": 0.7761,
+                "macro_precision": 0.8023,
+                "macro_recall": 0.7547
+              },
+              "training_time_s": 3.3692,
+              "macro_f1_ci95": [
+                0.7488117642820861,
+                0.7877002495930843
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.8276,
+                "macro_f1": 0.8244,
+                "weighted_f1": 0.8251,
+                "macro_precision": 0.8716,
+                "macro_recall": 0.799
+              },
+              "training_time_s": 14.8913,
+              "macro_f1_ci95": [
+                0.8080323583056022,
+                0.842219260849862
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_macro_f1": 0.7853
+        },
+        "creation_time": {
+          "categorical": [
+            "perimeter",
+            "incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.4214,
+                "macro_f1": 0.1482,
+                "weighted_f1": 0.2499,
+                "macro_precision": 0.1054,
+                "macro_recall": 0.25
+              },
+              "training_time_s": 0.4964,
+              "macro_f1_ci95": [
+                0.1426109810444105,
+                0.15323645970937913
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.6043,
+                "macro_f1": 0.6239,
+                "weighted_f1": 0.6044,
+                "macro_precision": 0.6147,
+                "macro_recall": 0.6587
+              },
+              "training_time_s": 3.2994,
+              "macro_f1_ci95": [
+                0.6033254527672247,
+                0.6438822462450139
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.6376,
+                "macro_f1": 0.6175,
+                "weighted_f1": 0.6275,
+                "macro_precision": 0.6354,
+                "macro_recall": 0.6137
+              },
+              "training_time_s": 3.7573,
+              "macro_f1_ci95": [
+                0.5960369714198065,
+                0.6392297415122137
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.6433,
+                "macro_f1": 0.56,
+                "weighted_f1": 0.5959,
+                "macro_precision": 0.7794,
+                "macro_recall": 0.5611
+              },
+              "training_time_s": 12.1818,
+              "macro_f1_ci95": [
+                0.5385644189668987,
+                0.5805528905563964
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_macro_f1": 0.6049
+        },
+        "creation_time_base_category": {
+          "categorical": [
+            "perimeter",
+            "base_incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.6481,
+                "macro_f1": 0.5656,
+                "weighted_f1": 0.5996,
+                "macro_precision": 0.787,
+                "macro_recall": 0.5673
+              },
+              "training_time_s": 12.532,
+              "macro_f1_ci95": [
+                0.542218271417595,
+                0.5873471523063091
+              ]
+            }
+          }
+        }
+      },
+      "paired_bootstrap": {
+        "XGBoost vs Logistic Regression (original features)": {
+          "macro_f1": {
+            "observed_diff": 0.0368,
+            "ci95": [
+              0.018,
+              0.0563
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Random Forest (original features)": {
+          "macro_f1": {
+            "observed_diff": 0.0549,
+            "ci95": [
+              0.0372,
+              0.0735
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Logistic Regression (creation-time features)": {
+          "macro_f1": {
+            "observed_diff": -0.0639,
+            "ci95": [
+              -0.0881,
+              -0.0378
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost original minus creation-time features": {
+          "macro_f1": {
+            "observed_diff": 0.2644,
+            "ci95": [
+              0.2396,
+              0.2908
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost creation-time minus base-category-only": {
+          "macro_f1": {
+            "observed_diff": -0.0056,
+            "ci95": [
+              -0.013,
+              0.0015
+            ],
+            "bootstrap_p_two_sided": 0.148,
+            "n_resamples": 1000
+          }
+        }
+      }
+    },
+    "action": {
+      "classes": [
+        "apply km",
+        "escalate n3",
+        "monitor",
+        "request information",
+        "resolve locally",
+        "transfer perimeter"
+      ],
+      "n_test": 2100,
+      "feature_sets": {
+        "original": {
+          "categorical": [
+            "perimeter",
+            "priority",
+            "incident_category",
+            "ticket_source",
+            "environment_type"
+          ],
+          "numeric": [
+            "sla_breached",
+            "escalation_required",
+            "transfer_required",
+            "resolution_time_minutes",
+            "description_missing",
+            "resolution_time_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.2167,
+                "macro_f1": 0.0594,
+                "weighted_f1": 0.0772,
+                "macro_precision": 0.0361,
+                "macro_recall": 0.1667
+              },
+              "training_time_s": 0.4816,
+              "macro_f1_ci95": [
+                0.055334921895684404,
+                0.06347982523772809
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.6952,
+                "macro_f1": 0.6804,
+                "weighted_f1": 0.6948,
+                "macro_precision": 0.6922,
+                "macro_recall": 0.6782
+              },
+              "training_time_s": 3.3946,
+              "macro_f1_ci95": [
+                0.6593516345231354,
+                0.701435892273916
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.6938,
+                "macro_f1": 0.6781,
+                "weighted_f1": 0.6911,
+                "macro_precision": 0.7501,
+                "macro_recall": 0.6631
+              },
+              "training_time_s": 3.4313,
+              "macro_f1_ci95": [
+                0.6565415446209768,
+                0.6988806273873597
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.7262,
+                "macro_f1": 0.7037,
+                "weighted_f1": 0.7192,
+                "macro_precision": 0.7618,
+                "macro_recall": 0.693
+              },
+              "training_time_s": 68.0199,
+              "macro_f1_ci95": [
+                0.683412031600551,
+                0.7240270248569047
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_macro_f1": 0.6752
+        },
+        "creation_time": {
+          "categorical": [
+            "perimeter",
+            "incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "Dummy (prior)": {
+              "test": {
+                "accuracy": 0.2167,
+                "macro_f1": 0.0594,
+                "weighted_f1": 0.0772,
+                "macro_precision": 0.0361,
+                "macro_recall": 0.1667
+              },
+              "training_time_s": 0.5012,
+              "macro_f1_ci95": [
+                0.055334921895684404,
+                0.06347982523772809
+              ]
+            },
+            "Logistic Regression": {
+              "test": {
+                "accuracy": 0.5795,
+                "macro_f1": 0.5809,
+                "weighted_f1": 0.5854,
+                "macro_precision": 0.5934,
+                "macro_recall": 0.5759
+              },
+              "training_time_s": 4.1975,
+              "macro_f1_ci95": [
+                0.5598658965442453,
+                0.6018063413249265
+              ]
+            },
+            "Random Forest": {
+              "test": {
+                "accuracy": 0.5748,
+                "macro_f1": 0.5794,
+                "weighted_f1": 0.5848,
+                "macro_precision": 0.649,
+                "macro_recall": 0.5555
+              },
+              "training_time_s": 3.6333,
+              "macro_f1_ci95": [
+                0.5565640860201309,
+                0.6015015138131918
+              ]
+            },
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.5871,
+                "macro_f1": 0.5862,
+                "weighted_f1": 0.5922,
+                "macro_precision": 0.6654,
+                "macro_recall": 0.5634
+              },
+              "training_time_s": 65.6287,
+              "macro_f1_ci95": [
+                0.5650979151599042,
+                0.6070487853470709
+              ]
+            }
+          },
+          "logistic_regression_selected_C": 1.0,
+          "logistic_regression_validation_macro_f1": 0.5635
+        },
+        "creation_time_base_category": {
+          "categorical": [
+            "perimeter",
+            "base_incident_category",
+            "environment_type",
+            "ticket_source",
+            "store_size",
+            "priority"
+          ],
+          "numeric": [
+            "queue_load",
+            "description_missing"
+          ],
+          "models": {
+            "XGBoost": {
+              "test": {
+                "accuracy": 0.5881,
+                "macro_f1": 0.5875,
+                "weighted_f1": 0.5931,
+                "macro_precision": 0.6726,
+                "macro_recall": 0.5639
+              },
+              "training_time_s": 65.3416,
+              "macro_f1_ci95": [
+                0.5673654104192016,
+                0.6088896407275927
+              ]
+            }
+          }
+        }
+      },
+      "paired_bootstrap": {
+        "XGBoost vs Logistic Regression (original features)": {
+          "macro_f1": {
+            "observed_diff": 0.0233,
+            "ci95": [
+              0.0073,
+              0.0387
+            ],
+            "bootstrap_p_two_sided": 0.01,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Random Forest (original features)": {
+          "macro_f1": {
+            "observed_diff": 0.0255,
+            "ci95": [
+              0.0137,
+              0.0377
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost vs Logistic Regression (creation-time features)": {
+          "macro_f1": {
+            "observed_diff": 0.0053,
+            "ci95": [
+              -0.0111,
+              0.0216
+            ],
+            "bootstrap_p_two_sided": 0.546,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost original minus creation-time features": {
+          "macro_f1": {
+            "observed_diff": 0.1174,
+            "ci95": [
+              0.1015,
+              0.1319
+            ],
+            "bootstrap_p_two_sided": 0.0,
+            "n_resamples": 1000
+          }
+        },
+        "XGBoost creation-time minus base-category-only": {
+          "macro_f1": {
+            "observed_diff": -0.0012,
+            "ci95": [
+              -0.0091,
+              0.006
+            ],
+            "bootstrap_p_two_sided": 0.786,
+            "n_resamples": 1000
+          }
+        }
+      }
+    }
+  },
+  "protocol": {
+    "split": "stratified 70/15/15, random_state=20260525 (identical to ml/benchmarks)",
+    "text_features": "TF-IDF word 1-2 grams, english stop words, min_df=3, max_df=0.92, max_features=3500 for every model",
+    "threshold": "0.5 on predicted probability for binary F1/precision/recall",
+    "lr_selection": "C in {0.01, 0.1, 1, 10} chosen by validation ROC-AUC (binary) or macro-F1 (multiclass)",
+    "bootstrap": "1,000 resamples of the test set; paired resamples for differences"
+  }
+}

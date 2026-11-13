@@ -1,0 +1,383 @@
+{
+  "meta": {
+    "experiment": "01_reproduction",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525,
+    "dataset": {
+      "rows": 14000,
+      "fingerprint_sha256": "245b401a533e3667fe69ebbaf029796e68196b3c7255ee82546e65a85f37e2ef"
+    }
+  },
+  "tasks": {
+    "escalation": {
+      "reported": {
+        "source": "ml/reports/03_escalation_benchmark_summary.md",
+        "positive_rate_reported": "~18%",
+        "Logistic Regression": {
+          "accuracy": 0.817,
+          "precision": 0.875,
+          "recall": 0.633,
+          "f1": 0.735,
+          "roc_auc": 0.927
+        },
+        "Random Forest": {
+          "accuracy": 0.852,
+          "precision": 0.859,
+          "recall": 0.755,
+          "f1": 0.804,
+          "roc_auc": 0.931
+        },
+        "XGBoost": {
+          "accuracy": 0.873,
+          "precision": 0.806,
+          "recall": 0.899,
+          "f1": 0.85,
+          "roc_auc": 0.954
+        }
+      },
+      "reproduced": {
+        "Logistic Regression": {
+          "accuracy": 0.7133,
+          "precision": 0.778,
+          "recall": 0.3964,
+          "f1": 0.5252,
+          "roc_auc": 0.808,
+          "training_time_s": 0.4841,
+          "inference_time_ms": 0.0789
+        },
+        "Random Forest": {
+          "accuracy": 0.76,
+          "precision": 0.875,
+          "recall": 0.4667,
+          "f1": 0.6087,
+          "roc_auc": 0.8594,
+          "training_time_s": 0.7098,
+          "inference_time_ms": 0.1175
+        },
+        "XGBoost": {
+          "accuracy": 0.7919,
+          "precision": 0.7272,
+          "recall": 0.7679,
+          "f1": 0.747,
+          "roc_auc": 0.8839,
+          "training_time_s": 7.5431,
+          "inference_time_ms": 0.1389
+        }
+      },
+      "committed_artifact": {
+        "file": "xgboost.joblib",
+        "accuracy": 0.6614,
+        "precision": 0.7279,
+        "recall": 0.2452,
+        "f1": 0.3669,
+        "roc_auc": 0.739,
+        "pr_auc": 0.6316,
+        "brier": 0.2124,
+        "positive_rate": 0.4,
+        "inference_time_ms": 0.0615
+      },
+      "positive_rate_current": 0.4,
+      "split_sizes": {
+        "train": 9800,
+        "test": 2100
+      }
+    },
+    "transfer": {
+      "reported": {
+        "source": "ml/reports/03_transfer_benchmark_summary.md",
+        "positive_rate_reported": "35%",
+        "Logistic Regression": {
+          "accuracy": 0.748,
+          "precision": 0.701,
+          "recall": 0.485,
+          "f1": 0.573,
+          "roc_auc": 0.76
+        },
+        "Random Forest": {
+          "accuracy": 0.809,
+          "precision": 0.763,
+          "recall": 0.657,
+          "f1": 0.706,
+          "roc_auc": 0.871
+        },
+        "XGBoost": {
+          "accuracy": 0.841,
+          "precision": 0.755,
+          "recall": 0.805,
+          "f1": 0.779,
+          "roc_auc": 0.915
+        }
+      },
+      "reproduced": {
+        "Logistic Regression": {
+          "accuracy": 0.6686,
+          "precision": 0.7053,
+          "recall": 0.0912,
+          "f1": 0.1614,
+          "roc_auc": 0.7281,
+          "training_time_s": 0.4654,
+          "inference_time_ms": 0.071
+        },
+        "Random Forest": {
+          "accuracy": 0.7586,
+          "precision": 0.6373,
+          "recall": 0.7197,
+          "f1": 0.676,
+          "roc_auc": 0.8313,
+          "training_time_s": 0.6922,
+          "inference_time_ms": 0.113
+        },
+        "XGBoost": {
+          "accuracy": 0.7914,
+          "precision": 0.677,
+          "recall": 0.7728,
+          "f1": 0.7217,
+          "roc_auc": 0.8838,
+          "training_time_s": 6.815,
+          "inference_time_ms": 0.1265
+        }
+      },
+      "committed_artifact": {
+        "file": "xgboost_transfer.joblib",
+        "accuracy": 0.7105,
+        "precision": 0.5886,
+        "recall": 0.5741,
+        "f1": 0.5813,
+        "roc_auc": 0.7852,
+        "pr_auc": 0.7191,
+        "brier": 0.1855,
+        "positive_rate": 0.35,
+        "inference_time_ms": 0.0639
+      },
+      "positive_rate_current": 0.35,
+      "split_sizes": {
+        "train": 9800,
+        "test": 2100
+      }
+    },
+    "sla": {
+      "reported": {
+        "source": "ml/reports/03_sla_prediction_benchmark_summary.md",
+        "positive_rate_reported": "31.82%",
+        "Logistic Regression": {
+          "accuracy": 0.772,
+          "precision": 0.606,
+          "recall": 0.807,
+          "f1": 0.692,
+          "roc_auc": 0.855
+        },
+        "Random Forest": {
+          "accuracy": 0.786,
+          "precision": 0.65,
+          "recall": 0.707,
+          "f1": 0.677,
+          "roc_auc": 0.847
+        },
+        "XGBoost": {
+          "accuracy": 0.868,
+          "precision": 0.745,
+          "recall": 0.889,
+          "f1": 0.811,
+          "roc_auc": 0.952
+        }
+      },
+      "reproduced": {
+        "Logistic Regression": {
+          "accuracy": 0.7481,
+          "precision": 0.5745,
+          "recall": 0.7652,
+          "f1": 0.6563,
+          "roc_auc": 0.8391,
+          "training_time_s": 0.4921,
+          "inference_time_ms": 0.0771
+        },
+        "Random Forest": {
+          "accuracy": 0.7633,
+          "precision": 0.6279,
+          "recall": 0.6061,
+          "f1": 0.6168,
+          "roc_auc": 0.8292,
+          "training_time_s": 1.8973,
+          "inference_time_ms": 0.1581
+        },
+        "XGBoost": {
+          "accuracy": 0.869,
+          "precision": 0.7543,
+          "recall": 0.8652,
+          "f1": 0.8059,
+          "roc_auc": 0.9454,
+          "training_time_s": 4.7758,
+          "inference_time_ms": 0.1286
+        }
+      },
+      "committed_artifact": {
+        "file": "xgboost_sla.joblib",
+        "accuracy": 0.8395,
+        "precision": 0.7031,
+        "recall": 0.847,
+        "f1": 0.7684,
+        "roc_auc": 0.9306,
+        "pr_auc": 0.8716,
+        "brier": 0.1101,
+        "positive_rate": 0.3143,
+        "inference_time_ms": 0.0621
+      },
+      "positive_rate_current": 0.314,
+      "split_sizes": {
+        "train": 9800,
+        "test": 2100
+      }
+    },
+    "priority": {
+      "reported": {
+        "source": "ml/reports/03_priority_prediction_benchmark_summary.md",
+        "Logistic Regression": {
+          "accuracy": 0.7381,
+          "macro_f1": 0.7298,
+          "weighted_f1": 0.7336
+        },
+        "Random Forest": {
+          "accuracy": 0.7386,
+          "macro_f1": 0.7526,
+          "weighted_f1": 0.7381
+        },
+        "XGBoost": {
+          "accuracy": 0.8295,
+          "macro_f1": 0.8318,
+          "weighted_f1": 0.8279
+        }
+      },
+      "reproduced": {
+        "Logistic Regression": {
+          "accuracy": 0.7495,
+          "macro_precision": 0.7989,
+          "macro_recall": 0.701,
+          "macro_f1": 0.7297,
+          "weighted_f1": 0.7419,
+          "training_time_s": 0.7232,
+          "inference_time_ms": 0.0858
+        },
+        "Random Forest": {
+          "accuracy": 0.7414,
+          "macro_precision": 0.7379,
+          "macro_recall": 0.7752,
+          "macro_f1": 0.7495,
+          "weighted_f1": 0.7422,
+          "training_time_s": 1.5956,
+          "inference_time_ms": 0.1519
+        },
+        "XGBoost": {
+          "accuracy": 0.8267,
+          "macro_precision": 0.8711,
+          "macro_recall": 0.7964,
+          "macro_f1": 0.8221,
+          "weighted_f1": 0.8239,
+          "training_time_s": 7.4673,
+          "inference_time_ms": 0.1596
+        }
+      },
+      "committed_artifact": {
+        "file": "xgboost_priority.joblib",
+        "label_encoder_matches": true,
+        "accuracy": 0.82,
+        "macro_f1": 0.8148,
+        "weighted_f1": 0.817,
+        "macro_precision": 0.8637,
+        "macro_recall": 0.7891,
+        "inference_time_ms": 0.0618
+      },
+      "class_distribution_current": {
+        "P3": 0.4214,
+        "P2": 0.272,
+        "P1": 0.1539,
+        "P4": 0.1528
+      },
+      "split_sizes": {
+        "train": 9800,
+        "test": 2100
+      }
+    },
+    "action": {
+      "reported": {
+        "source": "ml/reports/03_action_recommendation_benchmark_summary.md",
+        "Logistic Regression": {
+          "accuracy": 0.6648,
+          "macro_f1": 0.6397,
+          "weighted_f1": 0.6512
+        },
+        "Random Forest": {
+          "accuracy": 0.6805,
+          "macro_f1": 0.6518,
+          "weighted_f1": 0.6618
+        },
+        "XGBoost": {
+          "accuracy": 0.681,
+          "macro_f1": 0.6584,
+          "weighted_f1": 0.6691
+        }
+      },
+      "reproduced": {
+        "Logistic Regression": {
+          "accuracy": 0.6819,
+          "macro_precision": 0.7044,
+          "macro_recall": 0.6502,
+          "macro_f1": 0.66,
+          "weighted_f1": 0.6744,
+          "training_time_s": 1.2997,
+          "inference_time_ms": 0.0838
+        },
+        "Random Forest": {
+          "accuracy": 0.6757,
+          "macro_precision": 0.7173,
+          "macro_recall": 0.6456,
+          "macro_f1": 0.6564,
+          "weighted_f1": 0.6733,
+          "training_time_s": 1.0638,
+          "inference_time_ms": 0.1291
+        },
+        "XGBoost": {
+          "accuracy": 0.7224,
+          "macro_precision": 0.755,
+          "macro_recall": 0.6884,
+          "macro_f1": 0.6984,
+          "weighted_f1": 0.715,
+          "training_time_s": 69.5592,
+          "inference_time_ms": 0.1635
+        }
+      },
+      "committed_artifact": {
+        "file": "xgboost_action.joblib",
+        "label_encoder_matches": true,
+        "accuracy": 0.609,
+        "macro_f1": 0.5907,
+        "weighted_f1": 0.6028,
+        "macro_precision": 0.6511,
+        "macro_recall": 0.5805,
+        "inference_time_ms": 0.075
+      },
+      "class_distribution_current": {
+        "RESOLVE_LOCALLY": 0.2166,
+        "APPLY_KM": 0.2059,
+        "TRANSFER_PERIMETER": 0.1713,
+        "ESCALATE_N3": 0.1698,
+        "REQUEST_INFORMATION": 0.1291,
+        "MONITOR": 0.1074
+      },
+      "split_sizes": {
+        "train": 9800,
+        "test": 2100
+      }
+    }
+  },
+  "notes": [
+    "Reproduced = original ml/benchmarks code re-run on the dataset identified by meta.dataset.fingerprint_sha256.",
+    "The committed artifacts were trained on an earlier generator version; their scores here measure behaviour on the current generator, not a re-run of the original test."
+  ]
+}

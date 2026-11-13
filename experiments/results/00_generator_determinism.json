@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "experiment": "00_generator_determinism",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525,
+    "dataset": {
+      "rows": 14000,
+      "fingerprint_sha256": "245b401a533e3667fe69ebbaf029796e68196b3c7255ee82546e65a85f37e2ef"
+    }
+  },
+  "agreement_with_pinned_run": {
+    "same_clock_and_tz_rerun": {
+      "title": 1.0,
+      "description": 1.0,
+      "priority": 1.0,
+      "escalation_required": 1.0,
+      "transfer_required": 1.0,
+      "sla_breached": 1.0,
+      "recommended_action": 1.0,
+      "similar_case_group_id": 1.0,
+      "split": 1.0
+    },
+    "clock_plus_10_minutes": {
+      "title": 0.0416,
+      "description": 0.0006,
+      "priority": 0.4464,
+      "escalation_required": 0.6213,
+      "transfer_required": 0.6339,
+      "sla_breached": 0.6112,
+      "recommended_action": 0.2455,
+      "similar_case_group_id": 0.0091,
+      "split": 0.5491
+    },
+    "clock_plus_1_day": {
+      "title": 1.0,
+      "description": 1.0,
+      "priority": 1.0,
+      "escalation_required": 1.0,
+      "transfer_required": 1.0,
+      "sla_breached": 1.0,
+      "recommended_action": 1.0,
+      "similar_case_group_id": 1.0,
+      "split": 1.0
+    },
+    "same_clock_tz_europe_paris": {
+      "title": 0.0375,
+      "description": 0.0001,
+      "priority": 0.4021,
+      "escalation_required": 0.6177,
+      "transfer_required": 0.6367,
+      "sla_breached": 0.5949,
+      "recommended_action": 0.2296,
+      "similar_case_group_id": 0.0102,
+      "split": 0.5647
+    }
+  },
+  "pinned_fingerprints_identical": true,
+  "committed_csv_vs_pinned_agreement": {
+    "title": 0.0371,
+    "description": 0.0006,
+    "priority": 0.3943,
+    "incident_category": 0.2048,
+    "split": 0.5724
+  },
+  "pinned_dataset_profile": {
+    "rows": 14000,
+    "columns": 41,
+    "positive_rate": {
+      "escalation_required": 0.4,
+      "transfer_required": 0.35,
+      "sla_breached": 0.314
+    },
+    "priority_distribution": {
+      "P3": 0.4214,
+      "P2": 0.272,
+      "P1": 0.1539,
+      "P4": 0.1528
+    },
+    "action_distribution": {
+      "RESOLVE_LOCALLY": 0.2166,
+      "APPLY_KM": 0.2059,
+      "TRANSFER_PERIMETER": 0.1713,
+      "ESCALATE_N3": 0.1698,
+      "REQUEST_INFORMATION": 0.1291,
+      "MONITOR": 0.1074
+    },
+    "raw_perimeter_values": 42,
+    "incident_categories": 86,
+    "share_with_root_cause_suffix": 0.2593,
+    "similar_case_groups": 781,
+    "stores": 36,
+    "missing_rate": {
+      "description": 0.0,
+      "resolution_time_minutes": 0.4018,
+      "resolution_summary": 0.341
+    },
+    "generator_split": {
+      "train": 10287,
+      "validation": 2151,
+      "test": 1562
+    }
+  },
+  "pinned_generated_at": "2026-05-25T00:00:00Z"
+}

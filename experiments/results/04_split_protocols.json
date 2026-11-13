@@ -1,0 +1,1309 @@
+{
+  "meta": {
+    "experiment": "04_split_protocols",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525,
+    "dataset": {
+      "rows": 14000,
+      "fingerprint_sha256": "245b401a533e3667fe69ebbaf029796e68196b3c7255ee82546e65a85f37e2ef"
+    }
+  },
+  "protocol": {
+    "features": "creation_time (see common.py)",
+    "test_size": 0.15,
+    "seeds": [
+      20260525,
+      20260526,
+      20260527
+    ]
+  },
+  "group_counts": {
+    "similar_case_group_id": 781,
+    "store_id": 36
+  },
+  "tasks": {
+    "escalation": {
+      "random": {
+        "split_sizes": [
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 718
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 714
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 716
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.7998,
+              "std": 0.0039
+            },
+            "precision": {
+              "mean": 0.7414,
+              "std": 0.0109
+            },
+            "recall": {
+              "mean": 0.7679,
+              "std": 0.0289
+            },
+            "f1": {
+              "mean": 0.7541,
+              "std": 0.0097
+            },
+            "roc_auc": {
+              "mean": 0.8859,
+              "std": 0.0061
+            },
+            "pr_auc": {
+              "mean": 0.8552,
+              "std": 0.0098
+            },
+            "brier": {
+              "mean": 0.136,
+              "std": 0.003
+            },
+            "positive_rate": {
+              "mean": 0.4,
+              "std": 0.0
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.8013,
+              "std": 0.0058
+            },
+            "precision": {
+              "mean": 0.7412,
+              "std": 0.0136
+            },
+            "recall": {
+              "mean": 0.7738,
+              "std": 0.0156
+            },
+            "f1": {
+              "mean": 0.757,
+              "std": 0.0058
+            },
+            "roc_auc": {
+              "mean": 0.8869,
+              "std": 0.0056
+            },
+            "pr_auc": {
+              "mean": 0.8538,
+              "std": 0.0074
+            },
+            "brier": {
+              "mean": 0.1366,
+              "std": 0.0033
+            },
+            "positive_rate": {
+              "mean": 0.4,
+              "std": 0.0
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "case_group_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11815,
+            "test": 2185,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11896,
+            "test": 2104,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11915,
+            "test": 2085,
+            "test_stores": 36,
+            "test_groups": 118
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.8095,
+              "std": 0.0059
+            },
+            "precision": {
+              "mean": 0.7456,
+              "std": 0.0098
+            },
+            "recall": {
+              "mean": 0.7923,
+              "std": 0.011
+            },
+            "f1": {
+              "mean": 0.7682,
+              "std": 0.0103
+            },
+            "roc_auc": {
+              "mean": 0.8981,
+              "std": 0.0073
+            },
+            "pr_auc": {
+              "mean": 0.8679,
+              "std": 0.0121
+            },
+            "brier": {
+              "mean": 0.1296,
+              "std": 0.0039
+            },
+            "positive_rate": {
+              "mean": 0.3987,
+              "std": 0.0055
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.8125,
+              "std": 0.0067
+            },
+            "precision": {
+              "mean": 0.7472,
+              "std": 0.0109
+            },
+            "recall": {
+              "mean": 0.8002,
+              "std": 0.0119
+            },
+            "f1": {
+              "mean": 0.7728,
+              "std": 0.0113
+            },
+            "roc_auc": {
+              "mean": 0.901,
+              "std": 0.0069
+            },
+            "pr_auc": {
+              "mean": 0.87,
+              "std": 0.0127
+            },
+            "brier": {
+              "mean": 0.1293,
+              "std": 0.0047
+            },
+            "positive_rate": {
+              "mean": 0.3987,
+              "std": 0.0055
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "store_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 735
+          },
+          {
+            "train": 11666,
+            "test": 2334,
+            "test_stores": 6,
+            "test_groups": 742
+          },
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 724
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.8009,
+              "std": 0.0062
+            },
+            "precision": {
+              "mean": 0.7325,
+              "std": 0.0056
+            },
+            "recall": {
+              "mean": 0.7706,
+              "std": 0.0103
+            },
+            "f1": {
+              "mean": 0.7511,
+              "std": 0.0078
+            },
+            "roc_auc": {
+              "mean": 0.8874,
+              "std": 0.0057
+            },
+            "pr_auc": {
+              "mean": 0.8522,
+              "std": 0.0088
+            },
+            "brier": {
+              "mean": 0.1348,
+              "std": 0.0035
+            },
+            "positive_rate": {
+              "mean": 0.3899,
+              "std": 0.005
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.803,
+              "std": 0.0051
+            },
+            "precision": {
+              "mean": 0.7387,
+              "std": 0.0059
+            },
+            "recall": {
+              "mean": 0.7655,
+              "std": 0.0085
+            },
+            "f1": {
+              "mean": 0.7518,
+              "std": 0.0062
+            },
+            "roc_auc": {
+              "mean": 0.8904,
+              "std": 0.0057
+            },
+            "pr_auc": {
+              "mean": 0.8537,
+              "std": 0.0089
+            },
+            "brier": {
+              "mean": 0.1337,
+              "std": 0.0039
+            },
+            "positive_rate": {
+              "mean": 0.3899,
+              "std": 0.005
+            },
+            "n_repeats": 3
+          }
+        }
+      }
+    },
+    "transfer": {
+      "random": {
+        "split_sizes": [
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 713
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 713
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 717
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.7886,
+              "std": 0.0147
+            },
+            "precision": {
+              "mean": 0.6699,
+              "std": 0.0216
+            },
+            "recall": {
+              "mean": 0.7814,
+              "std": 0.0091
+            },
+            "f1": {
+              "mean": 0.7213,
+              "std": 0.0163
+            },
+            "roc_auc": {
+              "mean": 0.8783,
+              "std": 0.0088
+            },
+            "pr_auc": {
+              "mean": 0.8186,
+              "std": 0.009
+            },
+            "brier": {
+              "mean": 0.1407,
+              "std": 0.0049
+            },
+            "positive_rate": {
+              "mean": 0.35,
+              "std": 0.0
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.7865,
+              "std": 0.0111
+            },
+            "precision": {
+              "mean": 0.6656,
+              "std": 0.017
+            },
+            "recall": {
+              "mean": 0.7846,
+              "std": 0.0061
+            },
+            "f1": {
+              "mean": 0.7202,
+              "std": 0.0115
+            },
+            "roc_auc": {
+              "mean": 0.8836,
+              "std": 0.0065
+            },
+            "pr_auc": {
+              "mean": 0.8228,
+              "std": 0.0063
+            },
+            "brier": {
+              "mean": 0.1386,
+              "std": 0.0056
+            },
+            "positive_rate": {
+              "mean": 0.35,
+              "std": 0.0
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "case_group_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11815,
+            "test": 2185,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11896,
+            "test": 2104,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11915,
+            "test": 2085,
+            "test_stores": 36,
+            "test_groups": 118
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.7943,
+              "std": 0.0169
+            },
+            "precision": {
+              "mean": 0.6801,
+              "std": 0.0205
+            },
+            "recall": {
+              "mean": 0.773,
+              "std": 0.018
+            },
+            "f1": {
+              "mean": 0.7233,
+              "std": 0.0064
+            },
+            "roc_auc": {
+              "mean": 0.8815,
+              "std": 0.0119
+            },
+            "pr_auc": {
+              "mean": 0.822,
+              "std": 0.0099
+            },
+            "brier": {
+              "mean": 0.1376,
+              "std": 0.0076
+            },
+            "positive_rate": {
+              "mean": 0.3473,
+              "std": 0.0135
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.7962,
+              "std": 0.0141
+            },
+            "precision": {
+              "mean": 0.6769,
+              "std": 0.0091
+            },
+            "recall": {
+              "mean": 0.7919,
+              "std": 0.0143
+            },
+            "f1": {
+              "mean": 0.7298,
+              "std": 0.0084
+            },
+            "roc_auc": {
+              "mean": 0.886,
+              "std": 0.012
+            },
+            "pr_auc": {
+              "mean": 0.8234,
+              "std": 0.0096
+            },
+            "brier": {
+              "mean": 0.136,
+              "std": 0.0089
+            },
+            "positive_rate": {
+              "mean": 0.3473,
+              "std": 0.0135
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "store_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 735
+          },
+          {
+            "train": 11666,
+            "test": 2334,
+            "test_stores": 6,
+            "test_groups": 742
+          },
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 724
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.788,
+              "std": 0.0058
+            },
+            "precision": {
+              "mean": 0.6759,
+              "std": 0.0093
+            },
+            "recall": {
+              "mean": 0.7545,
+              "std": 0.0078
+            },
+            "f1": {
+              "mean": 0.7131,
+              "std": 0.0086
+            },
+            "roc_auc": {
+              "mean": 0.8742,
+              "std": 0.0061
+            },
+            "pr_auc": {
+              "mean": 0.8179,
+              "std": 0.0059
+            },
+            "brier": {
+              "mean": 0.141,
+              "std": 0.0026
+            },
+            "positive_rate": {
+              "mean": 0.3491,
+              "std": 0.0024
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.7911,
+              "std": 0.0065
+            },
+            "precision": {
+              "mean": 0.6777,
+              "std": 0.0101
+            },
+            "recall": {
+              "mean": 0.7664,
+              "std": 0.0171
+            },
+            "f1": {
+              "mean": 0.7192,
+              "std": 0.0102
+            },
+            "roc_auc": {
+              "mean": 0.878,
+              "std": 0.0072
+            },
+            "pr_auc": {
+              "mean": 0.8186,
+              "std": 0.0107
+            },
+            "brier": {
+              "mean": 0.1398,
+              "std": 0.004
+            },
+            "positive_rate": {
+              "mean": 0.3491,
+              "std": 0.0024
+            },
+            "n_repeats": 3
+          }
+        }
+      }
+    },
+    "sla": {
+      "random": {
+        "split_sizes": [
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 704
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 722
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 715
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.6933,
+              "std": 0.0085
+            },
+            "precision": {
+              "mean": 0.5085,
+              "std": 0.01
+            },
+            "recall": {
+              "mean": 0.6849,
+              "std": 0.0147
+            },
+            "f1": {
+              "mean": 0.5836,
+              "std": 0.0115
+            },
+            "roc_auc": {
+              "mean": 0.7592,
+              "std": 0.0187
+            },
+            "pr_auc": {
+              "mean": 0.5731,
+              "std": 0.0262
+            },
+            "brier": {
+              "mean": 0.1982,
+              "std": 0.0053
+            },
+            "positive_rate": {
+              "mean": 0.3138,
+              "std": 0.0
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.7073,
+              "std": 0.0069
+            },
+            "precision": {
+              "mean": 0.5255,
+              "std": 0.0083
+            },
+            "recall": {
+              "mean": 0.6935,
+              "std": 0.0131
+            },
+            "f1": {
+              "mean": 0.5979,
+              "std": 0.0102
+            },
+            "roc_auc": {
+              "mean": 0.774,
+              "std": 0.0141
+            },
+            "pr_auc": {
+              "mean": 0.5791,
+              "std": 0.0219
+            },
+            "brier": {
+              "mean": 0.1927,
+              "std": 0.0054
+            },
+            "positive_rate": {
+              "mean": 0.3138,
+              "std": 0.0
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "case_group_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11815,
+            "test": 2185,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11896,
+            "test": 2104,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11915,
+            "test": 2085,
+            "test_stores": 36,
+            "test_groups": 118
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.6948,
+              "std": 0.0061
+            },
+            "precision": {
+              "mean": 0.5035,
+              "std": 0.0076
+            },
+            "recall": {
+              "mean": 0.6977,
+              "std": 0.0077
+            },
+            "f1": {
+              "mean": 0.5848,
+              "std": 0.0028
+            },
+            "roc_auc": {
+              "mean": 0.7629,
+              "std": 0.0111
+            },
+            "pr_auc": {
+              "mean": 0.5669,
+              "std": 0.0056
+            },
+            "brier": {
+              "mean": 0.1982,
+              "std": 0.0041
+            },
+            "positive_rate": {
+              "mean": 0.3081,
+              "std": 0.0052
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.7096,
+              "std": 0.0036
+            },
+            "precision": {
+              "mean": 0.521,
+              "std": 0.0078
+            },
+            "recall": {
+              "mean": 0.7125,
+              "std": 0.0091
+            },
+            "f1": {
+              "mean": 0.6018,
+              "std": 0.0025
+            },
+            "roc_auc": {
+              "mean": 0.778,
+              "std": 0.0087
+            },
+            "pr_auc": {
+              "mean": 0.5715,
+              "std": 0.0118
+            },
+            "brier": {
+              "mean": 0.1928,
+              "std": 0.0038
+            },
+            "positive_rate": {
+              "mean": 0.3081,
+              "std": 0.0052
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "store_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 735
+          },
+          {
+            "train": 11666,
+            "test": 2334,
+            "test_stores": 6,
+            "test_groups": 742
+          },
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 724
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.7086,
+              "std": 0.0042
+            },
+            "precision": {
+              "mean": 0.5385,
+              "std": 0.0031
+            },
+            "recall": {
+              "mean": 0.718,
+              "std": 0.0056
+            },
+            "f1": {
+              "mean": 0.6154,
+              "std": 0.0004
+            },
+            "roc_auc": {
+              "mean": 0.777,
+              "std": 0.0053
+            },
+            "pr_auc": {
+              "mean": 0.6031,
+              "std": 0.01
+            },
+            "brier": {
+              "mean": 0.1937,
+              "std": 0.0023
+            },
+            "positive_rate": {
+              "mean": 0.3247,
+              "std": 0.0033
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.7234,
+              "std": 0.0094
+            },
+            "precision": {
+              "mean": 0.5578,
+              "std": 0.0092
+            },
+            "recall": {
+              "mean": 0.7171,
+              "std": 0.0025
+            },
+            "f1": {
+              "mean": 0.6275,
+              "std": 0.0059
+            },
+            "roc_auc": {
+              "mean": 0.7887,
+              "std": 0.0065
+            },
+            "pr_auc": {
+              "mean": 0.6051,
+              "std": 0.0146
+            },
+            "brier": {
+              "mean": 0.1887,
+              "std": 0.0043
+            },
+            "positive_rate": {
+              "mean": 0.3247,
+              "std": 0.0033
+            },
+            "n_repeats": 3
+          }
+        }
+      }
+    },
+    "priority": {
+      "random": {
+        "split_sizes": [
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 711
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 706
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 706
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.6487,
+              "std": 0.0046
+            },
+            "macro_f1": {
+              "mean": 0.564,
+              "std": 0.0021
+            },
+            "weighted_f1": {
+              "mean": 0.6012,
+              "std": 0.0038
+            },
+            "macro_precision": {
+              "mean": 0.7809,
+              "std": 0.003
+            },
+            "macro_recall": {
+              "mean": 0.5649,
+              "std": 0.0054
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.5911,
+              "std": 0.0065
+            },
+            "macro_f1": {
+              "mean": 0.6125,
+              "std": 0.0067
+            },
+            "weighted_f1": {
+              "mean": 0.5894,
+              "std": 0.0088
+            },
+            "macro_precision": {
+              "mean": 0.6062,
+              "std": 0.0074
+            },
+            "macro_recall": {
+              "mean": 0.6532,
+              "std": 0.0013
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "case_group_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11815,
+            "test": 2185,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11896,
+            "test": 2104,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11915,
+            "test": 2085,
+            "test_stores": 36,
+            "test_groups": 118
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.6397,
+              "std": 0.0064
+            },
+            "macro_f1": {
+              "mean": 0.5466,
+              "std": 0.0083
+            },
+            "weighted_f1": {
+              "mean": 0.5897,
+              "std": 0.0093
+            },
+            "macro_precision": {
+              "mean": 0.7626,
+              "std": 0.0101
+            },
+            "macro_recall": {
+              "mean": 0.5526,
+              "std": 0.0049
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.5914,
+              "std": 0.0081
+            },
+            "macro_f1": {
+              "mean": 0.6068,
+              "std": 0.0061
+            },
+            "weighted_f1": {
+              "mean": 0.5911,
+              "std": 0.0084
+            },
+            "macro_precision": {
+              "mean": 0.6028,
+              "std": 0.004
+            },
+            "macro_recall": {
+              "mean": 0.6443,
+              "std": 0.0027
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "store_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 735
+          },
+          {
+            "train": 11666,
+            "test": 2334,
+            "test_stores": 6,
+            "test_groups": 742
+          },
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 724
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.6427,
+              "std": 0.0076
+            },
+            "macro_f1": {
+              "mean": 0.563,
+              "std": 0.0078
+            },
+            "weighted_f1": {
+              "mean": 0.5967,
+              "std": 0.0118
+            },
+            "macro_precision": {
+              "mean": 0.7686,
+              "std": 0.0053
+            },
+            "macro_recall": {
+              "mean": 0.5621,
+              "std": 0.0028
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.5937,
+              "std": 0.0034
+            },
+            "macro_f1": {
+              "mean": 0.6143,
+              "std": 0.0054
+            },
+            "weighted_f1": {
+              "mean": 0.5924,
+              "std": 0.003
+            },
+            "macro_precision": {
+              "mean": 0.6071,
+              "std": 0.0058
+            },
+            "macro_recall": {
+              "mean": 0.6492,
+              "std": 0.0048
+            },
+            "n_repeats": 3
+          }
+        }
+      }
+    },
+    "action": {
+      "random": {
+        "split_sizes": [
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 720
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 714
+          },
+          {
+            "train": 11900,
+            "test": 2100,
+            "test_stores": 36,
+            "test_groups": 715
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.5889,
+              "std": 0.0026
+            },
+            "macro_f1": {
+              "mean": 0.5883,
+              "std": 0.0034
+            },
+            "weighted_f1": {
+              "mean": 0.5937,
+              "std": 0.0023
+            },
+            "macro_precision": {
+              "mean": 0.6672,
+              "std": 0.003
+            },
+            "macro_recall": {
+              "mean": 0.5649,
+              "std": 0.0033
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.5659,
+              "std": 0.0146
+            },
+            "macro_f1": {
+              "mean": 0.565,
+              "std": 0.0148
+            },
+            "weighted_f1": {
+              "mean": 0.5711,
+              "std": 0.014
+            },
+            "macro_precision": {
+              "mean": 0.5753,
+              "std": 0.0151
+            },
+            "macro_recall": {
+              "mean": 0.5608,
+              "std": 0.0145
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "case_group_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11815,
+            "test": 2185,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11896,
+            "test": 2104,
+            "test_stores": 36,
+            "test_groups": 118
+          },
+          {
+            "train": 11915,
+            "test": 2085,
+            "test_stores": 36,
+            "test_groups": 118
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.5911,
+              "std": 0.0058
+            },
+            "macro_f1": {
+              "mean": 0.5891,
+              "std": 0.0047
+            },
+            "weighted_f1": {
+              "mean": 0.5944,
+              "std": 0.0055
+            },
+            "macro_precision": {
+              "mean": 0.6674,
+              "std": 0.0064
+            },
+            "macro_recall": {
+              "mean": 0.569,
+              "std": 0.0041
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.5629,
+              "std": 0.0101
+            },
+            "macro_f1": {
+              "mean": 0.5643,
+              "std": 0.0102
+            },
+            "weighted_f1": {
+              "mean": 0.5675,
+              "std": 0.0103
+            },
+            "macro_precision": {
+              "mean": 0.576,
+              "std": 0.0109
+            },
+            "macro_recall": {
+              "mean": 0.5596,
+              "std": 0.0092
+            },
+            "n_repeats": 3
+          }
+        }
+      },
+      "store_disjoint": {
+        "split_sizes": [
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 735
+          },
+          {
+            "train": 11666,
+            "test": 2334,
+            "test_stores": 6,
+            "test_groups": 742
+          },
+          {
+            "train": 11667,
+            "test": 2333,
+            "test_stores": 6,
+            "test_groups": 724
+          }
+        ],
+        "models": {
+          "XGBoost": {
+            "accuracy": {
+              "mean": 0.5919,
+              "std": 0.0143
+            },
+            "macro_f1": {
+              "mean": 0.5904,
+              "std": 0.0113
+            },
+            "weighted_f1": {
+              "mean": 0.5969,
+              "std": 0.0136
+            },
+            "macro_precision": {
+              "mean": 0.6624,
+              "std": 0.0053
+            },
+            "macro_recall": {
+              "mean": 0.5663,
+              "std": 0.0118
+            },
+            "n_repeats": 3
+          },
+          "Logistic Regression": {
+            "accuracy": {
+              "mean": 0.5661,
+              "std": 0.0073
+            },
+            "macro_f1": {
+              "mean": 0.5648,
+              "std": 0.0104
+            },
+            "weighted_f1": {
+              "mean": 0.5725,
+              "std": 0.0064
+            },
+            "macro_precision": {
+              "mean": 0.5754,
+              "std": 0.011
+            },
+            "macro_recall": {
+              "mean": 0.5621,
+              "std": 0.0091
+            },
+            "n_repeats": 3
+          }
+        }
+      }
+    }
+  }
+}

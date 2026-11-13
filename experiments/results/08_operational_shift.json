@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "experiment": "08_operational_shift",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525,
+    "dataset": {
+      "rows": 14000,
+      "fingerprint_sha256": "245b401a533e3667fe69ebbaf029796e68196b3c7255ee82546e65a85f37e2ef"
+    }
+  },
+  "vocabulary_coverage": {
+    "training_distribution_test_split": {
+      "mean_unigram_coverage": 0.824,
+      "share_all_zero_tfidf": 0.0,
+      "n": 2100
+    },
+    "operational_care_tickets": {
+      "mean_unigram_coverage": 0.2927,
+      "share_all_zero_tfidf": 0.0,
+      "n": 70
+    }
+  },
+  "operational_escalation": {
+    "n": 70,
+    "label_positive_rate": 0.2143,
+    "probability": {
+      "min": 0.1329,
+      "median": 0.1853,
+      "max": 0.3236
+    },
+    "model_positive_at_0.45": 0,
+    "stored_positive_after_calibration": 2,
+    "recall_of_stored_decision": 0.0,
+    "roc_auc": 0.4606,
+    "roc_auc_ci95": [
+      0.29973102088057446,
+      0.6233570402298851
+    ],
+    "model_version": "xgboost_escalation_v1+cal_v1"
+  },
+  "notes": [
+    "Labels are the hand-authored catalog values in care_source.tickets; n is small, treat as a sanity check, not a benchmark."
+  ]
+}

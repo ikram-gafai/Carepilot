@@ -44,13 +44,28 @@ async function main() {
   const total = Number(argValue("size") ?? process.env.ML_TRAINING_SIZE ?? 14000)
   const seed = Number(argValue("seed") ?? process.env.ML_TRAINING_SEED ?? 20260525)
   const noiseLevel = parseNoiseLevel(argValue("noise") ?? process.env.ML_TRAINING_NOISE)
+  // The generator derives timestamps (and, through hour-of-day branches, the number of PRNG draws)
+  // from `generatedAt`. Pinning it (plus TZ=UTC) makes the dataset a pure function of the seed.
+  // Default stays `new Date()` so existing behaviour is unchanged.
+  const generatedAtRaw = argValue("generated-at") ?? process.env.ML_TRAINING_GENERATED_AT
+  const generatedAt = generatedAtRaw ? new Date(generatedAtRaw) : undefined
+  if (generatedAt && Number.isNaN(generatedAt.getTime())) {
+    throw new Error(`Invalid --generated-at / ML_TRAINING_GENERATED_AT value: ${generatedAtRaw}`)
+  }
 
   const sql = getSql()
   const ddl = readFileSync(join(process.cwd(), "sql", "ensure-ml-training.sql"), "utf8")
   await sql.unsafe(ddl)
+  // `missing_information_labels` is inserted below but only created by patch 020; apply it so a
+  // fresh database can be seeded in one step (the patch is idempotent).
+  const missingInfoPatch = readFileSync(
+    join(process.cwd(), "sql", "patches", "020_ml_training_missing_information_labels.sql"),
+    "utf8",
+  )
+  await sql.unsafe(missingInfoPatch)
 
   const db = getDb()
-  const dataset = generateMlTrainingDataset({ size: total, seed, noiseLevel })
+  const dataset = generateMlTrainingDataset({ size: total, seed, noiseLevel, generatedAt })
 
   await sql`
     TRUNCATE

@@ -1,0 +1,451 @@
+{
+  "meta": {
+    "experiment": "06_inference_robustness",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525,
+    "dataset": {
+      "rows": 14000,
+      "fingerprint_sha256": "245b401a533e3667fe69ebbaf029796e68196b3c7255ee82546e65a85f37e2ef"
+    }
+  },
+  "tasks": {
+    "escalation": {
+      "empty_batch": {
+        "exit_code": 0,
+        "latency_ms": 1815.2693,
+        "ok": true,
+        "n_predictions": 0,
+        "scores_in_unit_interval": null
+      },
+      "single_valid_ticket": {
+        "exit_code": 0,
+        "latency_ms": 1671.4765,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "batch_of_50": {
+        "exit_code": 0,
+        "latency_ms": 1631.3004,
+        "ok": true,
+        "n_predictions": 50,
+        "scores_in_unit_interval": true
+      },
+      "nulls_for_optional_fields": {
+        "exit_code": 0,
+        "latency_ms": 1596.744,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "unseen_categories": {
+        "exit_code": 0,
+        "latency_ms": 1696.379,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "empty_strings": {
+        "exit_code": 0,
+        "latency_ms": 1603.8618,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "very_long_description_50k_chars": {
+        "exit_code": 0,
+        "latency_ms": 1714.0321,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "non_ascii_french_text": {
+        "exit_code": 0,
+        "latency_ms": 1628.3857,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "string_in_numeric_field": {
+        "exit_code": 0,
+        "latency_ms": 1615.4654,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "missing_required_key": {
+        "exit_code": 1,
+        "latency_ms": 1616.1012,
+        "ok": false,
+        "error": "KeyError: 'incident_category'"
+      },
+      "malformed_json": {
+        "exit_code": 1,
+        "latency_ms": 1427.6027,
+        "ok": false,
+        "error": "Invalid JSON input: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+      },
+      "wrong_top_level_shape": {
+        "exit_code": 1,
+        "latency_ms": 1470.0829,
+        "ok": false,
+        "error": "Expected { \"tickets\": [...] }"
+      },
+      "determinism_same_batch_twice": {
+        "identical_outputs": true
+      }
+    },
+    "transfer": {
+      "empty_batch": {
+        "exit_code": 0,
+        "latency_ms": 1636.224,
+        "ok": true,
+        "n_predictions": 0,
+        "scores_in_unit_interval": null
+      },
+      "single_valid_ticket": {
+        "exit_code": 0,
+        "latency_ms": 1657.685,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "batch_of_50": {
+        "exit_code": 0,
+        "latency_ms": 1682.2508,
+        "ok": true,
+        "n_predictions": 50,
+        "scores_in_unit_interval": true
+      },
+      "nulls_for_optional_fields": {
+        "exit_code": 0,
+        "latency_ms": 1610.7751,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "unseen_categories": {
+        "exit_code": 0,
+        "latency_ms": 1706.6405,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "empty_strings": {
+        "exit_code": 0,
+        "latency_ms": 1640.9631,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "very_long_description_50k_chars": {
+        "exit_code": 0,
+        "latency_ms": 1699.8243,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "non_ascii_french_text": {
+        "exit_code": 0,
+        "latency_ms": 1713.5812,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "string_in_numeric_field": {
+        "exit_code": 0,
+        "latency_ms": 1776.715,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "missing_required_key": {
+        "exit_code": 1,
+        "latency_ms": 1695.985,
+        "ok": false,
+        "error": "KeyError: 'incident_category'"
+      },
+      "malformed_json": {
+        "exit_code": 1,
+        "latency_ms": 1439.4127,
+        "ok": false,
+        "error": "Invalid JSON input: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+      },
+      "wrong_top_level_shape": {
+        "exit_code": 1,
+        "latency_ms": 1485.6417,
+        "ok": false,
+        "error": "Expected { \"tickets\": [...] }"
+      },
+      "determinism_same_batch_twice": {
+        "identical_outputs": true
+      }
+    },
+    "sla": {
+      "empty_batch": {
+        "exit_code": 0,
+        "latency_ms": 1624.7903,
+        "ok": true,
+        "n_predictions": 0,
+        "scores_in_unit_interval": null
+      },
+      "single_valid_ticket": {
+        "exit_code": 0,
+        "latency_ms": 1647.7382,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "batch_of_50": {
+        "exit_code": 0,
+        "latency_ms": 1635.6689,
+        "ok": true,
+        "n_predictions": 50,
+        "scores_in_unit_interval": true
+      },
+      "nulls_for_optional_fields": {
+        "exit_code": 0,
+        "latency_ms": 1626.339,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "unseen_categories": {
+        "exit_code": 0,
+        "latency_ms": 1615.0648,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "empty_strings": {
+        "exit_code": 0,
+        "latency_ms": 1680.8486,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "very_long_description_50k_chars": {
+        "exit_code": 0,
+        "latency_ms": 1662.0793,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "non_ascii_french_text": {
+        "exit_code": 0,
+        "latency_ms": 1608.6878,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "string_in_numeric_field": {
+        "exit_code": 0,
+        "latency_ms": 1603.3154,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "missing_required_key": {
+        "exit_code": 1,
+        "latency_ms": 1627.5438,
+        "ok": false,
+        "error": "KeyError: 'incident_category'"
+      },
+      "malformed_json": {
+        "exit_code": 1,
+        "latency_ms": 1414.0306,
+        "ok": false,
+        "error": "Invalid JSON input: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+      },
+      "wrong_top_level_shape": {
+        "exit_code": 1,
+        "latency_ms": 1451.8528,
+        "ok": false,
+        "error": "Expected { \"tickets\": [...] }"
+      },
+      "determinism_same_batch_twice": {
+        "identical_outputs": true
+      }
+    },
+    "priority": {
+      "empty_batch": {
+        "exit_code": 0,
+        "latency_ms": 1584.5893,
+        "ok": true,
+        "n_predictions": 0,
+        "scores_in_unit_interval": null
+      },
+      "single_valid_ticket": {
+        "exit_code": 0,
+        "latency_ms": 1588.0997,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "batch_of_50": {
+        "exit_code": 0,
+        "latency_ms": 1778.8086,
+        "ok": true,
+        "n_predictions": 50,
+        "scores_in_unit_interval": true
+      },
+      "nulls_for_optional_fields": {
+        "exit_code": 0,
+        "latency_ms": 1679.6906,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "unseen_categories": {
+        "exit_code": 0,
+        "latency_ms": 1653.853,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "empty_strings": {
+        "exit_code": 0,
+        "latency_ms": 1709.6661,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "very_long_description_50k_chars": {
+        "exit_code": 0,
+        "latency_ms": 1709.2767,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "non_ascii_french_text": {
+        "exit_code": 0,
+        "latency_ms": 1661.5956,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "string_in_numeric_field": {
+        "exit_code": 0,
+        "latency_ms": 1624.3897,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "missing_required_key": {
+        "exit_code": 1,
+        "latency_ms": 1624.7508,
+        "ok": false,
+        "error": "KeyError: 'incident_category'"
+      },
+      "malformed_json": {
+        "exit_code": 1,
+        "latency_ms": 1413.0184,
+        "ok": false,
+        "error": "Invalid JSON input: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+      },
+      "wrong_top_level_shape": {
+        "exit_code": 1,
+        "latency_ms": 1432.9414,
+        "ok": false,
+        "error": "Expected { \"tickets\": [...] }"
+      },
+      "determinism_same_batch_twice": {
+        "identical_outputs": true
+      }
+    },
+    "action": {
+      "empty_batch": {
+        "exit_code": 0,
+        "latency_ms": 1687.5839,
+        "ok": true,
+        "n_predictions": 0,
+        "scores_in_unit_interval": null
+      },
+      "single_valid_ticket": {
+        "exit_code": 0,
+        "latency_ms": 1597.6007,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "batch_of_50": {
+        "exit_code": 0,
+        "latency_ms": 1863.0804,
+        "ok": true,
+        "n_predictions": 50,
+        "scores_in_unit_interval": true
+      },
+      "nulls_for_optional_fields": {
+        "exit_code": 0,
+        "latency_ms": 1761.3519,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "unseen_categories": {
+        "exit_code": 0,
+        "latency_ms": 1612.4154,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "empty_strings": {
+        "exit_code": 0,
+        "latency_ms": 1655.2322,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "very_long_description_50k_chars": {
+        "exit_code": 0,
+        "latency_ms": 1628.311,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "non_ascii_french_text": {
+        "exit_code": 0,
+        "latency_ms": 1624.2948,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "string_in_numeric_field": {
+        "exit_code": 0,
+        "latency_ms": 1689.751,
+        "ok": true,
+        "n_predictions": 1,
+        "scores_in_unit_interval": true
+      },
+      "missing_required_key": {
+        "exit_code": 1,
+        "latency_ms": 1675.6086,
+        "ok": false,
+        "error": "KeyError: 'incident_category'"
+      },
+      "malformed_json": {
+        "exit_code": 1,
+        "latency_ms": 1476.9973,
+        "ok": false,
+        "error": "Invalid JSON input: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+      },
+      "wrong_top_level_shape": {
+        "exit_code": 1,
+        "latency_ms": 1404.9842,
+        "ok": false,
+        "error": "Expected { \"tickets\": [...] }"
+      },
+      "determinism_same_batch_twice": {
+        "identical_outputs": true
+      }
+    }
+  },
+  "python": "3.13.7"
+}

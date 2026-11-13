@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "experiment": "07_llm_rubric_audit",
+    "environment": {
+      "python": "3.13.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.3.2",
+      "pandas": "2.3.3",
+      "scikit_learn": "1.7.2",
+      "xgboost": "3.1.2"
+    },
+    "random_state": 20260525
+  },
+  "n_cases": 50,
+  "reported_llm_scores": {
+    "Mistral": {
+      "clarity": 4.3,
+      "relevance": 3.9,
+      "completeness": 4.55,
+      "hallucination_control": 4.0,
+      "overall": 4.07
+    },
+    "Llama3": {
+      "clarity": 4.3,
+      "relevance": 3.9,
+      "completeness": 4.55,
+      "hallucination_control": 4.0,
+      "overall": 4.07
+    },
+    "DeepSeek R1": {
+      "clarity": 4.0,
+      "relevance": 3.74,
+      "completeness": 3.98,
+      "hallucination_control": 4.0,
+      "overall": 3.86
+    }
+  },
+  "strategies": {
+    "template_fallback": {
+      "mean_scores": {
+        "clarity": 3.8,
+        "relevance": 3.6944,
+        "completeness": 4.55,
+        "consistency": 3.6,
+        "hallucination_control": 4.0,
+        "overall": 3.9278
+      },
+      "hallucination_flag_rate": 0.0
+    },
+    "format_only_filler": {
+      "mean_scores": {
+        "clarity": 4.3,
+        "relevance": 3.224,
+        "completeness": 4.55,
+        "consistency": 3.6,
+        "hallucination_control": 4.0,
+        "overall": 3.9344
+      },
+      "hallucination_flag_rate": 0.0
+    },
+    "filler_with_fabrication": {
+      "mean_scores": {
+        "clarity": 4.3,
+        "relevance": 3.2928,
+        "completeness": 4.55,
+        "consistency": 3.6,
+        "hallucination_control": 4.0,
+        "overall": 3.9482
+      },
+      "hallucination_flag_rate": 0.0
+    },
+    "contradiction": {
+      "mean_scores": {
+        "clarity": 4.3,
+        "relevance": 3.2512,
+        "completeness": 4.55,
+        "consistency": 3.6,
+        "hallucination_control": 4.0,
+        "overall": 3.9396
+      },
+      "hallucination_flag_rate": 0.0
+    },
+    "empty": {
+      "mean_scores": {
+        "clarity": 3.2,
+        "relevance": 3.0,
+        "completeness": 2.8,
+        "consistency": 3.6,
+        "hallucination_control": 4.0,
+        "overall": 3.32
+      },
+      "hallucination_flag_rate": 0.0
+    }
+  },
+  "contexts_asserting_escalation": 0
+}
